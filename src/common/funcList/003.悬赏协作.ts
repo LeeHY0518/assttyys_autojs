@@ -257,6 +257,8 @@ export class Func003 implements IFuncOrigin {
 				const y0 = Math.round(dh * 0.62);
 				const y1 = Math.round(dh * 0.78);
 				let gold = 0;
+				let gold2 = 0;
+				let purple = 0;
 				let dark = 0;
 				for (let y = y0; y <= y1; y += 4) {
 					for (let x = x0; x <= x1; x += 4) {
@@ -267,14 +269,62 @@ export class Func003 implements IFuncOrigin {
 						if (r > 130 && g > 70 && b < 100 && r - b > 50 && r - g < 130) {
 							gold++;
 						}
+						if (r > 165 && g > 140 && b < 160 && r - b > 45 && g - b > 20) {
+							gold2++;
+						}
+						if (b > 95 && b - r > 20 && r < 150 && g < 130) {
+							purple++;
+						}
 						if (r < 75 && g < 75 && b < 75) {
 							dark++;
 						}
 					}
 				}
+				// 诊断：把奖励整片区域分成上下两带、每带 20 列，逐列算平均色。
+				// 目的：直接看出「碎片(深紫)」「勾玉(红)」「金币(金)」这几个图标各在哪一列、什么颜色。
+				const bx0 = Math.round(dw * 0.35);
+				const bx1 = Math.round(dw * 0.68);
+				const colN = 20;
+				const bandRanges = [[0.46, 0.68], [0.68, 0.86]];
+				let bandLog = '';
+				for (let bi = 0; bi < bandRanges.length; bi++) {
+					const by0 = Math.round(dh * bandRanges[bi][0]);
+					const by1 = Math.round(dh * bandRanges[bi][1]);
+					const rArr: number[] = [];
+					const gArr: number[] = [];
+					const bArr: number[] = [];
+					for (let j = 0; j < colN; j++) {
+						const cx0 = Math.round(bx0 + (bx1 - bx0) * j / colN);
+						const cx1 = Math.round(bx0 + (bx1 - bx0) * (j + 1) / colN);
+						let sr = 0;
+						let sg = 0;
+						let sb = 0;
+						let n = 0;
+						for (let y = by0; y < by1; y += 3) {
+							for (let x = cx0; x < cx1; x += 3) {
+								const c2 = bmp.getPixel(x, y);
+								sr += (c2 >> 16) & 0xff;
+								sg += (c2 >> 8) & 0xff;
+								sb += c2 & 0xff;
+								n++;
+							}
+						}
+						if (n < 1) {
+							n = 1;
+						}
+						rArr.push(Math.round(sr / n));
+						gArr.push(Math.round(sg / n));
+						bArr.push(Math.round(sb / n));
+					}
+					bandLog += '带' + bi + 'R:' + rArr.join(' ') + '\n';
+					bandLog += '带' + bi + 'G:' + gArr.join(' ') + '\n';
+					bandLog += '带' + bi + 'B:' + bArr.join(' ') + '\n';
+				}
 				bmp.recycle();
-				console.log('金色=' + gold + ' 深色=' + dark);
-				return gold >= 40 && dark >= 15;
+				console.log('位图=' + dw + 'x' + dh);
+				console.log('金色=' + gold + ' 深金=' + gold2 + ' 紫=' + purple + ' 深色=' + dark);
+				console.log('区域x:' + bx0 + '-' + bx1 + '\n' + bandLog);
+				return gold >= 90;
 			} catch (e) {
 				if (bmp) {
 					bmp.recycle();
