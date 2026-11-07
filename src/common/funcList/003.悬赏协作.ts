@@ -160,15 +160,18 @@ export class Func003 implements IFuncOrigin {
 			return false;
 		}
 
-		// 先确认弹窗确实存在，避免误点其它界面上的同名按钮
+		// 先确认弹窗确实存在，避免误点其它界面上的同名按钮。
+		// 注意：OCR 常把「赏」认成繁体「賞」，还会把「封印」拆开或认错，
+		// 所以标题判据放宽——只认「封」这个在多次识别里都稳定的字；
+		// 「邀约协作」同理，只认「邀」。
 		let dialogType = '';
 		for (let i = 0; i < ocrResult.length; i++) {
 			const label = ocrResult[i].label.replace(/\s/g, '');
-			if (label.indexOf('悬赏封印') > -1) {
+			if (label.indexOf('封') > -1) {
 				dialogType = '悬赏协作';
 				break;
 			}
-			if (label.indexOf('邀约协作') > -1) {
+			if (label.indexOf('邀') > -1) {
 				dialogType = '邀约协作';
 				break;
 			}
@@ -189,6 +192,11 @@ export class Func003 implements IFuncOrigin {
 			return null;
 		};
 
+		// 标题判据放宽后可能误命中其它界面，再要求弹窗上确实认出了按钮文字才算数
+		if (dialogType === '悬赏协作' && !findLabel(['接受', '拒绝', '取消', '关闭', '拒'])) {
+			return false;
+		}
+
 		// OCR 返回的是当前设备的真实坐标，直接交给点击器，不能再做开发分辨率换算
 		const clickLabel = (item: any) => {
 			const p = item.points;
@@ -202,7 +210,7 @@ export class Func003 implements IFuncOrigin {
 		// 关闭：先找文字，找不到再用兜底坐标
 		const doClose = () => {
 			// 这类邀约弹窗通常只有「接受 / 拒绝」两个按钮，点「拒绝」等同于关掉邀请
-			const btn = findLabel(['关闭', '取消', '拒绝']);
+			const btn = findLabel(['关闭', '取消', '拒绝', '拒']);
 			if (btn) {
 				clickLabel(btn);
 				return true;
