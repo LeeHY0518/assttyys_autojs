@@ -18,242 +18,242 @@ let lastOcrTime = 0;
  * 按钮文字基本不随 UI 改版而变，抗变化能力更强。
  */
 export class Func003 implements IFuncOrigin {
- id = 3;
- name = '悬赏协作';
- config = [{
- desc: '',
- config: [{
- name: 'type',
- desc: '操作',
- type: 'list',
- data: ['关闭', '接受', '拒绝'],
- default: '关闭',
- }, {
- name: 'switch',
- desc: '仅接受勾协',
- type: 'switch',
- default: false,
- }]
- }, {
- desc: '邀约协作（活动）',
- config: [{
- name: 'yytype',
- desc: '操作',
- type: 'list',
- data: ['关闭', '接受', '拒绝'],
- default: '关闭'
- }]
- }];
- // 算子表：desc 只能写「数组」或「不写」。
- // 写成字符串会被框架拿去 multiDetectColors.ts 里查表，查不到会直接抛错。
- // 第 0 项只用于提供「关闭按钮」的兜底坐标，不做比色匹配，因此不写 desc。
- operator: IFuncOperatorOrigin[] = [{
- // 0 悬赏协作弹窗 关闭兜底（仅提供坐标，不做比色）
- oper: [
- [center, 1280, 720, 791, 81, 816, 109, 1000],
- [center, 1280, 720, 1209, 66, 1260, 113, 1000],
- ]
- }, { // 1 阴阳寮成就页等杂弹窗，点空白处清掉
- desc: [
- 1280, 720,
- [
- [right, 1055, 230, 0x997242],
- [right, 1072, 462, 0xecd7b9],
- [center, 347, 490, 0xb8a281],
- [center, 357, 240, 0xf5ebd5],
- [center, 830, 150, 0xefe4d0],
- [center, 697, 172, 0x805054],
- [center, 827, 230, 0xb58a55],
- ]
- ],
- oper: [
- [center, 1280, 720, 357, 535, 1045, 662, 1200]
- ]
- }, { // 2 呱太弹窗
- desc: [1280, 720,
- [
- [center, 568, 225, 0xb7b052],
- [center, 733, 228, 0x4d4da2],
- [center, 756, 236, 0xc0c45e],
- [center, 879, 323, 0x690707],
- [center, 690, 422, 0xd3ae72]
- ]
- ],
- oper: [
- [center, 1280, 720, 517, 521, 841, 689, 1000],
- [center, 1280, 720, 509, 650, 912, 716, 1000]
- ]
- }, { // 3 其他设备登录(被顶掉)
- desc: [
- 1280, 720,
- [
- [center, 437, 258, 0x624333],
- [center, 841, 257, 0x664535],
- [center, 457, 289, 0xcbb59c],
- [center, 819, 428, 0xcbb59c],
- [center, 484, 329, 0x584f45],
- [center, 733, 322, 0x2b2723],
- [center, 581, 379, 0x963a2d],
- [center, 700, 428, 0x973c2e],
- ]
- ],
- oper: [
- [center, 1280, 720, 584, 382, 700, 429, 1000],
- ]
- }];
+	id = 3;
+	name = '悬赏协作';
+	config = [{
+		desc: '',
+		config: [{
+			name: 'type',
+			desc: '操作',
+			type: 'list',
+			data: ['关闭', '接受', '拒绝'],
+			default: '关闭',
+		}, {
+			name: 'switch',
+			desc: '仅接受勾协',
+			type: 'switch',
+			default: false,
+		}]
+	}, {
+		desc: '邀约协作（活动）',
+		config: [{
+			name: 'yytype',
+			desc: '操作',
+			type: 'list',
+			data: ['关闭', '接受', '拒绝'],
+			default: '关闭'
+		}]
+	}];
+	// 算子表：desc 只能写「数组」或「不写」。
+	// 写成字符串会被框架拿去 multiDetectColors.ts 里查表，查不到会直接抛错。
+	// 第 0 项只用于提供「关闭按钮」的兜底坐标，不做比色匹配，因此不写 desc。
+	operator: IFuncOperatorOrigin[] = [{
+		// 0 悬赏协作弹窗 关闭兜底（仅提供坐标，不做比色）
+		oper: [
+			[center, 1280, 720, 791, 81, 816, 109, 1000],
+			[center, 1280, 720, 1209, 66, 1260, 113, 1000],
+		]
+	}, { // 1 阴阳寮成就页等杂弹窗，点空白处清掉
+		desc: [
+			1280, 720,
+			[
+				[right, 1055, 230, 0x997242],
+				[right, 1072, 462, 0xecd7b9],
+				[center, 347, 490, 0xb8a281],
+				[center, 357, 240, 0xf5ebd5],
+				[center, 830, 150, 0xefe4d0],
+				[center, 697, 172, 0x805054],
+				[center, 827, 230, 0xb58a55],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 357, 535, 1045, 662, 1200]
+		]
+	}, { // 2 呱太弹窗
+		desc: [1280, 720,
+			[
+				[center, 568, 225, 0xb7b052],
+				[center, 733, 228, 0x4d4da2],
+				[center, 756, 236, 0xc0c45e],
+				[center, 879, 323, 0x690707],
+				[center, 690, 422, 0xd3ae72]
+			]
+		],
+		oper: [
+			[center, 1280, 720, 517, 521, 841, 689, 1000],
+			[center, 1280, 720, 509, 650, 912, 716, 1000]
+		]
+	}, { // 3 其他设备登录(被顶掉)
+		desc: [
+			1280, 720,
+			[
+				[center, 437, 258, 0x624333],
+				[center, 841, 257, 0x664535],
+				[center, 457, 289, 0xcbb59c],
+				[center, 819, 428, 0xcbb59c],
+				[center, 484, 329, 0x584f45],
+				[center, 733, 322, 0x2b2723],
+				[center, 581, 379, 0x963a2d],
+				[center, 700, 428, 0x973c2e],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 584, 382, 700, 429, 1000],
+		]
+	}];
 
- operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
- const thisconf = thisScript.scheme.config['3'];
- if (!thisconf) {
- return false;
- }
- // 顺手清掉挡路的杂弹窗（阴阳寮成就页、呱太弹窗）
- if (thisScript.oper({
- id: 3,
- name: '清除垃圾弹窗',
- operator: [thisOperator[1], thisOperator[2]]
- })) {
- return true;
- }
- // 被其它设备顶号：停止脚本并推送
- if (thisScript.oper({
- id: 3,
- name: '意外情况,停止脚本',
- operator: [thisOperator[3]]
- })) {
- thisScript.doPush(thisScript, { text: '意外情况已停止，请查看。', before() { thisScript.myToast('脚本即将停止，正在上传数据'); } });
- thisScript.stop();
- sleep(3000);
- return true;
- }
- // 节流：两次 OCR 至少间隔 800ms，避免拉高 CPU 占用
- const nowTime = new Date().getTime();
- if (nowTime - lastOcrTime < 800) {
- return false;
- }
- // 优先用设置里选定的 OCR 引擎；没有配置时退回 MLKit，避免功能静默失效
- let detector = thisScript.getOcrDetector();
- if (!detector) {
- try {
- detector = mlkitOcr.prepare();
- } catch (e) {
- console.error($debug.getStackTrace(e));
- }
- }
- if (!detector) {
- return false;
- }
- lastOcrTime = nowTime;
+	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
+		const thisconf = thisScript.scheme.config['3'];
+		if (!thisconf) {
+			return false;
+		}
+		// 顺手清掉挡路的杂弹窗（阴阳寮成就页、呱太弹窗）
+		if (thisScript.oper({
+			id: 3,
+			name: '清除垃圾弹窗',
+			operator: [thisOperator[1], thisOperator[2]]
+		})) {
+			return true;
+		}
+		// 被其它设备顶号：停止脚本并推送
+		if (thisScript.oper({
+			id: 3,
+			name: '意外情况,停止脚本',
+			operator: [thisOperator[3]]
+		})) {
+			thisScript.doPush(thisScript, { text: '意外情况已停止，请查看。', before() { thisScript.myToast('脚本即将停止，正在上传数据'); } });
+			thisScript.stop();
+			sleep(3000);
+			return true;
+		}
+		// 节流：两次 OCR 至少间隔 800ms，避免拉高 CPU 占用
+		const nowTime = new Date().getTime();
+		if (nowTime - lastOcrTime < 800) {
+			return false;
+		}
+		// 优先用设置里选定的 OCR 引擎；没有配置时退回 MLKit，避免功能静默失效
+		let detector = thisScript.getOcrDetector();
+		if (!detector) {
+			try {
+				detector = mlkitOcr.prepare();
+			} catch (e) {
+				console.error($debug.getStackTrace(e));
+			}
+		}
+		if (!detector) {
+			return false;
+		}
+		lastOcrTime = nowTime;
 
- let bmp: any = null;
- let ocrResult: any[] = [];
- try {
- bmp = thisScript.helperBridge.helper.GetBitmap();
- ocrResult = detector.loadImage(bmp);
- } catch (e) {
- console.error($debug.getStackTrace(e));
- }
- if (bmp) {
- bmp.recycle();
- }
- if (!ocrResult || ocrResult.length < 1) {
- return false;
- }
+		let bmp: any = null;
+		let ocrResult: any[] = [];
+		try {
+			bmp = thisScript.helperBridge.helper.GetBitmap();
+			ocrResult = detector.loadImage(bmp);
+		} catch (e) {
+			console.error($debug.getStackTrace(e));
+		}
+		if (bmp) {
+			bmp.recycle();
+		}
+		if (!ocrResult || ocrResult.length < 1) {
+			return false;
+		}
 
- // 先确认弹窗确实存在，避免误点其它界面上的同名按钮
- let dialogType = '';
- for (let i = 0; i < ocrResult.length; i++) {
- const label = ocrResult[i].label.replace(/\s/g, '');
- if (label.indexOf('封印') > -1) {
- dialogType = '悬赏协作';
- break;
- }
- if (label.indexOf('邀约协作') > -1) {
- dialogType = '邀约协作';
- break;
- }
- }
- if (!dialogType) {
- return false;
- }
+		// 先确认弹窗确实存在，避免误点其它界面上的同名按钮
+		let dialogType = '';
+		for (let i = 0; i < ocrResult.length; i++) {
+			const label = ocrResult[i].label.replace(/\s/g, '');
+			if (label.indexOf('悬赏封印') > -1) {
+				dialogType = '悬赏协作';
+				break;
+			}
+			if (label.indexOf('邀约协作') > -1) {
+				dialogType = '邀约协作';
+				break;
+			}
+		}
+		if (!dialogType) {
+			return false;
+		}
 
- const findLabel = (names: string[]) => {
- for (let i = 0; i < ocrResult.length; i++) {
- const label = ocrResult[i].label.replace(/\s/g, '');
- for (let j = 0; j < names.length; j++) {
- if (label.indexOf(names[j]) > -1) {
- return ocrResult[i];
- }
- }
- }
- return null;
- };
+		const findLabel = (names: string[]) => {
+			for (let i = 0; i < ocrResult.length; i++) {
+				const label = ocrResult[i].label.replace(/\s/g, '');
+				for (let j = 0; j < names.length; j++) {
+					if (label.indexOf(names[j]) > -1) {
+						return ocrResult[i];
+					}
+				}
+			}
+			return null;
+		};
 
- // OCR 返回的是当前设备的真实坐标，直接交给点击器，不能再做开发分辨率换算
- const clickLabel = (item: any) => {
- const p = item.points;
- thisScript.helperBridge.regionClick(
- [[Math.round(p[0].x), Math.round(p[0].y), Math.round(p[2].x), Math.round(p[2].y), 800]],
- 0,
- 0
- );
- };
+		// OCR 返回的是当前设备的真实坐标，直接交给点击器，不能再做开发分辨率换算
+		const clickLabel = (item: any) => {
+			const p = item.points;
+			thisScript.helperBridge.regionClick(
+				[[Math.round(p[0].x), Math.round(p[0].y), Math.round(p[2].x), Math.round(p[2].y), 800]],
+				0,
+				0
+			);
+		};
 
- // 关闭：先找文字，找不到再用兜底坐标
- const doClose = () => {
- const btn = findLabel(['关闭', '取消']);
- if (btn) {
- clickLabel(btn);
- return true;
- }
- return thisScript.oper({
- id: 3,
- name: '悬赏协作_关闭_坐标兜底',
- operator: [{ oper: [thisOperator[0].oper[0]] }]
- }, 0);
- };
+		// 关闭：先找文字，找不到再用兜底坐标
+		const doClose = () => {
+			const btn = findLabel(['关闭', '取消']);
+			if (btn) {
+				clickLabel(btn);
+				return true;
+			}
+			return thisScript.oper({
+				id: 3,
+				name: '悬赏协作_关闭_坐标兜底',
+				operator: [{ oper: [thisOperator[0].oper[0]] }]
+			}, 0);
+		};
 
- if (dialogType === '邀约协作') {
- const yytype = (thisconf.yytype || '关闭') as string;
- if (yytype === '关闭') {
- return doClose();
- }
- const btn = findLabel([yytype]);
- if (btn) {
- clickLabel(btn);
- return true;
- }
- return false;
- }
+		if (dialogType === '邀约协作') {
+			const yytype = (thisconf.yytype || '关闭') as string;
+			if (yytype === '关闭') {
+				return doClose();
+			}
+			const btn = findLabel([yytype]);
+			if (btn) {
+				clickLabel(btn);
+				return true;
+			}
+			return false;
+		}
 
- const type = (thisconf.type || '关闭') as string;
+		const type = (thisconf.type || '关闭') as string;
 
- // 「仅接受勾协」：弹窗里出现「勾玉」才接受，否则关闭
- if (thisconf.switch && type === '接受') {
- if (findLabel(['勾玉'])) {
- const btn = findLabel(['接受']);
- if (btn) {
- clickLabel(btn);
- thisScript.doPush(thisScript, { text: '接受到勾协，请确认是否影响到主体方案', before() { thisScript.myToast('正在上传数据'); } });
- return true;
- }
- }
- return doClose();
- }
+		// 「仅接受勾协」：弹窗里出现「勾玉」才接受，否则关闭
+		if (thisconf.switch && type === '接受') {
+			if (findLabel(['勾玉'])) {
+				const btn = findLabel(['接受']);
+				if (btn) {
+					clickLabel(btn);
+					thisScript.doPush(thisScript, { text: '接受到勾协，请确认是否影响到主体方案', before() { thisScript.myToast('正在上传数据'); } });
+					return true;
+				}
+			}
+			return doClose();
+		}
 
- // 接受 / 拒绝
- if (type === '接受' || type === '拒绝') {
- const btn = findLabel([type]);
- if (btn) {
- clickLabel(btn);
- return true;
- }
- return false;
- }
+		// 接受 / 拒绝
+		if (type === '接受' || type === '拒绝') {
+			const btn = findLabel([type]);
+			if (btn) {
+				clickLabel(btn);
+				return true;
+			}
+			return false;
+		}
 
- // 关闭
- return doClose();
- }
+		// 关闭
+		return doClose();
+	}
 }
 
 export default new Func003();
