@@ -9,8 +9,6 @@ const right = 2;
 
 // 节流用：上次 OCR 的时间戳
 let lastOcrTime = 0;
-// 临时诊断计数（取色点校准用，校准完删除）
-let diagCount = 0;
 
 /**
  * 悬赏协作（OCR 版）
@@ -182,32 +180,6 @@ export class Func003 implements IFuncOrigin {
 			return false;
 		}
 
-		// === 临时诊断：打印奖励行区域的颜色网格，用于校准勾玉取色点 ===
-		if (diagCount < 8) {
-			diagCount++;
-			try {
-				const dbgBmp: any = thisScript.helperBridge.helper.GetBitmap();
-				if (dbgBmp) {
-					const dw = dbgBmp.getWidth();
-					const dh = dbgBmp.getHeight();
-					console.log('诊断 位图=' + dw + 'x' + dh);
-					for (let r = 0; r <= 4; r++) {
-						const yy = Math.round(dh * (0.60 + 0.13 * r / 4));
-						let line = '诊断 y' + yy + ':';
-						for (let c = 0; c <= 16; c++) {
-							const xx = Math.round(dw * (0.30 + 0.40 * c / 16));
-							const cc = dbgBmp.getPixel(xx, yy);
-							line += ' ' + xx + '=#' + ('000000' + (cc & 0xffffff).toString(16)).slice(-6);
-						}
-						console.log(line);
-					}
-					dbgBmp.recycle();
-				}
-			} catch (e) {
-				console.log('诊断 采样失败');
-			}
-		}
-
 		const findLabel = (names: string[]) => {
 			for (let i = 0; i < ocrResult.length; i++) {
 				const label = ocrResult[i].label.replace(/\s/g, '');
@@ -266,39 +238,40 @@ export class Func003 implements IFuncOrigin {
 		const type = (thisconf.type || '关闭') as string;
 
 		// 「仅接受勾协」：改成认图案——游戏里勾玉是个图标，不是文字，OCR 认不出来
-		// 勾玉图标特征：中紫底 0x7746a8 + 逗号头部红橙 0xef492e（取色自 1280x720 开发分辨率）
+		// 取色点由实机采样校准（1280x720 基准）：紫色 #71469a / #634578 + 主体红 #ed4f39
 		const findGouyuIcon = () => {
 			if (!thisScript.helperBridge || !thisScript.helperBridge.helper) {
 				return false;
 			}
+			// 取色点经实测校准：勾玉主体红 + 底部紫，位置在奖励图标那一块
 			const patterns = [
 				[
-					[center, 668, 510, 0x7746a8],
-					[center, 694, 490, 0xef492e],
+					[center, 672, 526, 0x71469a],
+					[center, 704, 502, 0xed4f39],
 				],
 				[
-					[center, 618, 482, 0xdba83a],
-					[center, 668, 510, 0x7746a8],
-					[center, 694, 490, 0xef492e],
+					[center, 672, 479, 0x634578],
+					[center, 672, 526, 0x71469a],
 				],
 			];
-			// 只在弹窗中部找，缩小范围避免误判
+			// 只在奖励图标所在的一小块区域找，避免背景误判
 			const region = [
-				Math.round(thisScript.device.width * 0.18),
-				Math.round(thisScript.device.height * 0.48),
-				Math.round(thisScript.device.width * 0.82),
-				Math.round(thisScript.device.height * 0.96),
+				Math.round(thisScript.device.width * 0.42),
+				Math.round(thisScript.device.height * 0.55),
+				Math.round(thisScript.device.width * 0.66),
+				Math.round(thisScript.device.height * 0.82),
 			];
 			for (let i = 0; i < patterns.length; i++) {
 				const pattern = thisScript.helperBridge.helper.GetFindColorArray(1280, 720, patterns[i]);
 				const point = thisScript.helperBridge.helper.FindMultiColor(region[0], region[1], region[2], region[3], pattern, 90, true);
 				if (point && point.x !== -1) {
+					console.log('勾玉图案命中 ' + i);
 					return true;
 				}
 			}
+			console.log('勾玉图案未命中');
 			return false;
 		};
-
 		if (thisconf.switch && type === '接受') {
 			if (findGouyuIcon()) {
 				const btn = findLabel(['接受']);
