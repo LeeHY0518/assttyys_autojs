@@ -9,6 +9,8 @@ const right = 2;
 
 // 节流用：上次 OCR 的时间戳
 let lastOcrTime = 0;
+// 临时诊断计数（取色点校准用，校准完删除）
+let diagCount = 0;
 
 /**
  * 悬赏协作（OCR 版）
@@ -180,6 +182,40 @@ export class Func003 implements IFuncOrigin {
 			return false;
 		}
 
+		// === 临时诊断：把弹窗区域里偏红的像素位置与真实色值打到日志，用于校准勾玉取色点 ===
+		if (diagCount < 3) {
+			diagCount++;
+			try {
+				const dbgBmp: any = thisScript.helperBridge.helper.GetBitmap();
+				if (dbgBmp) {
+					const dw = dbgBmp.getWidth();
+					const dh = dbgBmp.getHeight();
+					const dx0 = Math.round(dw * 0.30);
+					const dx1 = Math.round(dw * 0.72);
+					const dy0 = Math.round(dh * 0.50);
+					const dy1 = Math.round(dh * 0.90);
+					let hits = '';
+					let hitCount = 0;
+					for (let y = dy0; y <= dy1; y += 8) {
+						for (let x = dx0; x <= dx1; x += 8) {
+							const cc = dbgBmp.getPixel(x, y);
+							const rr = (cc >> 16) & 0xff;
+							const gg = (cc >> 8) & 0xff;
+							const bb = cc & 0xff;
+							if (rr > 120 && rr - gg > 55 && rr - bb > 55 && hitCount < 14) {
+								hits += ' (' + x + ',' + y + ')=#' + ('000000' + (cc & 0xffffff).toString(16)).slice(-6);
+								hitCount++;
+							}
+						}
+					}
+					console.log('诊断 位图=' + dw + 'x' + dh + ' 红色命中=' + hitCount + hits);
+					dbgBmp.recycle();
+				}
+			} catch (e) {
+				console.log('诊断 采样失败');
+			}
+		}
+
 		const findLabel = (names: string[]) => {
 			for (let i = 0; i < ocrResult.length; i++) {
 				const label = ocrResult[i].label.replace(/\s/g, '');
@@ -210,7 +246,7 @@ export class Func003 implements IFuncOrigin {
 		// 关闭：先找文字，找不到再用兜底坐标
 		const doClose = () => {
 			// 这类邀约弹窗通常只有「接受 / 拒绝」两个按钮，点「拒绝」等同于关掉邀请
-			const btn = findLabel(['关闭', '取消', '拒绝', '拒']);
+			const btn = findLabel(['关闭', '取消', '拒绝', '拒', '绝']);
 			if (btn) {
 				clickLabel(btn);
 				return true;
