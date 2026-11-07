@@ -1,5 +1,6 @@
 import { Script } from '@/system/script';
 import { IFuncOrigin, IFuncOperator, IFuncOperatorOrigin } from '@/interface/IFunc';
+import { mlkitOcr } from '@/system/Ocr/MlkitOcr';
 
 // const normal = -1; //定义常量
 // const left = 0;
@@ -12,7 +13,7 @@ let lastOcrTime = 0;
 /**
  * 悬赏协作（OCR 版）
  * 原实现用「多点比色」识别弹窗 + 1280x720 固定坐标点按钮，
- * 游戏改版后界面布局变化，比色特征与坐标双双失效，无法接受/拒绝/关闭。
+ * 游戏改版后 UI 布局变化，比色特征与坐标双双失效，无法接受/拒绝/关闭。
  * 本版改为：全屏 OCR → 用标题文字确认弹窗 → 找「接受/拒绝/关闭」文字 → 点其矩形区域。
  * 按钮文字基本不随 UI 改版而变，抗变化能力更强。
  */
@@ -43,10 +44,11 @@ export class Func003 implements IFuncOrigin {
  default: '关闭'
  }]
  }];
- // 算子表：OCR 找不到按钮文字时，才会用到下面的兜底坐标
+ // 算子表：desc 只能写「数组」或「不写」。
+ // 写成字符串会被框架拿去 multiDetectColors.ts 里查表，查不到会直接抛错。
+ // 第 0 项只用于提供「关闭按钮」的兜底坐标，不做比色匹配，因此不写 desc。
  operator: IFuncOperatorOrigin[] = [{
- // 0 悬赏协作弹窗 关闭兜底
- desc: '悬赏协作弹窗_关闭兜底',
+ // 0 悬赏协作弹窗 关闭兜底（仅提供坐标，不做比色）
  oper: [
  [center, 1280, 720, 791, 81, 816, 109, 1000],
  [center, 1280, 720, 1209, 66, 1260, 113, 1000],
@@ -99,6 +101,7 @@ export class Func003 implements IFuncOrigin {
  [center, 1280, 720, 584, 382, 700, 429, 1000],
  ]
  }];
+
  operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
  const thisconf = thisScript.scheme.config['3'];
  if (!thisconf) {
@@ -128,7 +131,15 @@ export class Func003 implements IFuncOrigin {
  if (nowTime - lastOcrTime < 800) {
  return false;
  }
- const detector = thisScript.getOcrDetector();
+ // 优先用设置里选定的 OCR 引擎；没有配置时退回 MLKit，避免功能静默失效
+ let detector = thisScript.getOcrDetector();
+ if (!detector) {
+ try {
+ detector = mlkitOcr.prepare();
+ } catch (e) {
+ console.error($debug.getStackTrace(e));
+ }
+ }
  if (!detector) {
  return false;
  }
@@ -178,9 +189,14 @@ export class Func003 implements IFuncOrigin {
  return null;
  };
 
+ // OCR 返回的是当前设备的真实坐标，直接交给点击器，不能再做开发分辨率换算
  const clickLabel = (item: any) => {
  const p = item.points;
- thisScript.regionClick([[p[0].x, p[0].y, p[2].x, p[2].y, 800]]);
+ thisScript.helperBridge.regionClick(
+ [[Math.round(p[0].x), Math.round(p[0].y), Math.round(p[2].x), Math.round(p[2].y), 800]],
+ 0,
+ 0
+ );
  };
 
  // 关闭：先找文字，找不到再用兜底坐标
@@ -225,6 +241,7 @@ export class Func003 implements IFuncOrigin {
  return doClose();
  }
 
+ // 接受 / 拒绝
  if (type === '接受' || type === '拒绝') {
  const btn = findLabel([type]);
  if (btn) {
@@ -234,6 +251,7 @@ export class Func003 implements IFuncOrigin {
  return false;
  }
 
+ // 关闭
  return doClose();
  }
 }
