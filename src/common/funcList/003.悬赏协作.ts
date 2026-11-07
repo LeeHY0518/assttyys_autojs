@@ -201,7 +201,8 @@ export class Func003 implements IFuncOrigin {
 
 		// 关闭：先找文字，找不到再用兜底坐标
 		const doClose = () => {
-			const btn = findLabel(['关闭', '取消']);
+			// 这类邀约弹窗通常只有「接受 / 拒绝」两个按钮，点「拒绝」等同于关掉邀请
+			const btn = findLabel(['关闭', '取消', '拒绝']);
 			if (btn) {
 				clickLabel(btn);
 				return true;
@@ -228,13 +229,46 @@ export class Func003 implements IFuncOrigin {
 
 		const type = (thisconf.type || '关闭') as string;
 
-		// 「仅接受勾协」：弹窗里出现「勾玉」才接受，否则关闭
+		// 「仅接受勾协」：改成认图案——游戏里勾玉是个图标，不是文字，OCR 认不出来
+		// 勾玉图标特征：中紫底 0x7746a8 + 逗号头部红橙 0xef492e（取色自 1280x720 开发分辨率）
+		const findGouyuIcon = () => {
+			if (!thisScript.helperBridge || !thisScript.helperBridge.helper) {
+				return false;
+			}
+			const patterns = [
+				[
+					[center, 668, 510, 0x7746a8],
+					[center, 694, 490, 0xef492e],
+				],
+				[
+					[center, 618, 482, 0xdba83a],
+					[center, 668, 510, 0x7746a8],
+					[center, 694, 490, 0xef492e],
+				],
+			];
+			// 只在弹窗中部找，缩小范围避免误判
+			const region = [
+				Math.round(thisScript.device.width * 0.18),
+				Math.round(thisScript.device.height * 0.48),
+				Math.round(thisScript.device.width * 0.82),
+				Math.round(thisScript.device.height * 0.96),
+			];
+			for (let i = 0; i < patterns.length; i++) {
+				const pattern = thisScript.helperBridge.helper.GetFindColorArray(1280, 720, patterns[i]);
+				const point = thisScript.helperBridge.helper.FindMultiColor(region[0], region[1], region[2], region[3], pattern, 90, true);
+				if (point && point.x !== -1) {
+					return true;
+				}
+			}
+			return false;
+		};
+
 		if (thisconf.switch && type === '接受') {
-			if (findLabel(['勾玉'])) {
+			if (findGouyuIcon()) {
 				const btn = findLabel(['接受']);
 				if (btn) {
 					clickLabel(btn);
-					thisScript.doPush(thisScript, { text: '接受到勾协，请确认是否影响到主体方案', before() { thisScript.myToast('正在上传数据'); } });
+					thisScript.doPush(thisScript, { text: '✅ 已接受到勾协（勾玉协作）！勾玉是游戏内重要资源，请留意。', before() { thisScript.myToast('接到勾协！正在推送提醒'); } });
 					return true;
 				}
 			}
