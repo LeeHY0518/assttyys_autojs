@@ -237,40 +237,50 @@ export class Func003 implements IFuncOrigin {
 
 		const type = (thisconf.type || '关闭') as string;
 
-		// 「仅接受勾协」：改成认图案——游戏里勾玉是个图标，不是文字，OCR 认不出来
-		// 取色点由实机采样校准（1280x720 基准）：紫色 #71469a / #634578 + 主体红 #ed4f39
+		// 「仅接受勾协」：游戏里勾玉是个图标，OCR 认不出来，只能靠找色。
+		// 判据：奖励图标那一小块里同时存在「紫」和「红」像素——
+		// 勾玉是红白紫，而普通悬赏的碎片/料理是橙金色、不含紫。
+		// 不比对精确色值（弹窗底半透明，图标颜色会随背景漂移），只看颜色范围。
 		const findGouyuIcon = () => {
 			if (!thisScript.helperBridge || !thisScript.helperBridge.helper) {
 				return false;
 			}
-			// 取色点经实测校准：勾玉主体红 + 底部紫，位置在奖励图标那一块
-			const patterns = [
-				[
-					[center, 672, 526, 0x71469a],
-					[center, 704, 502, 0xed4f39],
-				],
-				[
-					[center, 672, 479, 0x634578],
-					[center, 672, 526, 0x71469a],
-				],
-			];
-			// 只在奖励图标所在的一小块区域找，避免背景误判
-			const region = [
-				Math.round(thisScript.device.width * 0.42),
-				Math.round(thisScript.device.height * 0.55),
-				Math.round(thisScript.device.width * 0.66),
-				Math.round(thisScript.device.height * 0.82),
-			];
-			for (let i = 0; i < patterns.length; i++) {
-				const pattern = thisScript.helperBridge.helper.GetFindColorArray(1280, 720, patterns[i]);
-				const point = thisScript.helperBridge.helper.FindMultiColor(region[0], region[1], region[2], region[3], pattern, 90, true);
-				if (point && point.x !== -1) {
-					console.log('勾玉图案命中 ' + i);
-					return true;
+			let bmp: any = null;
+			try {
+				bmp = thisScript.helperBridge.helper.GetBitmap();
+				if (!bmp) {
+					return false;
 				}
+				const x0 = Math.round(bmp.getWidth() * 0.50);
+				const x1 = Math.round(bmp.getWidth() * 0.60);
+				const y0 = Math.round(bmp.getHeight() * 0.62);
+				const y1 = Math.round(bmp.getHeight() * 0.78);
+				let purple = 0;
+				let red = 0;
+				for (let y = y0; y <= y1; y += 4) {
+					for (let x = x0; x <= x1; x += 4) {
+						const c = bmp.getPixel(x, y);
+						const r = (c >> 16) & 0xff;
+						const g = (c >> 8) & 0xff;
+						const b = c & 0xff;
+						if (b > 85 && b - g > 20 && b - r > 5) {
+							purple++;
+						}
+						if (r > 140 && r - g > 70 && r - b > 60) {
+							red++;
+						}
+					}
+				}
+				bmp.recycle();
+				console.log('勾玉检测 紫=' + purple + ' 红=' + red);
+				return purple >= 3 && red >= 2;
+			} catch (e) {
+				if (bmp) {
+					bmp.recycle();
+				}
+				console.log('勾玉检测失败');
+				return false;
 			}
-			console.log('勾玉图案未命中');
-			return false;
 		};
 		if (thisconf.switch && type === '接受') {
 			if (findGouyuIcon()) {
