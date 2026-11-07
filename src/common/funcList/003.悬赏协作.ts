@@ -182,33 +182,25 @@ export class Func003 implements IFuncOrigin {
 			return false;
 		}
 
-		// === 临时诊断：把弹窗区域里偏红的像素位置与真实色值打到日志，用于校准勾玉取色点 ===
-		if (diagCount < 3) {
+		// === 临时诊断：打印奖励行区域的颜色网格，用于校准勾玉取色点 ===
+		if (diagCount < 8) {
 			diagCount++;
 			try {
 				const dbgBmp: any = thisScript.helperBridge.helper.GetBitmap();
 				if (dbgBmp) {
 					const dw = dbgBmp.getWidth();
 					const dh = dbgBmp.getHeight();
-					const dx0 = Math.round(dw * 0.30);
-					const dx1 = Math.round(dw * 0.72);
-					const dy0 = Math.round(dh * 0.50);
-					const dy1 = Math.round(dh * 0.90);
-					let hits = '';
-					let hitCount = 0;
-					for (let y = dy0; y <= dy1; y += 8) {
-						for (let x = dx0; x <= dx1; x += 8) {
-							const cc = dbgBmp.getPixel(x, y);
-							const rr = (cc >> 16) & 0xff;
-							const gg = (cc >> 8) & 0xff;
-							const bb = cc & 0xff;
-							if (rr > 120 && rr - gg > 55 && rr - bb > 55 && hitCount < 14) {
-								hits += ' (' + x + ',' + y + ')=#' + ('000000' + (cc & 0xffffff).toString(16)).slice(-6);
-								hitCount++;
-							}
+					console.log('诊断 位图=' + dw + 'x' + dh);
+					for (let r = 0; r <= 4; r++) {
+						const yy = Math.round(dh * (0.60 + 0.13 * r / 4));
+						let line = '诊断 y' + yy + ':';
+						for (let c = 0; c <= 16; c++) {
+							const xx = Math.round(dw * (0.30 + 0.40 * c / 16));
+							const cc = dbgBmp.getPixel(xx, yy);
+							line += ' ' + xx + '=#' + ('000000' + (cc & 0xffffff).toString(16)).slice(-6);
 						}
+						console.log(line);
 					}
-					console.log('诊断 位图=' + dw + 'x' + dh + ' 红色命中=' + hitCount + hits);
 					dbgBmp.recycle();
 				}
 			} catch (e) {
