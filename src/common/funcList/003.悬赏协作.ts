@@ -164,7 +164,7 @@ export class Func003 implements IFuncOrigin {
  let dialogType = '';
  for (let i = 0; i < ocrResult.length; i++) {
  const label = ocrResult[i].label.replace(/\s/g, '');
- if (label.indexOf('悬赏封印') > -1) {
+ if (label.indexOf('封印') > -1) {
  dialogType = '悬赏协作';
  break;
  }
