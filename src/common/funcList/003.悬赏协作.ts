@@ -126,9 +126,9 @@ export class Func003 implements IFuncOrigin {
 			sleep(3000);
 			return true;
 		}
-		// 节流：两次 OCR 至少间隔 800ms，避免拉高 CPU 占用
+		// 节流：两次 OCR 至少间隔 300ms。这类协助是抢手速的，判定必须快。
 		const nowTime = new Date().getTime();
-		if (nowTime - lastOcrTime < 800) {
+		if (nowTime - lastOcrTime < 300) {
 			return false;
 		}
 		// 优先用设置里选定的 OCR 引擎；没有配置时退回 MLKit，避免功能静默失效
@@ -237,10 +237,9 @@ export class Func003 implements IFuncOrigin {
 
 		const type = (thisconf.type || '关闭') as string;
 
-		// 「仅接受勾协」：游戏里勾玉是个图标，OCR 认不出来，只能靠找色。
-		// 判据：奖励图标那一小块里同时存在「紫」和「红」像素——
-		// 勾玉是红白紫，而普通悬赏的碎片/料理是橙金色、不含紫。
-		// 不比对精确色值（弹窗底半透明，图标颜色会随背景漂移），只看颜色范围。
+		// 「仅接受勾协」：勾玉/碎片/体力三种图标底色都带紫，靠颜色分不出。
+		// 实测发现：勾协的奖励行里带一个「金色底」的碎片图标，其它邀请则是紫底。
+		// 金色图标左右位置不固定，因此整条奖励行都扫。
 		const findGouyuIcon = () => {
 			if (!thisScript.helperBridge || !thisScript.helperBridge.helper) {
 				return false;
@@ -251,29 +250,31 @@ export class Func003 implements IFuncOrigin {
 				if (!bmp) {
 					return false;
 				}
-				const x0 = Math.round(bmp.getWidth() * 0.50);
-				const x1 = Math.round(bmp.getWidth() * 0.60);
-				const y0 = Math.round(bmp.getHeight() * 0.62);
-				const y1 = Math.round(bmp.getHeight() * 0.78);
-				let purple = 0;
-				let red = 0;
+				const dw = bmp.getWidth();
+				const dh = bmp.getHeight();
+				const x0 = Math.round(dw * 0.41);
+				const x1 = Math.round(dw * 0.62);
+				const y0 = Math.round(dh * 0.62);
+				const y1 = Math.round(dh * 0.78);
+				let gold = 0;
+				let dark = 0;
 				for (let y = y0; y <= y1; y += 4) {
 					for (let x = x0; x <= x1; x += 4) {
 						const c = bmp.getPixel(x, y);
 						const r = (c >> 16) & 0xff;
 						const g = (c >> 8) & 0xff;
 						const b = c & 0xff;
-						if (b > 85 && b - g > 20 && b - r > 5) {
-							purple++;
+						if (r > 130 && g > 70 && b < 100 && r - b > 50 && r - g < 130) {
+							gold++;
 						}
-						if (r > 140 && r - g > 70 && r - b > 60) {
-							red++;
+						if (r < 75 && g < 75 && b < 75) {
+							dark++;
 						}
 					}
 				}
 				bmp.recycle();
-				console.log('勾玉检测 紫=' + purple + ' 红=' + red);
-				return purple >= 3 && red >= 2;
+				console.log('金色=' + gold + ' 深色=' + dark);
+				return gold >= 40 && dark >= 15;
 			} catch (e) {
 				if (bmp) {
 					bmp.recycle();
