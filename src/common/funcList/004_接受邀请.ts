@@ -7,21 +7,18 @@ const center = 1;
 const right = 2;
 
 // ——— 诊断（只打印，不参与判断与点击）———
-// 邀请横幅出现时，把两组判据的每个取色点的「预设色值 > 实测色值」打进日志，
-// 下一轮照实测值把坐标/色值改准，不必再靠截图目测。
-// 若日志里连「邀请判据」这一行都不出现，说明本模块没被调度，
-// 问题在方案的模块列表上，不在判据上。
+// 运行时每个判据点被展开成 [x, y, r, g, b]：颜色被拆成三个通道各占一位，
+// 坐标是 1280x720 基准，取图时要按实际位图尺寸换算。
 let invDiagTime = 0;
+let invFmtChecked = false;
 
 function invHex(c: number): string {
 	return '#' + ('000000' + (c & 0xffffff).toString(16)).slice(-6);
 }
 
-function invNear(c: number, target: number, tol: number): boolean {
-	const dr = Math.abs(((c >> 16) & 0xff) - ((target >> 16) & 0xff));
-	const dg = Math.abs(((c >> 8) & 0xff) - ((target >> 8) & 0xff));
-	const db = Math.abs((c & 0xff) - (target & 0xff));
-	return dr <= tol && dg <= tol && db <= tol;
+function invHex3(r: number, g: number, b: number): string {
+	const h = (n: number) => ('0' + (n & 0xff).toString(16)).slice(-2);
+	return '#' + h(r) + h(g) + h(b);
 }
 
 export class Func004 implements IFuncOrigin {
@@ -132,15 +129,23 @@ export class Func004 implements IFuncOrigin {
 						if (!pts || !pts.length) {
 							continue;
 						}
+						if (!invFmtChecked) {
+							invFmtChecked = true;
+							console.log('邀请判据[格式自检] 首点=' + JSON.stringify(pts[0]) + ' 点数=' + pts.length);
+						}
 						let hit = 0;
 						let line = '';
 						for (let i = 0; i < pts.length; i++) {
-							const c = bmp.getPixel(dSx(pts[i][1]), dSy(pts[i][2])) & 0xffffff;
-							const ok = invNear(c, pts[i][3], 12);
+							const p = pts[i];
+							const c = bmp.getPixel(dSx(p[0]), dSy(p[1])) & 0xffffff;
+							const cr = (c >> 16) & 0xff;
+							const cg = (c >> 8) & 0xff;
+							const cb = c & 0xff;
+							const ok = Math.abs(cr - p[2]) <= 12 && Math.abs(cg - p[3]) <= 12 && Math.abs(cb - p[4]) <= 12;
 							if (ok) {
 								hit++;
 							}
-							line += ' (' + pts[i][1] + ',' + pts[i][2] + ')' + invHex(pts[i][3]) + '>' + invHex(c) + (ok ? 'O' : 'X');
+							line += ' (' + p[0] + ',' + p[1] + ')' + invHex3(p[2], p[3], p[4]) + '>' + invHex(c) + (ok ? 'O' : 'X');
 						}
 						console.log('邀请判据[' + dNames[gi] + '] 命中' + hit + '/' + pts.length + line);
 					}
