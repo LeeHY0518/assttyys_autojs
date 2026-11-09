@@ -15,16 +15,27 @@ let lastCheckTime = 0;
 
 // 奖励行扫描范围（比例）。奖励图标左右位置不固定，所以整行扫；
 // 纵向只取奖励所在的一条带，把范围限死，不碰弹窗其它区域。
+// 右边界卡在「接受」按钮左边，免得把按钮的像素也算进奖励格。
 const REWARD_X0 = 0.35;
-const REWARD_X1 = 0.68;
+const REWARD_X1 = 0.64;
 const REWARD_Y0 = 0.62;
 const REWARD_Y1 = 0.78;
 
-// 「接受」「拒绝」按钮中心点（1280x720 基准，取自实测日志的按钮文字框）
-const BTN_ACCEPT_X = 957;
-const BTN_ACCEPT_Y = 497;
-const BTN_REJECT_X = 959;
-const BTN_REJECT_Y = 586;
+// ——— 定点比色（沿用原版 003 的做法）———
+// 原版就是写死坐标取色、和预设色值比对，不靠大范围数色。
+// 这里同样把位置钉死：颜色必须出现在它该在的地方才算数。
+// 「接受」「拒绝」两个按钮的定点（1280x720 基准，取自实测日志）
+const ACCEPT_PT_X = 874;
+const ACCEPT_PT_Y = 498;
+const REJECT_PT_X = 878;
+const REJECT_PT_Y = 586;
+// 色块质心允许偏离定点的像素数（1280x720 基准）
+const PT_TOL = 10;
+
+// 按钮点击区域（1280x720 基准）。点矩形而不是点一个像素——
+// 原版就是点矩形，框架会在矩形里随机取点，不会次次都落在同一像素上。
+const RECT_ACCEPT = [942, 482, 972, 512];
+const RECT_REJECT = [944, 571, 974, 601];
 
 /**
  * 悬赏协作（纯像素比色版）
@@ -295,10 +306,11 @@ export class Func003 implements IFuncOrigin {
 		const gold = goldL + goldR;
 
 		// ——— 存在性判据：定点比色 ———
-		// 上面两个取色窗已经把位置钉死（窗外的一律不参与），这里再卡「成团」与「点数」：
-		//   真协作弹窗：绿 159~162，外接框 40x40；橙红 204~208，外接框 42x38
-		//   秘闻副本页：绿 0                                     → 不过
-		//   战斗/结算页：绿 42~88；或 335 个但摊成 232x108 一片   → 不过
+		// 两个按钮的色块必须出现在它们该在的位置上，缺一不可。
+		// 这一条专门挡「画面里没有弹窗、只是碰巧颜色相近」：
+		// 战斗/斗技这类画面再花，也很难让绿对勾和红叉同时压在这两个写死的点上。
+		//   真协作弹窗：绿 159~162，外接框 40x40，中心 (874,498)
+		//               橙红 204~208，外接框 42x38，中心 (878,586)
 		if (rN < 60) {
 			return false;
 		}
@@ -306,6 +318,14 @@ export class Func003 implements IFuncOrigin {
 			return false;
 		}
 		if (gMaxX - gMinX > Math.round(58 * dw / BASE_W) || gMaxY - gMinY > Math.round(58 * dh / BASE_H)) {
+			return false;
+		}
+		// 色块中心到定点的偏差（换算回 1280x720 基准再比）
+		const gDx = Math.abs(Math.round(gSx / gN * BASE_W / dw) - ACCEPT_PT_X);
+		const gDy = Math.abs(Math.round(gSy / gN * BASE_H / dh) - ACCEPT_PT_Y);
+		const rDx = Math.abs(Math.round(rSx / rN * BASE_W / dw) - REJECT_PT_X);
+		const rDy = Math.abs(Math.round(rSy / rN * BASE_H / dh) - REJECT_PT_Y);
+		if (gDx > PT_TOL || gDy > PT_TOL || rDx > PT_TOL || rDy > PT_TOL) {
 			return false;
 		}
 
@@ -325,14 +345,18 @@ export class Func003 implements IFuncOrigin {
 		const toBx = (v: number) => Math.round(v * BASE_W / dw);
 		const toBy = (v: number) => Math.round(v * BASE_H / dh);
 		console.log('悬赏协作: 左金=' + goldL + ' 右金=' + goldR + ' 紫=' + purple + ' 深=' + dark + ' → ' + (isGou ? '勾协' : '非勾协'));
-		console.log('按钮定位: 绿 n=' + gN + (gN > 0 ? ' 中心(' + toBx(gSx / gN) + ',' + toBy(gSy / gN) + ') 框[' + toBx(gMinX) + ',' + toBy(gMinY) + '-' + toBx(gMaxX) + ',' + toBy(gMaxY) + ']' : '')
-			+ ' | 橙红 n=' + rN + (rN > 0 ? ' 中心(' + toBx(rSx / rN) + ',' + toBy(rSy / rN) + ') 框[' + toBx(rMinX) + ',' + toBy(rMinY) + '-' + toBx(rMaxX) + ',' + toBy(rMaxY) + ']' : '')
-			+ ' | 取色 接受=' + probeAcc + ' 拒绝=' + probeRej + ' (1280x720基准)');
+		console.log('定点比色: 接受点 n=' + gN + ' 中心(' + toBx(gSx / gN) + ',' + toBy(gSy / gN) + ') 偏差(' + gDx + ',' + gDy + ') 取色=' + probeAcc
+			+ ' | 拒绝点 n=' + rN + ' 中心(' + toBx(rSx / rN) + ',' + toBy(rSy / rN) + ') 偏差(' + rDx + ',' + rDy + ') 取色=' + probeRej
+			+ ' | 容差=' + PT_TOL + ' (1280x720基准)');
 
-		const clickAt = (nx: number, ny: number) => {
-			const px = Math.round(nx * dw / BASE_W);
-			const py = Math.round(ny * dh / BASE_H);
-			thisScript.helperBridge.regionClick([[px, py, px, py, 800]], 0, 0);
+		// 点矩形（原版就是点矩形）：框架会在矩形里随机取点，
+		// 不会次次都打在同一像素上。
+		const clickRect = (rect: number[]) => {
+			const px0 = Math.round(rect[0] * dw / BASE_W);
+			const py0 = Math.round(rect[1] * dh / BASE_H);
+			const px1 = Math.round(rect[2] * dw / BASE_W);
+			const py1 = Math.round(rect[3] * dh / BASE_H);
+			thisScript.helperBridge.regionClick([[px0, py0, px1, py1, 800]], 0, 0);
 		};
 
 		const type = (thisconf.type || '关闭') as string;
@@ -340,20 +364,20 @@ export class Func003 implements IFuncOrigin {
 		// 仅接受勾协：不是勾协就关掉
 		if (thisconf.switch && type === '接受') {
 			if (isGou) {
-				clickAt(BTN_ACCEPT_X, BTN_ACCEPT_Y);
+				clickRect(RECT_ACCEPT);
 				thisScript.doPush(thisScript, { text: '✅ 已接受到勾协（勾玉协作）！勾玉是游戏内重要资源，请留意。', before() { thisScript.myToast('接到勾协！正在推送提醒'); } });
 				return true;
 			}
-			clickAt(BTN_REJECT_X, BTN_REJECT_Y);
+			clickRect(RECT_REJECT);
 			return true;
 		}
 
 		if (type === '接受') {
-			clickAt(BTN_ACCEPT_X, BTN_ACCEPT_Y);
+			clickRect(RECT_ACCEPT);
 			return true;
 		}
 		// 拒绝 / 关闭
-		clickAt(BTN_REJECT_X, BTN_REJECT_Y);
+		clickRect(RECT_REJECT);
 		return true;
 	}
 }
