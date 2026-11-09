@@ -6,6 +6,24 @@ const left = 0;
 const center = 1;
 const right = 2;
 
+// ——— 诊断（只打印，不参与判断与点击）———
+// 邀请横幅出现时，把两组判据的每个取色点的「预设色值 > 实测色值」打进日志，
+// 下一轮照实测值把坐标/色值改准，不必再靠截图目测。
+// 若日志里连「邀请判据」这一行都不出现，说明本模块没被调度，
+// 问题在方案的模块列表上，不在判据上。
+let invDiagTime = 0;
+
+function invHex(c: number): string {
+	return '#' + ('000000' + (c & 0xffffff).toString(16)).slice(-6);
+}
+
+function invNear(c: number, target: number, tol: number): boolean {
+	const dr = Math.abs(((c >> 16) & 0xff) - ((target >> 16) & 0xff));
+	const dg = Math.abs(((c >> 8) & 0xff) - ((target >> 8) & 0xff));
+	const db = Math.abs((c & 0xff) - (target & 0xff));
+	return dr <= tol && dg <= tol && db <= tol;
+}
+
 export class Func004 implements IFuncOrigin {
 	id = 4;
 	name = '接受邀请';
@@ -93,6 +111,49 @@ export class Func004 implements IFuncOrigin {
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 		const thisConf = thisScript.scheme.config['4'];
+
+		// ——— 诊断：每秒一次，打印两组邀请判据的逐点实测色值 ———
+		const diagNow = new Date().getTime();
+		if (diagNow - invDiagTime >= 1000) {
+			invDiagTime = diagNow;
+			let bmp: any = null;
+			try {
+				if (thisScript.helperBridge && thisScript.helperBridge.helper) {
+					bmp = thisScript.helperBridge.helper.GetBitmap();
+				}
+				if (bmp) {
+					const dw = bmp.getWidth();
+					const dh = bmp.getHeight();
+					const dSx = (v: number) => Math.round(v * dw / 1280);
+					const dSy = (v: number) => Math.round(v * dh / 720);
+					const dNames = ['自动接受', '接受一次'];
+					for (let gi = 0; gi < 2; gi++) {
+						const pts: any = thisOperator[gi] && thisOperator[gi].desc;
+						if (!pts || !pts.length) {
+							continue;
+						}
+						let hit = 0;
+						let line = '';
+						for (let i = 0; i < pts.length; i++) {
+							const c = bmp.getPixel(dSx(pts[i][1]), dSy(pts[i][2])) & 0xffffff;
+							const ok = invNear(c, pts[i][3], 12);
+							if (ok) {
+								hit++;
+							}
+							line += ' (' + pts[i][1] + ',' + pts[i][2] + ')' + invHex(pts[i][3]) + '>' + invHex(c) + (ok ? 'O' : 'X');
+						}
+						console.log('邀请判据[' + dNames[gi] + '] 命中' + hit + '/' + pts.length + line);
+					}
+				}
+			} catch (e) {
+				console.error($debug.getStackTrace(e));
+			}
+			if (bmp) {
+				bmp.recycle();
+			}
+		}
+
+		// ——— 以下为原逻辑，未做改动 ———
 		if (thisScript.oper({
 			name: '组队界面奖励检测',
 			operator: [{ desc: thisOperator[4].desc }]
