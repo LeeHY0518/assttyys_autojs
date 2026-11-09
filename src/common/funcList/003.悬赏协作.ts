@@ -180,6 +180,8 @@ export class Func003 implements IFuncOrigin {
 		let rMinY = 0;
 		let rMaxX = 0;
 		let rMaxY = 0;
+		let probeAcc = '?';
+		let probeRej = '?';
 		try {
 			bmp = thisScript.helperBridge.helper.GetBitmap();
 			if (!bmp) {
@@ -221,13 +223,15 @@ export class Func003 implements IFuncOrigin {
 					}
 				}
 			}
-			// ——— 按钮诊断 ———
-			// 弹窗右下方：「接受」是深棕底 + 浅绿对勾，「拒绝」是深棕底 + 橙红叉。
-			// 这里只把这两种颜色的像素位置报出来，用来把按钮坐标一次量准。
-			const tx0 = Math.round(dw * 0.66);
-			const tx1 = Math.round(dw * 0.86);
-			const ty0 = Math.round(dh * 0.58);
-			const ty1 = Math.round(dh * 0.94);
+			// ——— 定点比色：只在两个固定小窗里取色，不再扫大片区域 ———
+			// 协作弹窗上「接受」「拒绝」按钮的位置是固定的（1280x720 基准）：
+			//   接受按钮的浅绿对勾  中心约 (874,498)，外接框约 40x40
+			//   拒绝按钮的橙红叉    中心约 (878,586)
+			// 所以只在这两个小窗里数色，窗外的画面再花哨也进不来。
+			const sx = (v: number) => Math.round(v * dw / BASE_W);
+			const sy = (v: number) => Math.round(v * dh / BASE_H);
+			const ax0 = sx(845), ax1 = sx(905), ay0 = sy(458), ay1 = sy(536);   // 接受窗
+			const bx0 = sx(845), bx1 = sx(911), by0 = sy(552), by1 = sy(622);   // 拒绝窗
 			gMinX = 99999;
 			gMinY = 99999;
 			gMaxX = 0;
@@ -236,8 +240,8 @@ export class Func003 implements IFuncOrigin {
 			rMinY = 99999;
 			rMaxX = 0;
 			rMaxY = 0;
-			for (let y = ty0; y <= ty1; y += 2) {
-				for (let x = tx0; x <= tx1; x += 2) {
+			for (let y = ay0; y <= ay1; y += 2) {
+				for (let x = ax0; x <= ax1; x += 2) {
 					const c = bmp.getPixel(x, y);
 					const r = (c >> 16) & 0xff;
 					const g = (c >> 8) & 0xff;
@@ -252,8 +256,16 @@ export class Func003 implements IFuncOrigin {
 						if (y < gMinY) { gMinY = y; }
 						if (y > gMaxY) { gMaxY = y; }
 					}
+				}
+			}
+			for (let y = by0; y <= by1; y += 2) {
+				for (let x = bx0; x <= bx1; x += 2) {
+					const c = bmp.getPixel(x, y);
+					const r = (c >> 16) & 0xff;
+					const g = (c >> 8) & 0xff;
+					const b = c & 0xff;
 					// 橙红（拒绝按钮的叉号）
-					else if (r - g > 40 && r - b > 60 && r > 130) {
+					if (r - g > 40 && r - b > 60 && r > 130) {
 						rN++;
 						rSx += x;
 						rSy += y;
@@ -264,6 +276,11 @@ export class Func003 implements IFuncOrigin {
 					}
 				}
 			}
+			// 顺手把两个按钮中心的真实色值记下来，供下次改成精确色组
+			const pa = (gN > 0 ? bmp.getPixel(Math.round(gSx / gN), Math.round(gSy / gN)) : bmp.getPixel(sx(874), sy(498))) & 0xffffff;
+			const pb = (rN > 0 ? bmp.getPixel(Math.round(rSx / rN), Math.round(rSy / rN)) : bmp.getPixel(sx(878), sy(586))) & 0xffffff;
+			probeAcc = '#' + ('000000' + pa.toString(16)).slice(-6);
+			probeRej = '#' + ('000000' + pb.toString(16)).slice(-6);
 		} catch (e) {
 			console.error($debug.getStackTrace(e));
 			if (bmp) {
@@ -277,18 +294,18 @@ export class Func003 implements IFuncOrigin {
 
 		const gold = goldL + goldR;
 
-		// ——— 弹窗存在性判据（关键，不能省）———
-		// 协作邀请弹窗上才有这两个按钮：接受 = 浅绿对勾，拒绝 = 橙红叉。
-		// 实测：协作弹窗 绿 n=159~162（中心约 874,498），橙红 n≈204~208；
-		//       秘闻副本等普通页面 绿 n=0（橙红那 463 个是页面里的红色元素窜进来的，不能单独用）。
-		// 两个按钮没同时出现或位置不对 → 当前不是协作弹窗，一律不动作，
-		// 直接 return false 把控制权交回方案，避免在普通页面上空点、把方案卡死。
-		if (gN < 40 || rN < 40) {
+		// ——— 存在性判据：定点比色 ———
+		// 上面两个取色窗已经把位置钉死（窗外的一律不参与），这里再卡「成团」与「点数」：
+		//   真协作弹窗：绿 159~162，外接框 40x40；橙红 204~208，外接框 42x38
+		//   秘闻副本页：绿 0                                     → 不过
+		//   战斗/结算页：绿 42~88；或 335 个但摊成 232x108 一片   → 不过
+		if (rN < 60) {
 			return false;
 		}
-		const gcx = Math.round(gSx / gN * BASE_W / dw);
-		const gcy = Math.round(gSy / gN * BASE_H / dh);
-		if (gcx < 790 || gcx > 970 || gcy < 430 || gcy > 570) {
+		if (gN < 90 || gN > 600) {
+			return false;
+		}
+		if (gMaxX - gMinX > Math.round(58 * dw / BASE_W) || gMaxY - gMinY > Math.round(58 * dh / BASE_H)) {
 			return false;
 		}
 
@@ -310,7 +327,7 @@ export class Func003 implements IFuncOrigin {
 		console.log('悬赏协作: 左金=' + goldL + ' 右金=' + goldR + ' 紫=' + purple + ' 深=' + dark + ' → ' + (isGou ? '勾协' : '非勾协'));
 		console.log('按钮定位: 绿 n=' + gN + (gN > 0 ? ' 中心(' + toBx(gSx / gN) + ',' + toBy(gSy / gN) + ') 框[' + toBx(gMinX) + ',' + toBy(gMinY) + '-' + toBx(gMaxX) + ',' + toBy(gMaxY) + ']' : '')
 			+ ' | 橙红 n=' + rN + (rN > 0 ? ' 中心(' + toBx(rSx / rN) + ',' + toBy(rSy / rN) + ') 框[' + toBx(rMinX) + ',' + toBy(rMinY) + '-' + toBx(rMaxX) + ',' + toBy(rMaxY) + ']' : '')
-			+ ' (1280x720基准)');
+			+ ' | 取色 接受=' + probeAcc + ' 拒绝=' + probeRej + ' (1280x720基准)');
 
 		const clickAt = (nx: number, ny: number) => {
 			const px = Math.round(nx * dw / BASE_W);
