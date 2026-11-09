@@ -277,7 +277,22 @@ export class Func003 implements IFuncOrigin {
 
 		const gold = goldL + goldR;
 
-		// 奖励行里没成片出现彩色图标 → 当前不是协作邀请弹窗，不动作
+		// ——— 弹窗存在性判据（关键，不能省）———
+		// 协作邀请弹窗上才有这两个按钮：接受 = 浅绿对勾，拒绝 = 橙红叉。
+		// 实测：协作弹窗 绿 n=159~162（中心约 874,498），橙红 n≈204~208；
+		//       秘闻副本等普通页面 绿 n=0（橙红那 463 个是页面里的红色元素窜进来的，不能单独用）。
+		// 两个按钮没同时出现或位置不对 → 当前不是协作弹窗，一律不动作，
+		// 直接 return false 把控制权交回方案，避免在普通页面上空点、把方案卡死。
+		if (gN < 40 || rN < 40) {
+			return false;
+		}
+		const gcx = Math.round(gSx / gN * BASE_W / dw);
+		const gcy = Math.round(gSy / gN * BASE_H / dh);
+		if (gcx < 790 || gcx > 970 || gcy < 430 || gcy > 570) {
+			return false;
+		}
+
+		// 奖励行里没成片出现彩色图标 → 图标还没刷出来，这一轮先不动
 		if (gold + purple < 150) {
 			return false;
 		}
