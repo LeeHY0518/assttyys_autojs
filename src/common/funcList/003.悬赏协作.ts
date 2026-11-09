@@ -30,13 +30,12 @@ const ACCEPT_PT_Y = 498;
 const REJECT_PT_X = 878;
 const REJECT_PT_Y = 586;
 // 色块质心允许偏离定点的像素数（1280x720 基准）
-// 游戏UI更新时按钮位置/大小可能微调，容差要放大到 25px 才不容易误杀
-const PT_TOL = 25;
+const PT_TOL = 10;
 
-// 按钮点击区域（1280x720 基准）。围绕按钮中心 ±30px 范围点击。
-// 之前这里写成 [942, 482, 972, 512] 差了 80px 根本点不中！
-const RECT_ACCEPT = [844, 468, 904, 528];   // 中心 (874, 498) ±30
-const RECT_REJECT = [848, 556, 908, 616];   // 中心 (878, 586) ±30
+// 按钮点击区域（1280x720 基准）。点矩形而不是点一个像素——
+// 原版就是点矩形，框架会在矩形里随机取点，不会次次都落在同一像素上。
+const RECT_ACCEPT = [942, 482, 972, 512];
+const RECT_REJECT = [944, 571, 974, 601];
 
 /**
  * 悬赏协作（纯像素比色版）
@@ -165,11 +164,6 @@ export class Func003 implements IFuncOrigin {
 		lastCheckTime = nowTime;
 
 		if (!thisScript.helperBridge || !thisScript.helperBridge.helper) {
-			console.log('[悬赏协作] helperBridge/helper 未初始化, 跳过检测');
-			return false;
-		}
-		if (!thisScript.helperBridge.automator) {
-			console.log('[悬赏协作] helperBridge.automator 未初始化, 跳过检测');
 			return false;
 		}
 
@@ -247,9 +241,8 @@ export class Func003 implements IFuncOrigin {
 			// 所以只在这两个小窗里数色，窗外的画面再花哨也进不来。
 			const sx = (v: number) => Math.round(v * dw / BASE_W);
 			const sy = (v: number) => Math.round(v * dh / BASE_H);
-			// 检测窗口从 60x78 扩大到 100x110，给游戏UI更新留余量
-			const ax0 = sx(825), ax1 = sx(925), ay0 = sy(448), ay1 = sy(558);   // 接受窗
-			const bx0 = sx(825), bx1 = sx(931), by0 = sy(542), by1 = sy(632);   // 拒绝窗
+			const ax0 = sx(845), ax1 = sx(905), ay0 = sy(458), ay1 = sy(536);   // 接受窗
+			const bx0 = sx(845), bx1 = sx(911), by0 = sy(552), by1 = sy(622);   // 拒绝窗
 			gMinX = 99999;
 			gMinY = 99999;
 			gMaxX = 0;
@@ -312,27 +305,19 @@ export class Func003 implements IFuncOrigin {
 
 		const gold = goldL + goldR;
 
-		// ——— 诊断日志：每次都打印按钮检测原始数值，方便排查 ———
-		console.log('[悬赏协作诊断] 绿(接受) n=' + gN + ' 红(拒绝) n=' + rN
-			+ ' | 绿色质心(' + Math.round(gSx / (gN || 1)) + ',' + Math.round(gSy / (gN || 1))
-			+ ') 红质心(' + Math.round(rSx / (rN || 1)) + ',' + Math.round(rSy / (rN || 1)) + ')'
-			+ ' | 奖励行 金=' + gold + ' 紫=' + purple + ' 深=' + dark
-			+ ' | 实际取色 接受=' + probeAcc + ' 拒绝=' + probeRej
-			+ ' | 容差=' + PT_TOL + ' (1280x720基准)');
-
 		// ——— 存在性判据：定点比色 ———
 		// 两个按钮的色块必须出现在它们该在的位置上，缺一不可。
-		// 游戏UI更新后按钮颜色/大小/位置可能微调，阈值放宽。
-		if (rN < 30) {
-			console.log('[悬赏协作] ❌ 拒绝按钮橙红像素太少 rN=' + rN + ' < 30');
+		// 这一条专门挡「画面里没有弹窗、只是碰巧颜色相近」：
+		// 战斗/斗技这类画面再花，也很难让绿对勾和红叉同时压在这两个写死的点上。
+		//   真协作弹窗：绿 159~162，外接框 40x40，中心 (874,498)
+		//               橙红 204~208，外接框 42x38，中心 (878,586)
+		if (rN < 60) {
 			return false;
 		}
-		if (gN < 30 || gN > 1200) {
-			console.log('[悬赏协作] ❌ 接受按钮绿色像素异常 gN=' + gN + ' (阈值 30~1200)');
+		if (gN < 90 || gN > 600) {
 			return false;
 		}
-		if (gMaxX - gMinX > Math.round(100 * dw / BASE_W) || gMaxY - gMinY > Math.round(100 * dh / BASE_H)) {
-			console.log('[悬赏协作] ❌ 绿色区域过大 ' + (gMaxX - gMinX) + 'x' + (gMaxY - gMinY));
+		if (gMaxX - gMinX > Math.round(58 * dw / BASE_W) || gMaxY - gMinY > Math.round(58 * dh / BASE_H)) {
 			return false;
 		}
 		// 色块中心到定点的偏差（换算回 1280x720 基准再比）
@@ -341,13 +326,11 @@ export class Func003 implements IFuncOrigin {
 		const rDx = Math.abs(Math.round(rSx / rN * BASE_W / dw) - REJECT_PT_X);
 		const rDy = Math.abs(Math.round(rSy / rN * BASE_H / dh) - REJECT_PT_Y);
 		if (gDx > PT_TOL || gDy > PT_TOL || rDx > PT_TOL || rDy > PT_TOL) {
-			console.log('[悬赏协作] ❌ 中心偏差超限 接受(' + gDx + ',' + gDy + ') 拒绝(' + rDx + ',' + rDy + ') 容差=' + PT_TOL);
 			return false;
 		}
 
 		// 奖励行里没成片出现彩色图标 → 图标还没刷出来，这一轮先不动
-		if (gold + purple < 80) {
-			console.log('[悬赏协作] ❌ 奖励行彩色像素太少 金=' + gold + ' 紫=' + purple + ' < 80');
+		if (gold + purple < 150) {
 			return false;
 		}
 
