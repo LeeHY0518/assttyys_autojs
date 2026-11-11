@@ -201,11 +201,58 @@ export class Func317 implements IFuncOrigin {
 				[right, 1066, 535, 0xf1631c],
 			]
 		]
+	}, { // 14 祸主降临主界面（新版）
+		desc: [1280, 720,
+			[
+				[left, 443, 94, 0x332630],
+				[left, 272, 92, 0x59233d],
+				[left, 224, 195, 0x412637],
+				[left, 104, 604, 0x533f5b],
+				[right, 1246, 554, 0x151320],
+				[right, 1264, 211, 0x1a1122],
+				[center, 783, 696, 0x353648],
+				[center, 637, 649, 0x73334d],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1109, 561, 1243, 681, 1000],	// 右下大圆按钮：召唤鬼王 / 挑战
+		]
+	}, { // 15 召唤队列面板（新版）
+		desc: [1280, 720,
+			[
+				[left, 431, 493, 0xe8e9ee],
+				[right, 828, 493, 0xe8e9ee],
+				[left, 539, 440, 0xe4e5ea],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 541, 451, 720, 490, 1000],	// 立即召唤
+		]
 	}];
 
 
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 		const thisConf = thisScript.scheme.config['317'];
+
+		// ===== 新版「祸主降临」：先让脚本有反应 =====
+		// 召唤队列面板：直接点立即召唤
+		if (thisScript.oper({
+			id: 317,
+			name: '召唤队列面板',
+			operator: [thisOperator[15]]
+		})) {
+			thisScript.global.waitFight = true;
+			return true;
+		}
+		// 主界面：点右下大圆按钮（无鬼王时为召唤鬼王，有鬼王时为挑战）
+		if (thisScript.oper({
+			id: 317,
+			name: '祸主降临主界面',
+			operator: [thisOperator[14]]
+		})) {
+			return true;
+		}
+
 		if (thisScript.oper({
 			id: 317,
 			name: '是否为没有鬼王页面',
