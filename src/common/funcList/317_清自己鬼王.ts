@@ -234,57 +234,57 @@ export class Func317 implements IFuncOrigin {
 		]
 	}, { // 16 星级1
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xd17b4b],
-			[right, 1065, 535, 0x8f888a],
-			[right, 1073, 535, 0x8f888a],
-			[right, 1080, 535, 0x8f888a],
-			[right, 1088, 535, 0x8f888a],
-			[right, 1096, 535, 0x8f888a],
+			[right, 1058, 535, 0xdc7d49],
+			[right, 1065, 535, 0x8a8285],
+			[right, 1073, 535, 0x8a8285],
+			[right, 1080, 535, 0x8a8285],
+			[right, 1088, 535, 0x8a8285],
+			[right, 1096, 535, 0x8a8285],
 		]]
 	}, { // 17 星级2
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xd17b4b],
-			[right, 1065, 535, 0xd17b4b],
-			[right, 1073, 535, 0x8f888a],
-			[right, 1080, 535, 0x8f888a],
-			[right, 1088, 535, 0x8f888a],
-			[right, 1096, 535, 0x8f888a],
+			[right, 1058, 535, 0xdc7d49],
+			[right, 1065, 535, 0xdc7d49],
+			[right, 1073, 535, 0x8a8285],
+			[right, 1080, 535, 0x8a8285],
+			[right, 1088, 535, 0x8a8285],
+			[right, 1096, 535, 0x8a8285],
 		]]
 	}, { // 18 星级3
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xd17b4b],
-			[right, 1065, 535, 0xd17b4b],
-			[right, 1073, 535, 0xd17b4b],
-			[right, 1080, 535, 0x8f888a],
-			[right, 1088, 535, 0x8f888a],
-			[right, 1096, 535, 0x8f888a],
+			[right, 1058, 535, 0xdc7d49],
+			[right, 1065, 535, 0xdc7d49],
+			[right, 1073, 535, 0xdc7d49],
+			[right, 1080, 535, 0x8a8285],
+			[right, 1088, 535, 0x8a8285],
+			[right, 1096, 535, 0x8a8285],
 		]]
 	}, { // 19 星级4
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xd17b4b],
-			[right, 1065, 535, 0xd17b4b],
-			[right, 1073, 535, 0xd17b4b],
-			[right, 1080, 535, 0xd17b4b],
-			[right, 1088, 535, 0x8f888a],
-			[right, 1096, 535, 0x8f888a],
+			[right, 1058, 535, 0xdc7d49],
+			[right, 1065, 535, 0xdc7d49],
+			[right, 1073, 535, 0xdc7d49],
+			[right, 1080, 535, 0xdc7d49],
+			[right, 1088, 535, 0x8a8285],
+			[right, 1096, 535, 0x8a8285],
 		]]
 	}, { // 20 星级5
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xd17b4b],
-			[right, 1065, 535, 0xd17b4b],
-			[right, 1073, 535, 0xd17b4b],
-			[right, 1080, 535, 0xd17b4b],
-			[right, 1088, 535, 0xd17b4b],
-			[right, 1096, 535, 0x8f888a],
+			[right, 1058, 535, 0xdc7d49],
+			[right, 1065, 535, 0xdc7d49],
+			[right, 1073, 535, 0xdc7d49],
+			[right, 1080, 535, 0xdc7d49],
+			[right, 1088, 535, 0xdc7d49],
+			[right, 1096, 535, 0x8a8285],
 		]]
 	}, { // 21 星级6
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xd17b4b],
-			[right, 1065, 535, 0xd17b4b],
-			[right, 1073, 535, 0xd17b4b],
-			[right, 1080, 535, 0xd17b4b],
-			[right, 1088, 535, 0xd17b4b],
-			[right, 1096, 535, 0xd17b4b],
+			[right, 1058, 535, 0xdc7d49],
+			[right, 1065, 535, 0xdc7d49],
+			[right, 1073, 535, 0xdc7d49],
+			[right, 1080, 535, 0xdc7d49],
+			[right, 1088, 535, 0xdc7d49],
+			[right, 1096, 535, 0xdc7d49],
 		]]
 	}, { // 22 右下大圆按钮（召唤鬼王 / 挑战）
 		oper: [
