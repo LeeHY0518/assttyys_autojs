@@ -326,18 +326,30 @@ export class Func317 implements IFuncOrigin {
 			try {
 				if (Date.now() - this.lastScan > 3000) {
 					this.lastScan = Date.now();
-					const pic = captureScreen();
+					const pic: any = captureScreen();
 					for (const yy of [460, 490, 510, 535, 555, 580, 610]) {
-					const spans: string[] = [];
-					let st = -1;
-					for (let x = 700; x < 1280; x++) {
-						const c = colors.rgb(images.pixel(pic, x, yy));
-						const isO = (c[0] - c[1]) > 60 && (c[0] - c[2]) > 100;
-						if (isO && st < 0) st = x;
-						if (!isO && st >= 0) { if (x - st >= 2) spans.push(`${st}-${x - 1}`); st = -1; }
-					}
-					if (st >= 0) spans.push(`${st}-1279`);
-					console.log(`317扫描y=${yy} 亮橙段：${spans.length ? spans.join(' | ') : '无'}`);
+						const spans: string[] = [];
+						let st = -1;
+						for (let x = 700; x < 1280; x++) {
+							const c: number = (images as any).pixel(pic, x, yy);
+							const rr = (c >> 16) & 0xff;
+							const gg = (c >> 8) & 0xff;
+							const bb = c & 0xff;
+							const isO = (rr - gg) > 60 && (rr - bb) > 100;
+							if (isO && st < 0) {
+								st = x;
+							}
+							if (!isO && st >= 0) {
+								if (x - st >= 2) {
+									spans.push(st + '-' + (x - 1));
+								}
+								st = -1;
+							}
+						}
+						if (st >= 0) {
+							spans.push(st + '-1279');
+						}
+						console.log('317扫描y=' + yy + ' 亮橙段：' + (spans.length ? spans.join(' | ') : '无'));
 					}
 				}
 			} catch (e) {
