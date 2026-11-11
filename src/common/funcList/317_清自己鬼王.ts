@@ -336,6 +336,16 @@ export class Func317 implements IFuncOrigin {
 			name: '祸主降临主界面',
 			operator: [thisOperator[14]]
 		})) {
+			const g: any = thisScript.global;
+			// 刚点过右下按钮（召唤）：此时按钮已变成「挑战」，不必再判星级
+			const summonedAt: number = g['summon317At'] || 0;
+			if (summonedAt && Date.now() - summonedAt < 20000) {
+				g['summon317At'] = 0;
+				const r = thisScript.oper({ id: 317, name: '挑战已召唤鬼王', operator: [thisOperator[28]] });
+				if (!r) g['summon317At'] = Date.now();
+				sleep(2500);
+				return r;
+			}
 			let star = 0;
 			for (let i = 0; i < 6; i++) {
 				if (thisScript.oper({ id: 317, name: `判星级${i + 1}`, operator: [thisOperator[16 + i]] })) {
@@ -364,12 +374,14 @@ export class Func317 implements IFuncOrigin {
 			}
 			this.zeroStar = 0;
 			if (star <= 4) {
-				const r = thisScript.oper({ id: 317, name: '挑战鬼王_新版', operator: [thisOperator[28]] });
+				const r = thisScript.oper({ id: 317, name: '召唤鬼王_新版', operator: [thisOperator[28]] });
+				if (r) g['summon317At'] = Date.now();
 				sleep(2500);
 				return r;
 			}
 			if (thisConf && thisConf.fight_level_five_six) {
-				const r = thisScript.oper({ id: 317, name: '挑战高星鬼王_新版', operator: [thisOperator[28]] });
+				const r = thisScript.oper({ id: 317, name: '召唤高星鬼王_新版', operator: [thisOperator[28]] });
+				if (r) g['summon317At'] = Date.now();
 				sleep(2500);
 				return r;
 			}
