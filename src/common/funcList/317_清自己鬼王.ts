@@ -19,6 +19,13 @@ export class Func317 implements IFuncOrigin {
 				type: 'switch',
 				default: true,
 				value: null,
+			},
+			{
+				name: 'fight_level_five_six',
+				desc: '5星/6星也直接挑战（关闭则遇到即停止）',
+				type: 'switch',
+				default: false,
+				value: null,
 			}
 		]
 	}]
@@ -213,9 +220,6 @@ export class Func317 implements IFuncOrigin {
 				[center, 783, 696, 0x353648],
 				[center, 637, 649, 0x73334d],
 			]
-		],
-		oper: [
-			[center, 1280, 720, 1109, 561, 1243, 681, 1000],	// 右下大圆按钮：召唤鬼王 / 挑战
 		]
 	}, { // 15 召唤队列面板（新版）
 		desc: [1280, 720,
@@ -227,6 +231,64 @@ export class Func317 implements IFuncOrigin {
 		],
 		oper: [
 			[center, 1280, 720, 541, 451, 720, 490, 1000],	// 立即召唤
+		]
+	}, { // 16 星级1
+		desc: [1280, 720, [
+			[right, 1058, 535, 0xd17b4b],
+			[right, 1065, 535, 0x8f888a],
+			[right, 1073, 535, 0x8f888a],
+			[right, 1080, 535, 0x8f888a],
+			[right, 1088, 535, 0x8f888a],
+			[right, 1096, 535, 0x8f888a],
+		]]
+	}, { // 17 星级2
+		desc: [1280, 720, [
+			[right, 1058, 535, 0xd17b4b],
+			[right, 1065, 535, 0xd17b4b],
+			[right, 1073, 535, 0x8f888a],
+			[right, 1080, 535, 0x8f888a],
+			[right, 1088, 535, 0x8f888a],
+			[right, 1096, 535, 0x8f888a],
+		]]
+	}, { // 18 星级3
+		desc: [1280, 720, [
+			[right, 1058, 535, 0xd17b4b],
+			[right, 1065, 535, 0xd17b4b],
+			[right, 1073, 535, 0xd17b4b],
+			[right, 1080, 535, 0x8f888a],
+			[right, 1088, 535, 0x8f888a],
+			[right, 1096, 535, 0x8f888a],
+		]]
+	}, { // 19 星级4
+		desc: [1280, 720, [
+			[right, 1058, 535, 0xd17b4b],
+			[right, 1065, 535, 0xd17b4b],
+			[right, 1073, 535, 0xd17b4b],
+			[right, 1080, 535, 0xd17b4b],
+			[right, 1088, 535, 0x8f888a],
+			[right, 1096, 535, 0x8f888a],
+		]]
+	}, { // 20 星级5
+		desc: [1280, 720, [
+			[right, 1058, 535, 0xd17b4b],
+			[right, 1065, 535, 0xd17b4b],
+			[right, 1073, 535, 0xd17b4b],
+			[right, 1080, 535, 0xd17b4b],
+			[right, 1088, 535, 0xd17b4b],
+			[right, 1096, 535, 0x8f888a],
+		]]
+	}, { // 21 星级6
+		desc: [1280, 720, [
+			[right, 1058, 535, 0xd17b4b],
+			[right, 1065, 535, 0xd17b4b],
+			[right, 1073, 535, 0xd17b4b],
+			[right, 1080, 535, 0xd17b4b],
+			[right, 1088, 535, 0xd17b4b],
+			[right, 1096, 535, 0xd17b4b],
+		]]
+	}, { // 22 右下大圆按钮（召唤鬼王 / 挑战）
+		oper: [
+			[center, 1280, 720, 1109, 561, 1243, 681, 1000],
 		]
 	}];
 
@@ -244,12 +306,33 @@ export class Func317 implements IFuncOrigin {
 			thisScript.global.waitFight = true;
 			return true;
 		}
-		// 主界面：点右下大圆按钮（无鬼王时为召唤鬼王，有鬼王时为挑战）
+		// 主界面：先判星级，1-4 星直接挑战；5-6 星看开关
 		if (thisScript.oper({
 			id: 317,
 			name: '祸主降临主界面',
 			operator: [thisOperator[14]]
 		})) {
+			const starOperator: IFuncOperator[] = [
+				thisOperator[16], thisOperator[17], thisOperator[18],
+				thisOperator[19], thisOperator[20], thisOperator[21],
+			];
+			let star = 0;
+			for (let i = 0; i < starOperator.length; i++) {
+				if (thisScript.oper({ id: 317, name: `判星级${i + 1}`, operator: [starOperator[i]], notForCnt: true } as any)) {
+					star = i + 1;
+					break;
+				}
+			}
+			console.log(`317当前鬼王星级：${star}`);
+			if (star <= 4) {
+				return thisScript.oper({ id: 317, name: '挑战鬼王_新版', operator: [thisOperator[22]] });
+			}
+			if (thisConf && thisConf.fight_level_five_six) {
+				return thisScript.oper({ id: 317, name: '挑战高星鬼王_新版', operator: [thisOperator[22]] });
+			}
+			thisScript.doPush(thisScript, { text: `当前鬼王 ${star} 星，已按设置停止。`, before() { thisScript.myToast('遇到高星鬼王，脚本即将停止'); } });
+			thisScript.stop();
+			sleep(3000);
 			return true;
 		}
 
