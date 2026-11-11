@@ -232,61 +232,73 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 541, 451, 720, 490, 1000],	// 立即召唤
 		]
-	}, { // 16 星级1
+	}, { // 16 星级1（第2-6颗灰）
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xdc7d49],
-			[right, 1065, 535, 0x8a8285],
-			[right, 1073, 535, 0x8a8285],
-			[right, 1080, 535, 0x8a8285],
-			[right, 1088, 535, 0x8a8285],
-			[right, 1096, 535, 0x8a8285],
+			[right, 1065, 535, 0x838080],
+			[right, 1073, 535, 0x838080],
+			[right, 1080, 535, 0x838080],
+			[right, 1088, 535, 0x838080],
+			[right, 1096, 535, 0x838080],
 		]]
-	}, { // 17 星级2
+	}, { // 17 星级2（第3-6颗灰）
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xdc7d49],
-			[right, 1065, 535, 0xdc7d49],
-			[right, 1073, 535, 0x8a8285],
-			[right, 1080, 535, 0x8a8285],
-			[right, 1088, 535, 0x8a8285],
-			[right, 1096, 535, 0x8a8285],
+			[right, 1073, 535, 0x838080],
+			[right, 1080, 535, 0x838080],
+			[right, 1088, 535, 0x838080],
+			[right, 1096, 535, 0x838080],
 		]]
-	}, { // 18 星级3
+	}, { // 18 星级3（第4-6颗灰）
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xdc7d49],
-			[right, 1065, 535, 0xdc7d49],
-			[right, 1073, 535, 0xdc7d49],
-			[right, 1080, 535, 0x8a8285],
-			[right, 1088, 535, 0x8a8285],
-			[right, 1096, 535, 0x8a8285],
+			[right, 1080, 535, 0x838080],
+			[right, 1088, 535, 0x838080],
+			[right, 1096, 535, 0x838080],
 		]]
-	}, { // 19 星级4
+	}, { // 19 星级4（第5-6颗灰）
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xdc7d49],
-			[right, 1065, 535, 0xdc7d49],
-			[right, 1073, 535, 0xdc7d49],
-			[right, 1080, 535, 0xdc7d49],
-			[right, 1088, 535, 0x8a8285],
-			[right, 1096, 535, 0x8a8285],
+			[right, 1088, 535, 0x838080],
+			[right, 1096, 535, 0x838080],
 		]]
-	}, { // 20 星级5
+	}, { // 20 星级5（第6颗灰）
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xdc7d49],
-			[right, 1065, 535, 0xdc7d49],
-			[right, 1073, 535, 0xdc7d49],
-			[right, 1080, 535, 0xdc7d49],
-			[right, 1088, 535, 0xdc7d49],
-			[right, 1096, 535, 0x8a8285],
+			[right, 1096, 535, 0x838080],
 		]]
-	}, { // 21 星级6
+	}, { // 21 星级6（六颗全亮）
 		desc: [1280, 720, [
-			[right, 1058, 535, 0xdc7d49],
-			[right, 1065, 535, 0xdc7d49],
-			[right, 1073, 535, 0xdc7d49],
-			[right, 1080, 535, 0xdc7d49],
-			[right, 1088, 535, 0xdc7d49],
-			[right, 1096, 535, 0xdc7d49],
+			[right, 1058, 535, 0xd67a44],
+			[right, 1080, 535, 0xd67a44],
+			[right, 1096, 535, 0xd67a44],
 		]]
-	}, { // 22 右下大圆按钮（召唤鬼王 / 挑战）
+	}, { // 22 倒序1星（第1-5颗灰）
+		desc: [1280, 720, [
+			[right, 1058, 535, 0x838080],
+			[right, 1065, 535, 0x838080],
+			[right, 1073, 535, 0x838080],
+			[right, 1080, 535, 0x838080],
+			[right, 1088, 535, 0x838080],
+		]]
+	}, { // 23 倒序2星（第1-4颗灰）
+		desc: [1280, 720, [
+			[right, 1058, 535, 0x838080],
+			[right, 1065, 535, 0x838080],
+			[right, 1073, 535, 0x838080],
+			[right, 1080, 535, 0x838080],
+		]]
+	}, { // 24 倒序3星（第1-3颗灰）
+		desc: [1280, 720, [
+			[right, 1058, 535, 0x838080],
+			[right, 1065, 535, 0x838080],
+			[right, 1073, 535, 0x838080],
+		]]
+	}, { // 25 倒序4星（第1-2颗灰）
+		desc: [1280, 720, [
+			[right, 1058, 535, 0x838080],
+			[right, 1065, 535, 0x838080],
+		]]
+	}, { // 26 倒序5星（第1颗灰）
+		desc: [1280, 720, [
+			[right, 1058, 535, 0x838080],
+		]]
+	}, { // 27 右下大圆按钮（召唤鬼王 / 挑战）
 		oper: [
 			[center, 1280, 720, 1109, 561, 1243, 681, 1000],
 		]
@@ -312,23 +324,31 @@ export class Func317 implements IFuncOrigin {
 			name: '祸主降临主界面',
 			operator: [thisOperator[14]]
 		})) {
-			const starOperator: IFuncOperator[] = [
-				thisOperator[16], thisOperator[17], thisOperator[18],
-				thisOperator[19], thisOperator[20], thisOperator[21],
-			];
 			let star = 0;
-			for (let i = 0; i < starOperator.length; i++) {
-				if (thisScript.oper({ id: 317, name: `判星级${i + 1}`, operator: [starOperator[i]], notForCnt: true } as any)) {
+			for (let i = 0; i < 6; i++) {
+				if (thisScript.oper({ id: 317, name: `判星级${i + 1}`, operator: [thisOperator[16 + i]], notForCnt: true } as any)) {
 					star = i + 1;
 					break;
 				}
 			}
+			if (!star) {
+				for (let i = 0; i < 5; i++) {
+					if (thisScript.oper({ id: 317, name: `判星级倒序${i + 1}`, operator: [thisOperator[22 + i]], notForCnt: true } as any)) {
+						star = i + 1;
+						break;
+					}
+				}
+			}
 			console.log(`317当前鬼王星级：${star}`);
 			if (star <= 4) {
-				return thisScript.oper({ id: 317, name: '挑战鬼王_新版', operator: [thisOperator[22]] });
+				const r = thisScript.oper({ id: 317, name: '挑战鬼王_新版', operator: [thisOperator[27]] });
+				sleep(2500);
+				return r;
 			}
 			if (thisConf && thisConf.fight_level_five_six) {
-				return thisScript.oper({ id: 317, name: '挑战高星鬼王_新版', operator: [thisOperator[22]] });
+				const r = thisScript.oper({ id: 317, name: '挑战高星鬼王_新版', operator: [thisOperator[27]] });
+				sleep(2500);
+				return r;
 			}
 			thisScript.doPush(thisScript, { text: `当前鬼王 ${star} 星，已按设置停止。`, before() { thisScript.myToast('遇到高星鬼王，脚本即将停止'); } });
 			thisScript.stop();
