@@ -9,7 +9,7 @@ const right = 2;
 export class Func317 implements IFuncOrigin {
 	id = 317;
 	name = '清自己鬼王';
-	private zeroStar = 0;
+	private noStarAt = 0;
 	desc: '只清理1-4星鬼王，56星自行开启通知或不时查看（脚本会停下）';
 	config = [{
 		desc: '',
@@ -341,6 +341,7 @@ export class Func317 implements IFuncOrigin {
 			const summonedAt: number = g['summon317At'] || 0;
 			if (summonedAt && Date.now() - summonedAt < 20000) {
 				g['summon317At'] = 0;
+				this.noStarAt = 0;
 				const r = thisScript.oper({ id: 317, name: '挑战已召唤鬼王', operator: [thisOperator[28]] });
 				if (!r) g['summon317At'] = Date.now();
 				sleep(2500);
@@ -361,27 +362,29 @@ export class Func317 implements IFuncOrigin {
 					}
 				}
 			}
-			console.log(`317当前鬼王星级：${star}`);
 			if (!star) {
-				this.zeroStar = (this.zeroStar || 0) + 1;
-				console.log(`317星级识别失败，累计${this.zeroStar}次`);
-				if (this.zeroStar >= 3) {
-					thisScript.doPush(thisScript, { text: '无法识别鬼王星级，可能是勾玉行位置变了，脚本已停止。', before() { thisScript.myToast('星级识别失败，脚本即将停止'); } });
+				if (!this.noStarAt) this.noStarAt = Date.now();
+				const waitSec = (Date.now() - this.noStarAt) / 1000;
+				console.log(`317暂未识别到星级，已等待${waitSec.toFixed(1)}秒（结算/刷新中）`);
+				if (waitSec >= 15) {
+					thisScript.doPush(thisScript, { text: '连续15秒没有可打的鬼王，可能是召唤券用完了，脚本已停止。', before() { thisScript.myToast('没有可打的鬼王，脚本即将停止'); } });
 					thisScript.stop();
 					sleep(3000);
+					return true;
 				}
-				return true;
+				return false;
 			}
-			this.zeroStar = 0;
+			console.log(`317当前鬼王星级：${star}`);
+			this.noStarAt = 0;
 			if (star <= 4) {
 				const r = thisScript.oper({ id: 317, name: '召唤鬼王_新版', operator: [thisOperator[28]] });
-				if (r) g['summon317At'] = Date.now();
+				if (r) { g['summon317At'] = Date.now(); this.noStarAt = 0; }
 				sleep(2500);
 				return r;
 			}
 			if (thisConf && thisConf.fight_level_five_six) {
 				const r = thisScript.oper({ id: 317, name: '召唤高星鬼王_新版', operator: [thisOperator[28]] });
-				if (r) g['summon317At'] = Date.now();
+				if (r) { g['summon317At'] = Date.now(); this.noStarAt = 0; }
 				sleep(2500);
 				return r;
 			}
