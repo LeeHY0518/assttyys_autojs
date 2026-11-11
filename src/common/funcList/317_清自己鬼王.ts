@@ -10,7 +10,6 @@ export class Func317 implements IFuncOrigin {
 	id = 317;
 	name = '清自己鬼王';
 	private noStarAt = 0;
-	private lastScan = 0;
 	desc: '只清理1-4星鬼王，56星自行开启通知或不时查看（脚本会停下）';
 	config = [{
 		desc: '',
@@ -318,43 +317,26 @@ export class Func317 implements IFuncOrigin {
 				sleep(2500);
 				return r;
 			}
+			const xs = [1066, 1074, 1083, 1090, 1097, 1105];
 			const lit: boolean[] = [];
-			for (let i = 0; i < 6; i++) {
-				lit.push(!!thisScript.oper({ id: 317, name: `第${i + 1}颗亮`, operator: [thisOperator[16 + i]] }));
-			}
-			console.log(`317各颗亮情况：${lit.map(v => v ? '1' : '0').join('')}`);
+			const dbg: string[] = [];
 			try {
-				if (Date.now() - this.lastScan > 3000) {
-					this.lastScan = Date.now();
-					const pic: any = captureScreen();
-					for (const yy of [460, 490, 510, 535, 555, 580, 610]) {
-						const spans: string[] = [];
-						let st = -1;
-						for (let x = 700; x < 1280; x++) {
-							const c: number = (images as any).pixel(pic, x, yy);
-							const rr = (c >> 16) & 0xff;
-							const gg = (c >> 8) & 0xff;
-							const bb = c & 0xff;
-							const isO = (rr - gg) > 60 && (rr - bb) > 100;
-							if (isO && st < 0) {
-								st = x;
-							}
-							if (!isO && st >= 0) {
-								if (x - st >= 2) {
-									spans.push(st + '-' + (x - 1));
-								}
-								st = -1;
-							}
-						}
-						if (st >= 0) {
-							spans.push(st + '-1279');
-						}
-						console.log('317扫描y=' + yy + ' 亮橙段：' + (spans.length ? spans.join(' | ') : '无'));
-					}
+				const pic: any = captureScreen();
+				for (let i = 0; i < 6; i++) {
+					const c: number = (images as any).pixel(pic, xs[i], 535);
+					const rr = (c >> 16) & 0xff;
+					const gg = (c >> 8) & 0xff;
+					const bb = c & 0xff;
+					lit.push((rr - bb) > 60 && rr > 120);
+					dbg.push(('000000' + c.toString(16)).slice(-6));
 				}
 			} catch (e) {
-				console.log('317扫描异常：' + e);
+				console.log('317判星异常：' + e);
+				for (let i = 0; i < 6; i++) {
+					lit.push(false);
+				}
 			}
+			console.log(`317各颗亮情况：${lit.map(v => v ? '1' : '0').join('')}  色值：${dbg.join(' ')}`);
 			let star = 0;
 			while (star < 6 && lit[star]) star++;
 			if (!star) {
