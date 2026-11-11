@@ -323,12 +323,20 @@ export class Func317 implements IFuncOrigin {
 			try {
 				const pic: any = captureScreen();
 				for (let i = 0; i < 6; i++) {
-					const c: number = (images as any).pixel(pic, xs[i], 535);
-					const rr = (c >> 16) & 0xff;
-					const gg = (c >> 8) & 0xff;
-					const bb = c & 0xff;
-					lit.push((rr - bb) > 60 && rr > 120);
-					dbg.push(('000000' + c.toString(16)).slice(-6));
+					let best = -999;
+					let bestHex = 0;
+					for (let yy = 526; yy <= 544; yy++) {
+						const c: number = (images as any).pixel(pic, xs[i], yy);
+						const rr = (c >> 16) & 0xff;
+						const bb = c & 0xff;
+						const d = rr - bb;
+						if (d > best) {
+							best = d;
+							bestHex = c;
+						}
+					}
+					lit.push(best > 70);
+					dbg.push(('000000' + bestHex.toString(16)).slice(-6) + '(' + best + ')');
 				}
 			} catch (e) {
 				console.log('317判星异常：' + e);
