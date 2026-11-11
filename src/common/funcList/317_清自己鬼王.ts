@@ -10,6 +10,7 @@ export class Func317 implements IFuncOrigin {
 	id = 317;
 	name = '清自己鬼王';
 	private noStarAt = 0;
+	private lastScan = 0;
 	desc: '只清理1-4星鬼王，56星自行开启通知或不时查看（脚本会停下）';
 	config = [{
 		desc: '',
@@ -323,17 +324,24 @@ export class Func317 implements IFuncOrigin {
 			}
 			console.log(`317各颗亮情况：${lit.map(v => v ? '1' : '0').join('')}`);
 			try {
-				const pic = captureScreen();
-				const kx = device.width / 1280;
-				const ky = device.height / 720;
-				const xs = [1066, 1074, 1083, 1090, 1097, 1105];
-				const cols: string[] = [];
-				for (let i = 0; i < 6; i++) {
-					cols.push(colors.toString(images.pixel(pic, Math.round(xs[i] * kx), Math.round(535 * ky))));
+				if (Date.now() - this.lastScan > 3000) {
+					this.lastScan = Date.now();
+					const pic = captureScreen();
+					for (const yy of [460, 490, 510, 535, 555, 580, 610]) {
+					const spans: string[] = [];
+					let st = -1;
+					for (let x = 700; x < 1280; x++) {
+						const c = colors.rgb(images.pixel(pic, x, yy));
+						const isO = (c[0] - c[1]) > 60 && (c[0] - c[2]) > 100;
+						if (isO && st < 0) st = x;
+						if (!isO && st >= 0) { if (x - st >= 2) spans.push(`${st}-${x - 1}`); st = -1; }
+					}
+					if (st >= 0) spans.push(`${st}-1279`);
+					console.log(`317扫描y=${yy} 亮橙段：${spans.length ? spans.join(' | ') : '无'}`);
+					}
 				}
-				console.log(`317实测色值：${cols.join(' ')}  屏幕${device.width}x${device.height}`);
 			} catch (e) {
-				console.log('317取色诊断异常：' + e);
+				console.log('317扫描异常：' + e);
 			}
 			let star = 0;
 			while (star < 6 && lit[star]) star++;
