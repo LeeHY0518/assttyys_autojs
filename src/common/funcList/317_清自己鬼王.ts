@@ -10,6 +10,7 @@ export class Func317 implements IFuncOrigin {
 	id = 317;
 	name = '清自己鬼王';
 	private noStarAt = 0;
+	private lastLogAt = 0;
 	desc: '只清理1-4星鬼王，56星自行开启通知或不时查看（脚本会停下）';
 	config = [{
 		desc: '',
@@ -319,8 +320,7 @@ export class Func317 implements IFuncOrigin {
 			}
 			const xs = [1066, 1074, 1083, 1090, 1097, 1105];
 			const lit: boolean[] = [];
-			const dbg: string[] = [];
-			try {
+			const dbg: string[] = [];			try {
 				const pic: any = captureScreen();
 				for (let i = 0; i < 6; i++) {
 					let best = -999;
@@ -344,13 +344,20 @@ export class Func317 implements IFuncOrigin {
 					lit.push(false);
 				}
 			}
-			console.log(`317各颗亮情况：${lit.map(v => v ? '1' : '0').join('')}  色值：${dbg.join(' ')}`);
+			const nowMs = Date.now();
+			const logIt = !this.lastLogAt || nowMs - this.lastLogAt >= 5000;
+			if (logIt) {
+				this.lastLogAt = nowMs;
+				console.log(`317各颗亮情况：${lit.map(v => v ? '1' : '0').join('')}  色值：${dbg.join(' ')}`);
+			}
 			let star = 0;
 			while (star < 6 && lit[star]) star++;
 			if (!star) {
 				if (!this.noStarAt) this.noStarAt = Date.now();
 				const waitSec = (Date.now() - this.noStarAt) / 1000;
-				console.log(`317暂未识别到星级，已等待${waitSec.toFixed(1)}秒（结算/刷新中）`);
+				if (logIt) {
+					console.log(`317暂未识别到星级，已等待${waitSec.toFixed(1)}秒（结算/刷新中）`);
+				}
 				if (waitSec >= 15) {
 					thisScript.doPush(thisScript, { text: '连续15秒没有可打的鬼王，可能是召唤券用完了，脚本已停止。', before() { thisScript.myToast('没有可打的鬼王，脚本即将停止'); } });
 					thisScript.stop();
