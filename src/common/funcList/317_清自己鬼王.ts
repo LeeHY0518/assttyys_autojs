@@ -322,6 +322,19 @@ export class Func317 implements IFuncOrigin {
 				lit.push(!!thisScript.oper({ id: 317, name: `第${i + 1}颗亮`, operator: [thisOperator[16 + i]] }));
 			}
 			console.log(`317各颗亮情况：${lit.map(v => v ? '1' : '0').join('')}`);
+			try {
+				const pic = captureScreen();
+				const kx = device.width / 1280;
+				const ky = device.height / 720;
+				const xs = [1066, 1074, 1083, 1090, 1097, 1105];
+				const cols: string[] = [];
+				for (let i = 0; i < 6; i++) {
+					cols.push(colors.toString(images.pixel(pic, Math.round(xs[i] * kx), Math.round(535 * ky))));
+				}
+				console.log(`317实测色值：${cols.join(' ')}  屏幕${device.width}x${device.height}`);
+			} catch (e) {
+				console.log('317取色诊断异常：' + e);
+			}
 			let star = 0;
 			while (star < 6 && lit[star]) star++;
 			if (!star) {
