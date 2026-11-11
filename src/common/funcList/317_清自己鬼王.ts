@@ -232,83 +232,65 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 541, 451, 720, 490, 1000],	// 立即召唤
 		]
-	}, { // 16 星级1（第2-6颗灰）
+	}, { // 16 星级1（第1颗亮，第2颗灰）
 		desc: [1280, 720, [
-			[right, 1074, 534, 0x7c7778],
-			[right, 1083, 534, 0x7c7778],
-			[right, 1090, 534, 0x7c7778],
-			[right, 1097, 534, 0x7c7778],
-			[right, 1105, 534, 0x7c7778],
+			[right, 1067, 535, 0xb36037],
+			[right, 1074, 535, 0x7c7778],
 		]]
-	}, { // 17 星级2（第3-6颗灰）
+	}, { // 17 星级2（第2颗亮，第3颗灰）
 		desc: [1280, 720, [
-			[right, 1083, 534, 0x7c7778],
-			[right, 1090, 534, 0x7c7778],
-			[right, 1097, 534, 0x7c7778],
-			[right, 1105, 534, 0x7c7778],
+			[right, 1074, 535, 0xba6235],
+			[right, 1083, 535, 0x7c7778],
 		]]
-	}, { // 18 星级3（第4-6颗灰）
+	}, { // 18 星级3（第3颗亮，第4颗灰）
 		desc: [1280, 720, [
-			[right, 1090, 534, 0x7c7778],
-			[right, 1097, 534, 0x7c7778],
-			[right, 1105, 534, 0x7c7778],
+			[right, 1083, 535, 0xc46536],
+			[right, 1090, 535, 0x7c7778],
 		]]
-	}, { // 19 星级4（第5-6颗灰）
+	}, { // 19 星级4（第4颗亮，第5颗灰）
 		desc: [1280, 720, [
-			[right, 1097, 534, 0x7c7778],
-			[right, 1105, 534, 0x7c7778],
+			[right, 1090, 535, 0xce703c],
+			[right, 1097, 535, 0x7c7778],
 		]]
-	}, { // 20 星级5（第6颗灰）
+	}, { // 20 星级5（第5颗亮，第6颗灰）
 		desc: [1280, 720, [
-			[right, 1105, 534, 0x7c7778],
+			[right, 1097, 535, 0xc3682f],
+			[right, 1105, 535, 0x7c7778],
 		]]
-	}, { // 21 星级6（六颗全亮）
+	}, { // 21 星级6（第6颗亮，第1颗亮）
 		desc: [1280, 720, [
-			[right, 1067, 534, 0xb36037],
-			[right, 1074, 534, 0xba6235],
-			[right, 1083, 534, 0xc46536],
-			[right, 1090, 534, 0xce703c],
-			[right, 1097, 534, 0xc3682f],
-			[right, 1105, 534, 0xc3682f],
+			[right, 1105, 535, 0xc3682f],
+			[right, 1067, 535, 0xb36037],
 		]]
-	}, { // 22 备用星级1（原项目灰值）
+	}, { // 22 备用星级1（第1颗亮，第2颗灰）
 		desc: [1280, 720, [
-			[right, 1074, 534, 0x7c7778],
-			[right, 1083, 534, 0x7c7778],
-			[right, 1090, 534, 0x7c7778],
-			[right, 1097, 534, 0x7c7778],
-			[right, 1105, 534, 0x7c7778],
+			[right, 1067, 535, 0xb36037],
+			[right, 1074, 535, 0x7c7778],
 		]]
-	}, { // 23 备用星级2
+	}, { // 23 备用星级2（第2颗亮，第3颗灰）
 		desc: [1280, 720, [
-			[right, 1083, 534, 0x7c7778],
-			[right, 1090, 534, 0x7c7778],
-			[right, 1097, 534, 0x7c7778],
-			[right, 1105, 534, 0x7c7778],
+			[right, 1074, 535, 0xba6235],
+			[right, 1083, 535, 0x7c7778],
 		]]
-	}, { // 24 备用星级3
+	}, { // 24 备用星级3（第3颗亮，第4颗灰）
 		desc: [1280, 720, [
-			[right, 1090, 534, 0x7c7778],
-			[right, 1097, 534, 0x7c7778],
-			[right, 1105, 534, 0x7c7778],
+			[right, 1083, 535, 0xc46536],
+			[right, 1090, 535, 0x7c7778],
 		]]
-	}, { // 25 备用星级4
+	}, { // 25 备用星级4（第4颗亮，第5颗灰）
 		desc: [1280, 720, [
-			[right, 1097, 534, 0x7c7778],
-			[right, 1105, 534, 0x7c7778],
+			[right, 1090, 535, 0xce703c],
+			[right, 1097, 535, 0x7c7778],
 		]]
-	}, { // 26 备用星级5
+	}, { // 26 备用星级5（第5颗亮，第6颗灰）
 		desc: [1280, 720, [
-			[right, 1105, 534, 0x7c7778],
+			[right, 1097, 535, 0xc3682f],
+			[right, 1105, 535, 0x7c7778],
 		]]
-	}, { // 27 备用星级6
+	}, { // 27 备用星级6（第6颗亮，第1颗亮）
 		desc: [1280, 720, [
-			[right, 1067, 534, 0xb36037],
-			[right, 1074, 534, 0xba6235],
-			[right, 1083, 534, 0xc46536],
-			[right, 1090, 534, 0xce703c],
-			[right, 1097, 534, 0xc3682f],
-			[right, 1105, 534, 0xc3682f],
+			[right, 1105, 535, 0xc3682f],
+			[right, 1067, 535, 0xb36037],
 		]]
 	}, { // 28 右下大圆按钮（召唤鬼王 / 挑战）
 		oper: [
@@ -355,14 +337,6 @@ export class Func317 implements IFuncOrigin {
 				}
 			}
 			if (!star) {
-				for (let i = 0; i < 6; i++) {
-					if (thisScript.oper({ id: 317, name: `判星级备用${i + 1}`, operator: [thisOperator[22 + i]] })) {
-						star = i + 1;
-						break;
-					}
-				}
-			}
-			if (!star) {
 				if (!this.noStarAt) this.noStarAt = Date.now();
 				const waitSec = (Date.now() - this.noStarAt) / 1000;
 				console.log(`317暂未识别到星级，已等待${waitSec.toFixed(1)}秒（结算/刷新中）`);
@@ -377,6 +351,12 @@ export class Func317 implements IFuncOrigin {
 			console.log(`317当前鬼王星级：${star}`);
 			this.noStarAt = 0;
 			if (star <= 4) {
+				if (star === 4 && thisConf && !thisConf.fight_level_four) {
+					thisScript.doPush(thisScript, { text: '当前鬼王 4 星，已按设置停止（未开启清4星）。', before() { thisScript.myToast('遇到4星鬼王，脚本即将停止'); } });
+					thisScript.stop();
+					sleep(3000);
+					return true;
+				}
 				const r = thisScript.oper({ id: 317, name: '召唤鬼王_新版', operator: [thisOperator[28]] });
 				if (r) { g['summon317At'] = Date.now(); this.noStarAt = 0; }
 				sleep(2500);
