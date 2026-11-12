@@ -6,6 +6,40 @@ const left = 0;
 const center = 1;
 const right = 2;
 
+// 判定是否处于「已召唤出鬼王」状态（按钮=挑战、勾玉排整排缺位）
+// 特征A：右下按钮三处文字位置的亮度模式（挑战=中部暗、左侧亮、下侧亮）
+// 特征B：勾玉槽位整排缺位（蓝紫底、亮度低）
+// 两者同时成立才算，缺一不改状态
+function isSummonedPage317(): boolean {
+	try {
+		const pic: any = captureScreen();
+		const lum = (x: number, y: number): number => {
+			const c: number = (images as any).pixel(pic, x, y);
+			const r = (c >> 16) & 0xff;
+			const g2 = (c >> 8) & 0xff;
+			const b = c & 0xff;
+			return (r + g2 + b) / 3;
+		};
+		const midDark = lum(1190, 614) < 110;
+		const leftLight = lum(1157, 608) > 170;
+		const botLight = lum(1197, 644) > 170;
+		const xs2 = [1066, 1074, 1083, 1090, 1097, 1105];
+		let missing = 0;
+		for (let i = 0; i < 6; i++) {
+			const c: number = (images as any).pixel(pic, xs2[i], 534);
+			const r = (c >> 16) & 0xff;
+			const g3 = (c >> 8) & 0xff;
+			const b2 = c & 0xff;
+			if ((r + g3 + b2) / 3 < 90 && b2 > r) missing++;
+		}
+		console.log(`317状态判定：按钮中${midDark ? '暗' : '亮'} 左${leftLight ? '亮' : '暗'} 下${botLight ? '亮' : '暗'} 勾玉缺位${missing}/6`);
+		return midDark && leftLight && botLight && missing >= 4;
+	} catch (e) {
+		console.log('317状态判定异常：' + e);
+		return false;
+	}
+}
+
 export class Func317 implements IFuncOrigin {
 	id = 317;
 	name = '清自己鬼王';
@@ -288,40 +322,6 @@ export class Func317 implements IFuncOrigin {
 	}];
 
 
-	// 判定是否处于「已召唤出鬼王」状态：
-	// 特征A：右下按钮三处文字位置的亮度模式（挑战=中部暗、左侧亮、下侧亮）
-	// 特征B：勾玉槽位整排缺位（蓝紫底、亮度低）
-	// 两者同时成立才算，缺一不改状态
-	private isSummonedPage(): boolean {
-		try {
-			const pic: any = captureScreen();
-			const lum = (x: number, y: number): number => {
-				const c: number = (images as any).pixel(pic, x, y);
-				const r = (c >> 16) & 0xff;
-				const g2 = (c >> 8) & 0xff;
-				const b = c & 0xff;
-				return (r + g2 + b) / 3;
-			};
-			const midDark = lum(1190, 614) < 110;
-			const leftLight = lum(1157, 608) > 170;
-			const botLight = lum(1197, 644) > 170;
-			const xs2 = [1066, 1074, 1083, 1090, 1097, 1105];
-			let missing = 0;
-			for (let i = 0; i < 6; i++) {
-				const c: number = (images as any).pixel(pic, xs2[i], 534);
-				const r = (c >> 16) & 0xff;
-				const g3 = (c >> 8) & 0xff;
-				const b2 = c & 0xff;
-				if ((r + g3 + b2) / 3 < 90 && b2 > r) missing++;
-			}
-			console.log(`317状态判定：按钮中${midDark ? '暗' : '亮'} 左${leftLight ? '亮' : '暗'} 下${botLight ? '亮' : '暗'} 勾玉缺位${missing}/6`);
-			return midDark && leftLight && botLight && missing >= 4;
-		} catch (e) {
-			console.log('317状态判定异常：' + e);
-			return false;
-		}
-	}
-
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 		const thisConf = thisScript.scheme.config['317'];
 		// 主界面：先判星级，1-4 星直接挑战；5-6 星看开关
@@ -337,7 +337,7 @@ export class Func317 implements IFuncOrigin {
 				return true;
 			}
 			// 先区分「已召唤出鬼王」（按钮=挑战）与「等待召唤」（按钮=召唤鬼王）
-			if (this.isSummonedPage()) {
+			if (isSummonedPage317()) {
 				const cnt: number = g['challenge317Cnt'] || 0;
 				if (cnt >= 10) {
 					thisScript.doPush(thisScript, {
