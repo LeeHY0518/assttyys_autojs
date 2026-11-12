@@ -288,19 +288,42 @@ export class Func317 implements IFuncOrigin {
 	}];
 
 
+	// 判定是否处于「已召唤出鬼王」状态：
+	// 特征A：右下按钮三处文字位置的亮度模式（挑战=中部暗、左侧亮、下侧亮）
+	// 特征B：勾玉槽位整排缺位（蓝紫底、亮度低）
+	// 两者同时成立才算，缺一不改状态
+	private isSummonedPage(): boolean {
+		try {
+			const pic: any = captureScreen();
+			const lum = (x: number, y: number): number => {
+				const c: number = (images as any).pixel(pic, x, y);
+				const r = (c >> 16) & 0xff;
+				const g2 = (c >> 8) & 0xff;
+				const b = c & 0xff;
+				return (r + g2 + b) / 3;
+			};
+			const midDark = lum(1190, 614) < 110;
+			const leftLight = lum(1157, 608) > 170;
+			const botLight = lum(1197, 644) > 170;
+			const xs2 = [1066, 1074, 1083, 1090, 1097, 1105];
+			let missing = 0;
+			for (let i = 0; i < 6; i++) {
+				const c: number = (images as any).pixel(pic, xs2[i], 534);
+				const r = (c >> 16) & 0xff;
+				const g3 = (c >> 8) & 0xff;
+				const b2 = c & 0xff;
+				if ((r + g3 + b2) / 3 < 90 && b2 > r) missing++;
+			}
+			console.log(`317状态判定：按钮中${midDark ? '暗' : '亮'} 左${leftLight ? '亮' : '暗'} 下${botLight ? '亮' : '暗'} 勾玉缺位${missing}/6`);
+			return midDark && leftLight && botLight && missing >= 4;
+		} catch (e) {
+			console.log('317状态判定异常：' + e);
+			return false;
+		}
+	}
+
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 		const thisConf = thisScript.scheme.config['317'];
-
-		// ===== 新版「祸主降临」：先让脚本有反应 =====
-		// 召唤队列面板：直接点立即召唤
-		if (thisScript.oper({
-			id: 317,
-			name: '召唤队列面板',
-			operator: [thisOperator[15]]
-		})) {
-			thisScript.global.waitFight = true;
-			return true;
-		}
 		// 主界面：先判星级，1-4 星直接挑战；5-6 星看开关
 		if (thisScript.oper({
 			id: 317,
@@ -308,19 +331,33 @@ export class Func317 implements IFuncOrigin {
 			operator: [thisOperator[14]]
 		})) {
 			const g: any = thisScript.global;
-			// 刚点过右下按钮（召唤）：此时按钮已变成「挑战」，不必再判星级
-			const summonedAt: number = g['summon317At'] || 0;
-			if (summonedAt && Date.now() - summonedAt < 20000) {
-				g['summon317At'] = 0;
-				this.noStarAt = 0;
-				const r = thisScript.oper({ id: 317, name: '挑战已召唤鬼王', operator: [thisOperator[28]] });
-				if (!r) g['summon317At'] = Date.now();
-				sleep(2500);
-				return r;
+			// 结算动画期间不判星级、不点击（用户要求：退出结算后 15 秒内不动作）
+			const settleAt: number = g['settle317At'] || 0;
+			if (settleAt && Date.now() - settleAt < 15000) {
+				return true;
 			}
+			// 先区分「已召唤出鬼王」（按钮=挑战）与「等待召唤」（按钮=召唤鬼王）
+			if (this.isSummonedPage()) {
+				const cnt: number = g['challenge317Cnt'] || 0;
+				if (cnt >= 10) {
+					thisScript.doPush(thisScript, {
+						text: '已召唤鬼王，但连续10次点挑战无响应，脚本已停止。',
+						before() { thisScript.myToast('挑战无响应，脚本即将停止'); }
+					});
+					thisScript.stop();
+					sleep(3000);
+					return true;
+				}
+				const rc = thisScript.oper({ id: 317, name: '挑战已召唤鬼王', operator: [thisOperator[28]] });
+				g['challenge317Cnt'] = rc ? cnt + 1 : 0;
+				sleep(2500);
+				return true;
+			}
+			g['challenge317Cnt'] = 0;
 			const xs = [1066, 1074, 1083, 1090, 1097, 1105];
 			const lit: boolean[] = [];
-			const dbg: string[] = [];			try {
+			const dbg: string[] = [];
+			try {
 				const pic: any = captureScreen();
 				for (let i = 0; i < 6; i++) {
 					let best = -999;
@@ -376,13 +413,13 @@ export class Func317 implements IFuncOrigin {
 					return true;
 				}
 				const r = thisScript.oper({ id: 317, name: '召唤鬼王_新版', operator: [thisOperator[28]] });
-				if (r) { g['summon317At'] = Date.now(); this.noStarAt = 0; }
+				if (r) this.noStarAt = 0;
 				sleep(2500);
 				return r;
 			}
 			if (thisConf && thisConf.fight_level_five_six) {
 				const r = thisScript.oper({ id: 317, name: '召唤高星鬼王_新版', operator: [thisOperator[28]] });
-				if (r) { g['summon317At'] = Date.now(); this.noStarAt = 0; }
+				if (r) this.noStarAt = 0;
 				sleep(2500);
 				return r;
 			}
@@ -435,6 +472,8 @@ export class Func317 implements IFuncOrigin {
 		})) {
 			thisScript.global.waitFight = true;
 			thisScript.global.faXian_NumOT = 0;
+			thisScript.global['settle317At'] = Date.now();
+			thisScript.global['challenge317Cnt'] = 0;
 			return true;
 		}
 		// 分享鬼王被击杀后才再次攻打鬼王
