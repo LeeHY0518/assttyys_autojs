@@ -26,6 +26,11 @@ export class Func322 implements IFuncOrigin {
 			desc: '下一个方案',
 			type: 'scheme',
 			default: '返回庭院',
+		}, {
+			name: 'debugColor',
+			desc: '打印取色日志（定判据时临时开）',
+			type: 'switch',
+			default: false,
 		}],
 	}];
 	operator: IFuncOperatorOrigin[] = [{
@@ -259,33 +264,39 @@ export class Func322 implements IFuncOrigin {
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
-		// 取色探针：每5秒打印一次全屏采样颜色，用于定判据
-		const nowProbe = new Date().getTime();
-		if (!thisScript.global.currentRunTimes['d6jProbe'] || nowProbe - thisScript.global.currentRunTimes['d6jProbe'] > 5000) {
-			thisScript.global.currentRunTimes['d6jProbe'] = nowProbe;
-			try {
-				const bmp = thisScript.helperBridge.helper.GetBitmap();
-				const dw = bmp.getWidth();
-				const dh = bmp.getHeight();
-				// 采样点按 1280x720 基准定义，再换算到实际分辨率
-				const pts = [
-					[1140, 610], [1160, 610], [1180, 610],
-					[1140, 635], [1160, 635], [1180, 635],
-					[1140, 660], [1160, 660], [1180, 660],
-					[819, 648], [928, 648], [1037, 648],
-					[150, 36], [333, 36], [640, 300], [200, 500],
-				];
-				let line = '[322主页' + dw + 'x' + dh + ']';
-				for (let pi = 0; pi < pts.length; pi++) {
-					const sx = Math.round(pts[pi][0] * dw / 1280);
-					const sy = Math.round(pts[pi][1] * dh / 720);
-					const px = bmp.getPixel(sx, sy) & 0xffffff;
-					line += ' P' + (pi + 1) + ':#' + ('000000' + px.toString(16)).slice(-6);
+		// 取色探针：仅在开启[打印取色日志]时执行，每5秒一次
+		const cfg322 = thisScript.scheme.config['322'] || {};
+		if (cfg322.debugColor) {
+			const nowProbe = new Date().getTime();
+			if (!thisScript.global.currentRunTimes['d6jProbe'] || nowProbe - thisScript.global.currentRunTimes['d6jProbe'] > 5000) {
+				thisScript.global.currentRunTimes['d6jProbe'] = nowProbe;
+				let bmp = null;
+				try {
+					bmp = thisScript.helperBridge.helper.GetBitmap();
+					const dw = bmp.getWidth();
+					const dh = bmp.getHeight();
+					let line = '[322屏' + dw + 'x' + dh + ']';
+					// 9列5行均匀采样，任一界面都能看出布局
+					for (let ry = 0; ry < 5; ry++) {
+						for (let rx = 0; rx < 9; rx++) {
+							const sx = Math.min(dw - 1, Math.round(dw * (rx + 0.5) / 9));
+							const sy = Math.min(dh - 1, Math.round(dh * (ry + 0.5) / 5));
+							const px = bmp.getPixel(sx, sy) & 0xffffff;
+							line += ' ' + (ry + 1) + '-' + (rx + 1) + ':#' + ('000000' + px.toString(16)).slice(-6);
+						}
+					}
+					console.log(line);
+				} catch (err) {
+					console.log('[322屏]取图失败');
+				} finally {
+					try {
+						if (bmp) {
+							bmp.recycle();
+						}
+					} catch (err2) {
+						// 忽略回收异常
+					}
 				}
-				console.log(line);
-				bmp.recycle();
-			} catch (err) {
-				console.log('[322屏]取图失败');
 			}
 		}
 
@@ -295,7 +306,7 @@ export class Func322 implements IFuncOrigin {
 			name: '六道觉_结算',
 			operator: [thisOperator[14]]
 		})) {
-			const thisconf = thisScript.scheme.config['322'];
+			const thisconf = cfg322;
 			thisconf.overTimes = Math.floor(Number(thisconf.overTimes) || 0);
 			const now = new Date().getTime();
 			const currentCost = Math.floor((now - thisScript.global.d6dCurrentBegin) / 1000);
