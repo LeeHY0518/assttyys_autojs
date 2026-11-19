@@ -65,19 +65,21 @@ export class Func322 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1145, 597, 1228, 662, 500],
 		]
-	}, { // 2 选试炼式神_确定
+	}, { // 2 精进舞技_选第三个
 		desc: [
 			1280, 720,
 			[
-				[right, 1148, 589, 0xfff5bb],
-				[right, 1187, 604, 0xfff0b5],
-				[right, 1196, 633, 0xfff3bd],
-				[right, 1162, 664, 0xabc1d3],
-				[right, 1180, 645, 0x3d4c62],
+				[left, 71, 72, 0x132131],
+				[center, 213, 504, 0x073f78],
+				[center, 356, 504, 0x023972],
+				[right, 1067, 504, 0x0a4372],
+				[center, 213, 360, 0xe9c556],
+				[right, 1067, 360, 0x6a1f06],
 			]
 		],
+		// 三个舞技横排，固定选第三个（祈愿之舞）
 		oper: [
-			[center, 1280, 720, 1145, 597, 1228, 662, 500],
+			[center, 1280, 720, 950, 578, 1140, 665, 500],
 		]
 	}, { // 3 阵容页_开启
 		desc: [
@@ -425,6 +427,17 @@ export class Func322 implements IFuncOrigin {
 			}
 			thisScript.regionClick([thisOperator[6].oper[0]]);
 			thisScript.global.d6Loop = 0;
+			return true;
+		}
+
+		// 精进舞技：三个舞技横排，固定选第三个
+		if (thisScript.oper({
+			id: 322,
+			name: '六道觉_精进舞技',
+			operator: [thisOperator[2]]
+		})) {
+			thisScript.regionClick([thisOperator[2].oper[0]]);
+			console.log('[322]已选第三个舞技');
 			return true;
 		}
 
