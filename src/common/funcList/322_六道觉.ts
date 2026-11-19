@@ -99,14 +99,15 @@ export class Func322 implements IFuncOrigin {
 		desc: [
 			1280, 720,
 			[
-				[center, 782, 72, 0x101c2f],
-				[left, 71, 360, 0xe1e7f4],
-				[center, 356, 360, 0xd8ddef],
-				[left, 71, 504, 0xb0cbd1],
-				[left, 71, 648, 0x226a9e],
-				[center, 356, 648, 0xeceff9],
-				[right, 1067, 648, 0x5e6469],
-				[right, 1209, 648, 0x4a4c50],
+				[left, 71, 360, 0xdae0f1],
+				[left, 213, 360, 0xdfe6f2],
+				[center, 782, 360, 0x325d94],
+				[right, 924, 360, 0x8eb9c7],
+				[left, 71, 504, 0xd7e0f0],
+				[left, 213, 504, 0xc6d3e3],
+				[left, 71, 648, 0x22699e],
+				[center, 356, 648, 0xe2e7ef],
+				[right, 1209, 648, 0x424b69],
 			]
 		],
 		oper: [
@@ -518,6 +519,12 @@ export class Func322 implements IFuncOrigin {
 				thisScript.regionClick([[mapPoint.x - 40, mapPoint.y + 20, mapPoint.x + 40, mapPoint.y + 80, 500]]);
 				console.log('[322]地图点节点 ' + mapPoint.x + ',' + mapPoint.y);
 				return true;
+			}
+			// 地图页已识别但没找到节点，5秒提示一次
+			const nowNoNode = new Date().getTime();
+			if (!thisScript.global.currentRunTimes['d6jNoNode'] || nowNoNode - thisScript.global.currentRunTimes['d6jNoNode'] > 5000) {
+				thisScript.global.currentRunTimes['d6jNoNode'] = nowNoNode;
+				console.log('[322]地图页已识别，但没找到节点图标');
 			}
 			return false;
 		}
