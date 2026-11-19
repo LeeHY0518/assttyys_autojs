@@ -572,24 +572,145 @@ export class Func322 implements IFuncOrigin {
 			}
 		}
 
-		// 局内地图：找地图节点（鏖战/神秘/混沌/商店/绽放等都算），找到后点图标下方
+		// 局内地图：扫描候选节点并输出九宫格签名，按 米白>红色>紫色 顺序点击
 		if (thisScript.oper({
 			id: 322,
 			name: '六道觉_局内地图',
 			operator: [thisOperator[4]]
 		})) {
+			const nowScan = new Date().getTime();
+			if (!thisScript.global.currentRunTimes['d6jScan'] || nowScan - thisScript.global.currentRunTimes['d6jScan'] > 1500) {
+				thisScript.global.currentRunTimes['d6jScan'] = nowScan;
+				let bmpS = null;
+				try {
+					bmpS = thisScript.helperBridge.helper.GetBitmap();
+					const sw = bmpS.getWidth();
+					const sh = bmpS.getHeight();
+					const sxr = sw / 1280;
+					const syr = sh / 720;
+					const cX = [];
+					const cY = [];
+					const cT = [];
+					for (let gy = 290; gy <= 600; gy = gy + 24) {
+						for (let gx = 130; gx <= 1150; gx = gx + 24) {
+							let rc = 0;
+							let wc = 0;
+							let pc = 0;
+							for (let oy = -10; oy <= 10; oy = oy + 5) {
+								for (let ox = -10; ox <= 10; ox = ox + 5) {
+									const px = Math.round((gx + ox) * sxr);
+									const py = Math.round((gy + oy) * syr);
+									if (px < 0 || py < 0 || px >= sw || py >= sh) {
+										continue;
+									}
+									const cc = bmpS.getPixel(px, py);
+									const rr = (cc >> 16) & 0xff;
+									const gg = (cc >> 8) & 0xff;
+									const bb = cc & 0xff;
+									if (rr > 120 && rr - gg > 35 && rr - bb > 35) {
+										rc = rc + 1;
+									}
+									if (rr > 210 && gg > 205 && bb > 175 && bb < 240) {
+										wc = wc + 1;
+									}
+									if (rr > 90 && bb > 90 && bb - gg > 30 && rr - gg > 30) {
+										pc = pc + 1;
+									}
+								}
+							}
+							let ct = '';
+							if (wc >= 16) {
+								ct = 'W';
+							} else if (rc >= 8) {
+								ct = 'R';
+							} else if (pc >= 8) {
+								ct = 'P';
+							}
+							if (ct !== '') {
+								cX.push(gx);
+								cY.push(gy);
+								cT.push(ct);
+							}
+						}
+					}
+					for (let ci = 0; ci < cX.length && ci < 6; ci++) {
+						let sig = '[322签' + cT[ci] + cX[ci] + ',' + cY[ci] + ']';
+						for (let bk = 0; bk < 9; bk++) {
+							const bkx = cX[ci] - 30 + (bk % 3) * 30 + 15;
+							const bky = cY[ci] - 30 + Math.floor(bk / 3) * 30 + 15;
+							let sr = 0;
+							let sg = 0;
+							let sb = 0;
+							let sn = 0;
+							for (let ny = -12; ny <= 12; ny = ny + 6) {
+								for (let nx = -12; nx <= 12; nx = nx + 6) {
+									const qx = Math.round((bkx + nx) * sxr);
+									const qy = Math.round((bky + ny) * syr);
+									if (qx < 0 || qy < 0 || qx >= sw || qy >= sh) {
+										continue;
+									}
+									const qc = bmpS.getPixel(qx, qy);
+									sr = sr + ((qc >> 16) & 0xff);
+									sg = sg + ((qc >> 8) & 0xff);
+									sb = sb + (qc & 0xff);
+									sn = sn + 1;
+								}
+							}
+							let bhex = '------';
+							if (sn > 0) {
+								const ar = Math.round(sr / sn);
+								const ag = Math.round(sg / sn);
+								const ab = Math.round(sb / sn);
+								bhex = ('000000' + ((ar << 16) + (ag << 8) + ab).toString(16)).slice(-6);
+							}
+							sig = sig + bhex + ' ';
+						}
+						console.log(sig);
+					}
+					let pickI = -1;
+					const order = ['W', 'R', 'P'];
+					for (let oi = 0; oi < order.length; oi++) {
+						for (let pi = 0; pi < cX.length; pi++) {
+							if (cT[pi] !== order[oi]) {
+								continue;
+							}
+							if (pickI < 0 || cX[pi] < cX[pickI]) {
+								pickI = pi;
+							}
+						}
+						if (pickI >= 0) {
+							break;
+						}
+					}
+					if (pickI >= 0) {
+						thisScript.global.d6jPkX = cX[pickI];
+						thisScript.global.d6jPkY = cY[pickI];
+						thisScript.global.d6jPkT = cT[pickI];
+					} else {
+						thisScript.global.d6jPkX = -1;
+					}
+				} catch (errScan) {
+					console.log('[322]扫描异常');
+				} finally {
+					try {
+						if (bmpS) {
+							bmpS.recycle();
+						}
+					} catch (errScan2) {
+						// 忽略回收异常
+					}
+				}
+			}
+			const pkX = thisScript.global.d6jPkX;
+			const pkY = thisScript.global.d6jPkY;
+			const pkT = thisScript.global.d6jPkT;
+			if (pkX >= 0) {
+				console.log('[322]点' + pkT + ' ' + pkX + ',' + pkY);
+				thisScript.regionClick([[pkX - 40, pkY + 20, pkX + 40, pkY + 80, 500]]);
+				thisScript.global.d6jPkX = -1;
+				return true;
+			}
 			return false;
-		}
-
-
-		// 神秘之屿：左上箭头退出
-		if (thisScript.oper({
-			id: 322,
-			name: '六道觉_神秘',
-			operator: [thisOperator[5]]
-		})) {
-			thisScript.regionClick([thisOperator[5].oper[0]]);
-			return true;
 		}
 
 		// 绽放之屿：右下离开
