@@ -503,51 +503,75 @@ export class Func322 implements IFuncOrigin {
 			return true;
 		}
 
-		// 采样版5：不依赖任何判据，无条件输出两块区域颜色矩阵
-		if (!thisScript.global.currentRunTimes['d6jSamp2'] || new Date().getTime() - thisScript.global.currentRunTimes['d6jSamp2'] > 15000) {
-			thisScript.global.currentRunTimes['d6jSamp2'] = new Date().getTime();
-			console.log('[322]采样版5');
-			const zxList = [343, 873];
-			const zyList = [341, 365];
-			const znList = ['A', 'B'];
-			let bmpZZ = null;
+		// 采样版6：每行不超过80字符，避免长串被截断
+		if (!thisScript.global.currentRunTimes['d6jSamp3'] || new Date().getTime() - thisScript.global.currentRunTimes['d6jSamp3'] > 15000) {
+			thisScript.global.currentRunTimes['d6jSamp3'] = new Date().getTime();
+			console.log('[322]采样版6');
+			const cxList = [393, 923];
+			const cyList = [391, 415];
+			const nmList = ['A', 'B'];
+			const offX = [0, -30, 30, 0, 0];
+			const offY = [0, 0, 0, -30, 30];
+			let bmpQ = null;
 			try {
-				bmpZZ = thisScript.helperBridge.helper.GetBitmap();
-				const zw = bmpZZ.getWidth();
-				const zh = bmpZZ.getHeight();
-				for (let zi = 0; zi < 2; zi++) {
-					let zline = '';
-					for (let gy = 0; gy < 21; gy++) {
-						zline = zline + 'R';
-						if (gy < 10) {
-							zline = zline + '0';
-						}
-						zline = zline + gy + ':';
-						for (let gx = 0; gx < 21; gx++) {
-							const pxx = Math.round((zxList[zi] + gx * 5) * zw / 1280);
-							const pyy = Math.round((zyList[zi] + gy * 5) * zh / 720);
-							if (pxx >= 0 && pyy >= 0 && pxx < zw && pyy < zh) {
-								zline = zline + ('000000' + (bmpZZ.getPixel(pxx, pyy) & 0xffffff).toString(16)).slice(-6);
-							} else {
-								zline = zline + '------';
+				bmpQ = thisScript.helperBridge.helper.GetBitmap();
+				const qw = bmpQ.getWidth();
+				const qh = bmpQ.getHeight();
+				for (let qi = 0; qi < 2; qi++) {
+					const qcx = cxList[qi];
+					const qcy = cyList[qi];
+					let cntR = 0;
+					let cntG = 0;
+					let cntB = 0;
+					let cntT = 0;
+					for (let oy = -45; oy <= 45; oy = oy + 5) {
+						for (let ox = -45; ox <= 45; ox = ox + 5) {
+							const qpx = Math.round((qcx + ox) * qw / 1280);
+							const qpy = Math.round((qcy + oy) * qh / 720);
+							if (qpx < 0 || qpy < 0 || qpx >= qw || qpy >= qh) {
+								continue;
+							}
+							const qc = bmpQ.getPixel(qpx, qpy);
+							const qr = (qc >> 16) & 0xff;
+							const qg = (qc >> 8) & 0xff;
+							const qb = qc & 0xff;
+							cntT = cntT + 1;
+							if (qr > 120 && qr - qg > 35 && qr - qb > 35) {
+								cntR = cntR + 1;
+							}
+							if (qg > 120 && qg - qr > 35 && qg - qb > 35) {
+								cntG = cntG + 1;
+							}
+							if (qb > 120 && qb - qr > 35 && qb - qg > 35) {
+								cntB = cntB + 1;
 							}
 						}
-						zline = zline + ' ';
 					}
-					console.log('[322' + znList[zi] + ']' + zline);
+					let qout = '[322' + nmList[qi] + ']T' + cntT + ' R' + cntR + ' G' + cntG + ' B' + cntB;
+					for (let pi = 0; pi < 5; pi++) {
+						const ppx = Math.round((qcx + offX[pi]) * qw / 1280);
+						const ppy = Math.round((qcy + offY[pi]) * qh / 720);
+						let phx = '------';
+						if (ppx >= 0 && ppy >= 0 && ppx < qw && ppy < qh) {
+							phx = ('000000' + (bmpQ.getPixel(ppx, ppy) & 0xffffff).toString(16)).slice(-6);
+						}
+						qout = qout + ' ' + phx;
+					}
+					console.log(qout);
 				}
-			} catch (errZZ) {
+			} catch (errQ) {
 				console.log('[322]采样异常');
 			} finally {
 				try {
-					if (bmpZZ) {
-						bmpZZ.recycle();
+					if (bmpQ) {
+						bmpQ.recycle();
 					}
-				} catch (errZZ2) {
+				} catch (errQ2) {
 					// 忽略回收异常
 				}
 			}
 		}
+
 		// 局内地图：找地图节点（鏖战/神秘/混沌/商店/绽放等都算），找到后点图标下方
 		if (thisScript.oper({
 			id: 322,
