@@ -259,6 +259,30 @@ export class Func317 implements IFuncOrigin {
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
+		// 取色探针：每5秒打印一次全屏采样颜色，用于定判据
+		const nowProbe = new Date().getTime();
+		if (!thisScript.global.currentRunTimes['d6jProbe'] || nowProbe - thisScript.global.currentRunTimes['d6jProbe'] > 5000) {
+			thisScript.global.currentRunTimes['d6jProbe'] = nowProbe;
+			try {
+				const bmp = thisScript.helperBridge.helper.GetBitmap();
+				const dw = bmp.getWidth();
+				const dh = bmp.getHeight();
+				const xs = [0.10, 0.30, 0.50, 0.70, 0.90];
+				const ys = [0.15, 0.45, 0.75];
+				let line = '[317屏' + dw + 'x' + dh + ']';
+				for (let yi = 0; yi < 3; yi++) {
+					for (let xi = 0; xi < 5; xi++) {
+						const px = bmp.getPixel(Math.round(dw * xs[xi]), Math.round(dh * ys[yi])) & 0xffffff;
+						line += ' ' + (yi + 1) + '-' + (xi + 1) + ':#' + ('000000' + px.toString(16)).slice(-6);
+					}
+				}
+				console.log(line);
+				bmp.recycle();
+			} catch (err) {
+				console.log('[317屏]取图失败');
+			}
+		}
+
 		// 结算页：统计与局数管理
 		if (thisScript.oper({
 			id: 317,
