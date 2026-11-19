@@ -28,9 +28,9 @@ export class Func322 implements IFuncOrigin {
 			default: '返回庭院',
 		}, {
 			name: 'debugColor',
-			desc: '打印取色日志（定判据时临时开）',
+			desc: '打印取色日志（定判据用，稳定后可关）',
 			type: 'switch',
-			default: false,
+			default: true,
 		}],
 	}];
 	operator: IFuncOperatorOrigin[] = [{
@@ -268,7 +268,7 @@ export class Func322 implements IFuncOrigin {
 		const cfg322 = thisScript.scheme.config['322'] || {};
 		if (cfg322.debugColor) {
 			const nowProbe = new Date().getTime();
-			if (!thisScript.global.currentRunTimes['d6jProbe'] || nowProbe - thisScript.global.currentRunTimes['d6jProbe'] > 5000) {
+			if (!thisScript.global.currentRunTimes['d6jProbe'] || nowProbe - thisScript.global.currentRunTimes['d6jProbe'] > 3000) {
 				thisScript.global.currentRunTimes['d6jProbe'] = nowProbe;
 				let bmp = null;
 				try {
