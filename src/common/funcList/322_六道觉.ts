@@ -509,94 +509,59 @@ export class Func322 implements IFuncOrigin {
 			name: '六道觉_局内地图',
 			operator: [thisOperator[4]]
 		})) {
-			// 节点定位：多点找色找出地图上所有节点（通用文字锚点，不区分类型）
-			let rawPts = [];
-			try {
-				rawPts = thisScript.findMultiColorEx('六道觉_地图节点');
-			} catch (errPts) {
-				rawPts = [];
-			}
-			const nodePts = [];
-			if (rawPts) {
-				for (let qi = 0; qi < rawPts.length; qi++) {
-					const qp = rawPts[qi];
-					let isDup = false;
-					for (let ui = 0; ui < nodePts.length; ui++) {
-						if (Math.abs(nodePts[ui].x - qp.x) < 70 && Math.abs(nodePts[ui].y - qp.y) < 70) {
-							isDup = true;
-							break;
+			// 图标取色采样：不依赖任何定位，直接按固定区域输出颜色矩阵
+			// A区=左侧节点（神秘） B区=右侧节点（鏖战），各 100x100 像素，步长5
+			const nowSamp = new Date().getTime();
+			if (!thisScript.global.currentRunTimes['d6jSamp'] || nowSamp - thisScript.global.currentRunTimes['d6jSamp'] > 15000) {
+				thisScript.global.currentRunTimes['d6jSamp'] = nowSamp;
+				const zones = [
+					['A', 343, 341],
+					['B', 873, 365],
+				];
+				let bmpZ = null;
+				try {
+					bmpZ = thisScript.helperBridge.helper.GetBitmap();
+					const zw = bmpZ.getWidth();
+					const zh = bmpZ.getHeight();
+					const zsx = zw / 1280;
+					const zsy = zh / 720;
+					for (let zi = 0; zi < zones.length; zi++) {
+						const zname = zones[zi][0];
+						const zx0 = zones[zi][1] as number;
+						const zy0 = zones[zi][2] as number;
+						let zline = '';
+						for (let gy = 0; gy < 21; gy++) {
+							zline += 'R';
+							if (gy < 10) {
+								zline += '0';
+							}
+							zline += String(gy) + ':';
+							for (let gx = 0; gx < 21; gx++) {
+								const px = Math.round((zx0 + gx * 5) * zsx);
+								const py = Math.round((zy0 + gy * 5) * zsy);
+								let hx = '------';
+								if (px >= 0 && py >= 0 && px < zw && py < zh) {
+									hx = ('000000' + (bmpZ.getPixel(px, py) & 0xffffff).toString(16)).slice(-6);
+								}
+								zline += hx;
+							}
+							if (gy < 20) {
+								zline += ' ';
+							}
 						}
+						console.log('[322' + zname + ' ' + zx0 + ',' + zy0 + ']' + zline);
 					}
-					if (!isDup) {
-						nodePts.push(qp);
-					}
-				}
-			}
-			// 取色采样：输出每个节点图标区的颜色矩阵（步长5，17x17）
-			if (nodePts.length) {
-				const nowSample = new Date().getTime();
-				if (!thisScript.global.currentRunTimes['d6jSample'] || nowSample - thisScript.global.currentRunTimes['d6jSample'] > 6000) {
-					thisScript.global.currentRunTimes['d6jSample'] = nowSample;
-					let bmpS = null;
+				} catch (errZ) {
+					console.log('[322]采样失败');
+				} finally {
 					try {
-						bmpS = thisScript.helperBridge.helper.GetBitmap();
-						const sw = bmpS.getWidth();
-						const sh = bmpS.getHeight();
-						const ssx = sw / 1280;
-						const ssy = sh / 720;
-						for (let si = 0; si < nodePts.length; si++) {
-							const sp = nodePts[si];
-							let line = '';
-							for (let gy = 0; gy < 17; gy++) {
-								line += 'R';
-								if (gy < 10) {
-									line += '0';
-								}
-								line += String(gy) + ':';
-								for (let gx = 0; gx < 17; gx++) {
-									const sx2 = Math.round((sp.x - 40 + gx * 5) * ssx);
-									const sy2 = Math.round((sp.y - 90 + gy * 5) * ssy);
-									let hexS = '------';
-									if (sx2 >= 0 && sy2 >= 0 && sx2 < sw && sy2 < sh) {
-										hexS = ('000000' + (bmpS.getPixel(sx2, sy2) & 0xffffff).toString(16)).slice(-6);
-									}
-									line += hexS;
-								}
-								if (gy < 16) {
-									line += ' ';
-								}
-							}
-							console.log('[322图' + sp.x + ',' + sp.y + ']' + line);
+						if (bmpZ) {
+							bmpZ.recycle();
 						}
-					} catch (errSample) {
-						console.log('[322]采样失败');
-					} finally {
-						try {
-							if (bmpS) {
-								bmpS.recycle();
-							}
-						} catch (errRecycle2) {
-							// 忽略回收异常
-						}
+					} catch (errZ2) {
+						// 忽略回收异常
 					}
 				}
-			}
-			// 指纹建成前，临时点最左节点，保证流程不卡
-			if (nodePts.length) {
-				let leftMost = nodePts[0];
-				for (let li = 1; li < nodePts.length; li++) {
-					if (nodePts[li].x < leftMost.x) {
-						leftMost = nodePts[li];
-					}
-				}
-				thisScript.regionClick([[leftMost.x - 40, leftMost.y + 20, leftMost.x + 40, leftMost.y + 80, 500]]);
-				console.log('[322]临时点最左 ' + leftMost.x + ',' + leftMost.y);
-				return true;
-			}
-			const nowNoNode = new Date().getTime();
-			if (!thisScript.global.currentRunTimes['d6jNoNode'] || nowNoNode - thisScript.global.currentRunTimes['d6jNoNode'] > 8000) {
-				thisScript.global.currentRunTimes['d6jNoNode'] = nowNoNode;
-				console.log('[322]地图页未找到节点');
 			}
 			return false;
 		}
