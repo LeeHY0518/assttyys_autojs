@@ -267,14 +267,20 @@ export class Func317 implements IFuncOrigin {
 				const bmp = thisScript.helperBridge.helper.GetBitmap();
 				const dw = bmp.getWidth();
 				const dh = bmp.getHeight();
-				const xs = [0.10, 0.30, 0.50, 0.70, 0.90];
-				const ys = [0.15, 0.45, 0.75];
-				let line = '[317屏' + dw + 'x' + dh + ']';
-				for (let yi = 0; yi < 3; yi++) {
-					for (let xi = 0; xi < 5; xi++) {
-						const px = bmp.getPixel(Math.round(dw * xs[xi]), Math.round(dh * ys[yi])) & 0xffffff;
-						line += ' ' + (yi + 1) + '-' + (xi + 1) + ':#' + ('000000' + px.toString(16)).slice(-6);
-					}
+				// 采样点按 1280x720 基准定义，再换算到实际分辨率
+				const pts = [
+					[1140, 610], [1160, 610], [1180, 610],
+					[1140, 635], [1160, 635], [1180, 635],
+					[1140, 660], [1160, 660], [1180, 660],
+					[819, 648], [928, 648], [1037, 648],
+					[150, 36], [333, 36], [640, 300], [200, 500],
+				];
+				let line = '[317主页' + dw + 'x' + dh + ']';
+				for (let pi = 0; pi < pts.length; pi++) {
+					const sx = Math.round(pts[pi][0] * dw / 1280);
+					const sy = Math.round(pts[pi][1] * dh / 720);
+					const px = bmp.getPixel(sx, sy) & 0xffffff;
+					line += ' P' + (pi + 1) + ':#' + ('000000' + px.toString(16)).slice(-6);
 				}
 				console.log(line);
 				bmp.recycle();
