@@ -528,7 +528,7 @@ export class Func322 implements IFuncOrigin {
 					let rAll = 0;
 					let pAll = 0;
 					for (let gy = 290; gy <= 600; gy = gy + 24) {
-						for (let gx = 130; gx <= 1150; gx = gx + 24) {
+						for (let gx = 190; gx <= 1140; gx = gx + 24) {
 							let rc = 0;
 							let wc = 0;
 							let pc = 0;
@@ -546,7 +546,7 @@ export class Func322 implements IFuncOrigin {
 									if (rr > 120 && rr - gg > 35 && rr - bb > 35) {
 										rc = rc + 1;
 									}
-									if (rr > 210 && gg > 205 && bb > 175 && bb < 240) {
+									if (rr > 185 && gg > 185 && rr >= bb - 10) {
 										wc = wc + 1;
 									}
 									if (rr > 90 && bb > 90 && bb - gg > 30 && rr - gg > 30) {
@@ -555,7 +555,7 @@ export class Func322 implements IFuncOrigin {
 								}
 							}
 							let ct = '';
-							if (wc >= 6) {
+							if (wc >= 12) {
 								ct = 'W';
 								wAll = wAll + 1;
 							} else if (rc >= 4) {
@@ -607,14 +607,35 @@ export class Func322 implements IFuncOrigin {
 						}
 						console.log(sig);
 					}
+					const mX = [];
+					const mY = [];
+					const mT = [];
+					for (let ci = 0; ci < cX.length; ci++) {
+						let fi = -1;
+						for (let mi = 0; mi < mX.length; mi++) {
+							if (mT[mi] === cT[ci] && Math.abs(mX[mi] - cX[ci]) < 60 && Math.abs(mY[mi] - cY[ci]) < 60) {
+								fi = mi;
+								break;
+							}
+						}
+						if (fi >= 0) {
+							mX[fi] = Math.round((mX[fi] + cX[ci]) / 2);
+							mY[fi] = Math.round((mY[fi] + cY[ci]) / 2);
+						} else {
+							mX.push(cX[ci]);
+							mY.push(cY[ci]);
+							mT.push(cT[ci]);
+						}
+					}
+					console.log('[322合]' + mX.length + '个');
 					let pickI = -1;
 					const order = ['W', 'R', 'P'];
 					for (let oi = 0; oi < order.length; oi++) {
-						for (let pi = 0; pi < cX.length; pi++) {
-							if (cT[pi] !== order[oi]) {
+						for (let pi = 0; pi < mX.length; pi++) {
+							if (mT[pi] !== order[oi]) {
 								continue;
 							}
-							if (pickI < 0 || cX[pi] < cX[pickI]) {
+							if (pickI < 0 || mX[pi] < mX[pickI]) {
 								pickI = pi;
 							}
 						}
@@ -623,9 +644,9 @@ export class Func322 implements IFuncOrigin {
 						}
 					}
 					if (pickI >= 0) {
-						thisScript.global.currentRunTimes['d6jPkX'] = cX[pickI];
-						thisScript.global.currentRunTimes['d6jPkY'] = cY[pickI];
-						thisScript.global.currentRunTimes['d6jPkT'] = cT[pickI] === 'W' ? 1 : (cT[pickI] === 'R' ? 2 : 3);
+						thisScript.global.currentRunTimes['d6jPkX'] = mX[pickI];
+						thisScript.global.currentRunTimes['d6jPkY'] = mY[pickI];
+						thisScript.global.currentRunTimes['d6jPkT'] = mT[pickI] === 'W' ? 1 : (mT[pickI] === 'R' ? 2 : 3);
 					} else {
 						thisScript.global.currentRunTimes['d6jPkX'] = -1;
 					}
