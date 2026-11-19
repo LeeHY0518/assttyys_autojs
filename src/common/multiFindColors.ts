@@ -3149,6 +3149,22 @@ const multiFindColors: IMultiFindColorsOrigin = {
 			],
 		]
 	},
+	'六道觉_神秘': {
+		region: [left, 1280, 720, 60, 120, 1240, 665],
+		desc: []
+	},
+	'六道觉_商店': {
+		region: [left, 1280, 720, 60, 120, 1240, 665],
+		desc: []
+	},
+	'六道觉_鏖战': {
+		region: [left, 1280, 720, 60, 120, 1240, 665],
+		desc: []
+	},
+	'六道觉_混沌': {
+		region: [left, 1280, 720, 60, 120, 1240, 665],
+		desc: []
+	},
 	// '': {
 	// 	region: [left, 1280, 720, 0, 0, 1280, 720],
 	// 	desc: [[
