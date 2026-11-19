@@ -509,22 +509,90 @@ export class Func322 implements IFuncOrigin {
 			name: '六道觉_局内地图',
 			operator: [thisOperator[4]]
 		})) {
-			let mapPoint = null;
-			try {
-				mapPoint = thisScript.findMultiColor('六道觉_地图节点');
-			} catch (errMap) {
-				console.log('[322]地图节点色组未定义');
+			// 优先级：神秘 > 商店 > 鏖战 > 混沌，逐类查找，命中即点
+			const nodeOrder = [
+				['六道觉_神秘', '神秘'],
+				['六道觉_商店', '商店'],
+				['六道觉_鏖战', '鏖战'],
+				['六道觉_混沌', '混沌'],
+			];
+			for (let ni = 0; ni < nodeOrder.length; ni++) {
+				let nodePoint = null;
+				try {
+					nodePoint = thisScript.findMultiColor(nodeOrder[ni][0], undefined, false, true);
+				} catch (errNode) {
+					nodePoint = null;
+				}
+				if (nodePoint) {
+					thisScript.regionClick([[nodePoint.x - 40, nodePoint.y + 20, nodePoint.x + 40, nodePoint.y + 80, 500]]);
+					console.log('[322]点' + nodeOrder[ni][1] + ' ' + nodePoint.x + ',' + nodePoint.y);
+					return true;
+				}
 			}
-			if (mapPoint) {
-				thisScript.regionClick([[mapPoint.x - 40, mapPoint.y + 20, mapPoint.x + 40, mapPoint.y + 80, 500]]);
-				console.log('[322]地图点节点 ' + mapPoint.x + ',' + mapPoint.y);
-				return true;
-			}
-			// 地图页已识别但没找到节点，5秒提示一次
-			const nowNoNode = new Date().getTime();
-			if (!thisScript.global.currentRunTimes['d6jNoNode'] || nowNoNode - thisScript.global.currentRunTimes['d6jNoNode'] > 5000) {
-				thisScript.global.currentRunTimes['d6jNoNode'] = nowNoNode;
-				console.log('[322]地图页已识别，但没找到节点图标');
+			// 四类都未命中：输出节点位置与图标区主要颜色，供建指纹用
+			const nowDiag = new Date().getTime();
+			if (!thisScript.global.currentRunTimes['d6jIcon'] || nowDiag - thisScript.global.currentRunTimes['d6jIcon'] > 6000) {
+				thisScript.global.currentRunTimes['d6jIcon'] = nowDiag;
+				let rawPts = [];
+				try {
+					rawPts = thisScript.findMultiColorEx('六道觉_地图节点');
+				} catch (errEx) {
+					rawPts = [];
+				}
+				if (!rawPts || !rawPts.length) {
+					console.log('[322]地图页未定位到节点');
+				} else {
+					const uniqPts = [];
+					for (let qi = 0; qi < rawPts.length; qi++) {
+						const qp = rawPts[qi];
+						let isDup = false;
+						for (let ui = 0; ui < uniqPts.length; ui++) {
+							if (Math.abs(uniqPts[ui].x - qp.x) < 60 && Math.abs(uniqPts[ui].y - qp.y) < 60) {
+								isDup = true;
+								break;
+							}
+						}
+						if (!isDup) {
+							uniqPts.push(qp);
+						}
+					}
+					let bmpN = null;
+					try {
+						bmpN = thisScript.helperBridge.helper.GetBitmap();
+						const nw = bmpN.getWidth();
+						const nh = bmpN.getHeight();
+						const nsx = nw / 1280;
+						const nsy = nh / 720;
+						for (let pi = 0; pi < uniqPts.length; pi++) {
+							const np = uniqPts[pi];
+							const colorCnt = {};
+							for (let gy = 0; gy < 24; gy++) {
+								for (let gx = 0; gx < 18; gx++) {
+									const npx = Math.round((np.x - 45 + gx * 5) * nsx);
+									const npy = Math.round((np.y - 130 + gy * 5) * nsy);
+									if (npx < 0 || npy < 0 || npx >= nw || npy >= nh) {
+										continue;
+									}
+									const nc = bmpN.getPixel(npx, npy) & 0xffffff;
+									const nhex = ('000000' + nc.toString(16)).slice(-6);
+									colorCnt[nhex] = (colorCnt[nhex] || 0) + 1;
+								}
+							}
+							const topKeys = Object.keys(colorCnt).sort((ka, kb) => colorCnt[kb] - colorCnt[ka]).slice(0, 6);
+							console.log('[322节点' + np.x + ',' + np.y + ']' + topKeys.map(kk2 => kk2 + ':' + colorCnt[kk2]).join(' '));
+						}
+					} catch (errBmp) {
+						console.log('[322]节点取色失败');
+					} finally {
+						try {
+							if (bmpN) {
+								bmpN.recycle();
+							}
+						} catch (errRec) {
+							// 忽略回收异常
+						}
+					}
+				}
 			}
 			return false;
 		}
