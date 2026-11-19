@@ -502,62 +502,52 @@ export class Func322 implements IFuncOrigin {
 			console.log('[322]已选第三个舞技');
 			return true;
 		}
-			// 图标取色采样：不依赖任何定位，直接按固定区域输出颜色矩阵
-			// A区=左侧节点（神秘） B区=右侧节点（鏖战），各 100x100 像素，步长5
-			const nowSamp = new Date().getTime();
-			if (!thisScript.global.currentRunTimes['d6jSamp'] || nowSamp - thisScript.global.currentRunTimes['d6jSamp'] > 15000) {
-				thisScript.global.currentRunTimes['d6jSamp'] = nowSamp;
-				console.log('[322]采样版3');
-				const zones = [
-					['A', 343, 341],
-					['B', 873, 365],
-				];
-				let bmpZ = null;
+
+		// 采样版5：不依赖任何判据，无条件输出两块区域颜色矩阵
+		if (!thisScript.global.currentRunTimes['d6jSamp2'] || new Date().getTime() - thisScript.global.currentRunTimes['d6jSamp2'] > 15000) {
+			thisScript.global.currentRunTimes['d6jSamp2'] = new Date().getTime();
+			console.log('[322]采样版5');
+			const zxList = [343, 873];
+			const zyList = [341, 365];
+			const znList = ['A', 'B'];
+			let bmpZZ = null;
+			try {
+				bmpZZ = thisScript.helperBridge.helper.GetBitmap();
+				const zw = bmpZZ.getWidth();
+				const zh = bmpZZ.getHeight();
+				for (let zi = 0; zi < 2; zi++) {
+					let zline = '';
+					for (let gy = 0; gy < 21; gy++) {
+						zline = zline + 'R';
+						if (gy < 10) {
+							zline = zline + '0';
+						}
+						zline = zline + gy + ':';
+						for (let gx = 0; gx < 21; gx++) {
+							const pxx = Math.round((zxList[zi] + gx * 5) * zw / 1280);
+							const pyy = Math.round((zyList[zi] + gy * 5) * zh / 720);
+							if (pxx >= 0 && pyy >= 0 && pxx < zw && pyy < zh) {
+								zline = zline + ('000000' + (bmpZZ.getPixel(pxx, pyy) & 0xffffff).toString(16)).slice(-6);
+							} else {
+								zline = zline + '------';
+							}
+						}
+						zline = zline + ' ';
+					}
+					console.log('[322' + znList[zi] + ']' + zline);
+				}
+			} catch (errZZ) {
+				console.log('[322]采样异常');
+			} finally {
 				try {
-					bmpZ = thisScript.helperBridge.helper.GetBitmap();
-					const zw = bmpZ.getWidth();
-					const zh = bmpZ.getHeight();
-					const zsx = zw / 1280;
-					const zsy = zh / 720;
-					for (let zi = 0; zi < zones.length; zi++) {
-						const zname = zones[zi][0];
-						const zx0 = zones[zi][1] as number;
-						const zy0 = zones[zi][2] as number;
-						let zline = '';
-						for (let gy = 0; gy < 21; gy++) {
-							zline += 'R';
-							if (gy < 10) {
-								zline += '0';
-							}
-							zline += String(gy) + ':';
-							for (let gx = 0; gx < 21; gx++) {
-								const px = Math.round((zx0 + gx * 5) * zsx);
-								const py = Math.round((zy0 + gy * 5) * zsy);
-								let hx = '------';
-								if (px >= 0 && py >= 0 && px < zw && py < zh) {
-									hx = ('000000' + (bmpZ.getPixel(px, py) & 0xffffff).toString(16)).slice(-6);
-								}
-								zline += hx;
-							}
-							if (gy < 20) {
-								zline += ' ';
-							}
-						}
-						console.log('[322' + zname + ' ' + zx0 + ',' + zy0 + ']' + zline);
+					if (bmpZZ) {
+						bmpZZ.recycle();
 					}
-				} catch (errZ) {
-					console.log('[322]采样失败');
-				} finally {
-					try {
-						if (bmpZ) {
-							bmpZ.recycle();
-						}
-					} catch (errZ2) {
-						// 忽略回收异常
-					}
+				} catch (errZZ2) {
+					// 忽略回收异常
 				}
 			}
-
+		}
 		// 局内地图：找地图节点（鏖战/神秘/混沌/商店/绽放等都算），找到后点图标下方
 		if (thisScript.oper({
 			id: 322,
