@@ -683,11 +683,11 @@ export class Func322 implements IFuncOrigin {
 						}
 					}
 					if (pickI >= 0) {
-						thisScript.global.d6jPkX = cX[pickI];
-						thisScript.global.d6jPkY = cY[pickI];
-						thisScript.global.d6jPkT = cT[pickI];
+						thisScript.global.currentRunTimes['d6jPkX'] = cX[pickI];
+						thisScript.global.currentRunTimes['d6jPkY'] = cY[pickI];
+						thisScript.global.currentRunTimes['d6jPkT'] = cT[pickI] === 'W' ? 1 : (cT[pickI] === 'R' ? 2 : 3);
 					} else {
-						thisScript.global.d6jPkX = -1;
+						thisScript.global.currentRunTimes['d6jPkX'] = -1;
 					}
 				} catch (errScan) {
 					console.log('[322]扫描异常');
@@ -701,13 +701,14 @@ export class Func322 implements IFuncOrigin {
 					}
 				}
 			}
-			const pkX = thisScript.global.d6jPkX;
-			const pkY = thisScript.global.d6jPkY;
-			const pkT = thisScript.global.d6jPkT;
+			const pkX = thisScript.global.currentRunTimes['d6jPkX'];
+			const pkY = thisScript.global.currentRunTimes['d6jPkY'];
+			const pkN = thisScript.global.currentRunTimes['d6jPkT'];
+			const pkT = pkN === 1 ? 'W' : (pkN === 2 ? 'R' : 'P');
 			if (pkX >= 0) {
 				console.log('[322]点' + pkT + ' ' + pkX + ',' + pkY);
 				thisScript.regionClick([[pkX - 40, pkY + 20, pkX + 40, pkY + 80, 500]]);
-				thisScript.global.d6jPkX = -1;
+				thisScript.global.currentRunTimes['d6jPkX'] = -1;
 				return true;
 			}
 			return false;
