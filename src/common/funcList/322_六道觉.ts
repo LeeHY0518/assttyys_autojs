@@ -502,18 +502,12 @@ export class Func322 implements IFuncOrigin {
 			console.log('[322]已选第三个舞技');
 			return true;
 		}
-
-		// 局内地图：找地图节点（鏖战/神秘/混沌/商店/绽放等都算），找到后点图标下方
-		if (thisScript.oper({
-			id: 322,
-			name: '六道觉_局内地图',
-			operator: [thisOperator[4]]
-		})) {
 			// 图标取色采样：不依赖任何定位，直接按固定区域输出颜色矩阵
 			// A区=左侧节点（神秘） B区=右侧节点（鏖战），各 100x100 像素，步长5
 			const nowSamp = new Date().getTime();
 			if (!thisScript.global.currentRunTimes['d6jSamp'] || nowSamp - thisScript.global.currentRunTimes['d6jSamp'] > 15000) {
 				thisScript.global.currentRunTimes['d6jSamp'] = nowSamp;
+				console.log('[322]采样版3');
 				const zones = [
 					['A', 343, 341],
 					['B', 873, 365],
@@ -563,6 +557,13 @@ export class Func322 implements IFuncOrigin {
 					}
 				}
 			}
+
+		// 局内地图：找地图节点（鏖战/神秘/混沌/商店/绽放等都算），找到后点图标下方
+		if (thisScript.oper({
+			id: 322,
+			name: '六道觉_局内地图',
+			operator: [thisOperator[4]]
+		})) {
 			return false;
 		}
 
