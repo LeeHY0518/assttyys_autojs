@@ -5,6 +5,71 @@ const left = 0;
 const center = 1;
 const right = 2;
 
+// 模块级工具（类方法内不能用 this，框架调用时 this 为空）
+function d6jTryFind(thisScript: Script, key: string) {
+	try {
+		return thisScript.findMultiColor(key);
+	} catch (e) {
+		console.log('[317]找色失败:' + key);
+		return null;
+	}
+}
+
+function d6jFindHonglei(thisScript: Script) {
+	const p = d6jTryFind(thisScript, '六道觉_六道轰雷');
+	if (p) {
+		console.log('[317]色组命中六道轰雷');
+		return p;
+	}
+	try {
+		const dw = thisScript.device.width;
+		const dh = thisScript.device.height;
+		// 只盯列表区域，不做全屏搜字
+		const region = [
+			Math.round(dw * 0.15), Math.round(dh * 0.18),
+			Math.round(dw * 0.85), Math.round(dh * 0.72)
+		];
+		const res = thisScript.findText('轰雷', 600, region, '包含');
+		if (res && res.length && res[0].points && res[0].points.length) {
+			const pt = res[0].points[0];
+			console.log('[317]文字命中轰雷:' + pt.x + ',' + pt.y);
+			return { x: pt.x, y: pt.y };
+		}
+	} catch (e) {
+		console.log('[317]文字找轰雷失败');
+	}
+	return null;
+}
+
+function d6jProbeShop(thisScript: Script) {
+	try {
+		const bmp = thisScript.helperBridge.helper.GetBitmap();
+		if (!bmp) return;
+		const dw = bmp.getWidth();
+		const dh = bmp.getHeight();
+		const rx0 = dw * 0.18;
+		const rx1 = dw * 0.80;
+		const ry0 = dh * 0.22;
+		const ry1 = dh * 0.68;
+		const cw = (rx1 - rx0) / 3;
+		const ch = (ry1 - ry0) / 3;
+		let line = '[317探针]';
+		for (let r = 0; r < 3; r++) {
+			for (let c = 0; c < 3; c++) {
+				const cx = Math.round(rx0 + cw * (c + 0.5));
+				const cy = Math.round(ry0 + ch * (r + 0.5));
+				const px = bmp.getPixel(cx, cy) & 0xffffff;
+				const hex = ('000000' + px.toString(16)).slice(-6);
+				line += ' (' + (r + 1) + ',' + (c + 1) + '):#' + hex;
+			}
+		}
+		console.log(line);
+		bmp.recycle();
+	} catch (e) {
+		console.log('[317探针]失败');
+	}
+}
+
 export class Func317 implements IFuncOrigin {
 	id = 317;
 	name = '六道觉';
@@ -28,13 +93,13 @@ export class Func317 implements IFuncOrigin {
 			default: '返回庭院',
 		}, {
 			name: 'debugColor',
-			desc: '诊断：打印关键点实测颜色',
+			desc: '诊断：打印商店列表实测颜色',
 			type: 'switch',
 			default: false,
 		}],
 	}];
 	operator: IFuncOperatorOrigin[] = [{
-		// 0 玩法主页_开启按钮（每局起点与终点）
+		// 0 玩法主页_开启按钮
 		desc: [1280, 720,
 			[
 				[right, 1145, 591, 0xf4e2ae],
@@ -59,7 +124,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 560, 420, 720, 540, 500],
 		]
-	}, { // 2 选试炼式神_确定按钮
+	}, { // 2 选试炼式神_确定
 		desc: [1280, 720,
 			[
 				[right, 1148, 589, 0xfff5bb],
@@ -72,7 +137,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1145, 597, 1228, 662, 500],
 		]
-	}, { // 3 阵容页_开启按钮（左下「预设/更换/全部」为页面独有特征）
+	}, { // 3 阵容页_开启
 		desc: [1280, 720,
 			[
 				[left, 120, 596, 0x3a3f4d],
@@ -85,7 +150,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1128, 606, 1217, 664, 500],
 		]
-	}, { // 4 局内地图（仅用于存在性判断，无点击）
+	}, { // 4 局内地图（仅存在性判断）
 		desc: [1280, 720,
 			[
 				[left, 60, 30, 0x1b2233],
@@ -94,9 +159,7 @@ export class Func317 implements IFuncOrigin {
 				[right, 1166, 114, 0x0f1123],
 			]
 		]
-	},
-];
-	{ // 5 神秘之屿_左上箭头（坐标与椒图篇一致）
+	}, { // 5 神秘之屿_左上箭头
 		desc: [1280, 720,
 			[
 				[center, 913, 678, 0x39607c],
@@ -109,7 +172,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 17, 20, 52, 58, 500],
 		]
-	}, { // 6 商店（宁息之屿）_离开按钮
+	}, { // 6 商店_离开
 		desc: [1280, 720,
 			[
 				[center, 558, 628, 0xbdab86],
@@ -135,7 +198,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 678, 409, 837, 453, 500],
 		]
-	}, { // 8 鏖战_选择挑战内容（右侧选项）
+	}, { // 8 鏖战_选择挑战内容_右侧
 		desc: [1280, 720,
 			[
 				[center, 700, 300, 0x242a36],
@@ -147,7 +210,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 760, 320, 1000, 520, 500],
 		]
-	}, { // 9 准备页_挑战按钮（鏖战/混沌共用）
+	}, { // 9 准备页_挑战（鏖战/混沌共用）
 		desc: [1280, 720,
 			[
 				[right, 1145, 591, 0xf4e2ae],
@@ -159,9 +222,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1120, 597, 1231, 682, 500],
 		]
-	},
-];
-	{ // 10 buff四选一_第四个「舞技强化」（兼轰雷购买位）
+	}, { // 10 buff四选一_第四个
 		desc: [1280, 720,
 			[
 				[center, 530, 599, 0x494949],
@@ -174,7 +235,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1034, 578, 1137, 621, 500],
 		]
-	}, { // 11 buff三选一_第一个「力量强化」
+	}, { // 11 buff三选一_第一个
 		desc: [1280, 720,
 			[
 				[center, 320, 596, 0x494949],
@@ -198,7 +259,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 700, 300, 1000, 450, 500],
 		]
-	}, { // 13 boss页（迦摩天）_挑战（左下奖励预览为页面独有特征）
+	}, { // 13 boss页（迦摩天）_挑战
 		desc: [1280, 720,
 			[
 				[left, 120, 600, 0x2a3040],
@@ -211,7 +272,7 @@ export class Func317 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1120, 597, 1231, 682, 500],
 		]
-	}, { // 14 结算页_点空白继续（左右两栏统计数据为独有特征）
+	}, { // 14 结算页_点空白继续
 		desc: [1280, 720,
 			[
 				[left, 300, 180, 0x1a2030],
@@ -250,89 +311,19 @@ export class Func317 implements IFuncOrigin {
 		]
 	},
 ];
-	// 在商店/buff列表里定位「六道·轰雷」：先试色组，色组没有时用限定区域的文字识别兜底
-	findHonglei(thisScript: Script) {
-		const p = this.tryFind(thisScript, '六道觉_六道轰雷');
-		if (p) {
-			console.log('[317]色组命中六道轰雷');
-			return p;
-		}
-		try {
-			const dw = thisScript.device.width;
-			const dh = thisScript.device.height;
-			// 只盯列表区域，不使用全屏搜字
-			const region = [
-				Math.round(dw * 0.15), Math.round(dh * 0.18),
-				Math.round(dw * 0.85), Math.round(dh * 0.72)
-			];
-			const res = thisScript.findText('轰雷', 600, region, '包含');
-			if (res && res.length && res[0].points && res[0].points.length) {
-				const pt = res[0].points[0];
-				// 文字识别返回的已是设备真实坐标，不再做基准换算
-				console.log('[317]文字识别命中六道轰雷，坐标:' + pt.x + ',' + pt.y);
-				return { x: pt.x, y: pt.y };
-			}
-		} catch (e) {
-			console.log('[317]文字找轰雷失败:' + e);
-		}
-		return null;
-	}
-
-	// 诊断：扫商店列表 3×3 格中心颜色，供定色组用
-	probeShopColors(thisScript: Script) {
-		try {
-			const bmp = thisScript.helperBridge.helper.GetBitmap();
-			if (!bmp) return;
-			const dw = bmp.getWidth();
-			const dh = bmp.getHeight();
-			const rx0 = dw * 0.18;
-			const rx1 = dw * 0.80;
-			const ry0 = dh * 0.22;
-			const ry1 = dh * 0.68;
-			const cw = (rx1 - rx0) / 3;
-			const ch = (ry1 - ry0) / 3;
-			let line = '[317探针]';
-			for (let r = 0; r < 3; r++) {
-				for (let c = 0; c < 3; c++) {
-					const cx = Math.round(rx0 + cw * (c + 0.5));
-					const cy = Math.round(ry0 + ch * (r + 0.5));
-					const px = bmp.getPixel(cx, cy) & 0xffffff;
-					const hex = ('000000' + px.toString(16)).slice(-6);
-					line += ' (' + (r + 1) + ',' + (c + 1) + '):#' + hex;
-				}
-			}
-			console.log(line);
-			bmp.recycle();
-		} catch (e) {
-			console.log('[317探针]失败:' + e);
-		}
-	}
-
-	// 安全找色：色组缺失或异常时返回 null，不影响主流程
-	tryFind(thisScript: Script, key: string) {
-		try {
-			return thisScript.findMultiColor(key);
-		} catch (e) {
-			console.log('[317]找色失败:' + key + ' ' + e);
-			return null;
-		}
-	}
-
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
-		const conf = thisScript.scheme.config['317'] || {};
-		// 本项目全局状态是强类型定义，新增字段不写入公共类型，这里局部断言
+		const conf: any = thisScript.scheme.config['317'] || {};
 		const g: any = thisScript.global;
 
-		// 诊断模式：定期打印商店列表区域颜色，用于定色组
 		if (conf.debugColor) {
-			const nowProbe = new Date().getTime();
-			if (!g.d6jProbeAt || nowProbe - g.d6jProbeAt > 1500) {
-				g.d6jProbeAt = nowProbe;
-				this.probeShopColors(thisScript);
+			const np = new Date().getTime();
+			if (!g.d6jProbeAt || np - g.d6jProbeAt > 1500) {
+				g.d6jProbeAt = np;
+				d6jProbeShop(thisScript);
 			}
 		}
 
-		// ── 1 结算页：统计 + 局数管理，最后点空白继续
+		// 1 结算页：统计 + 局数管理，最后点空白继续
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_结算',
@@ -344,7 +335,8 @@ export class Func317 implements IFuncOrigin {
 				const times = g.d6jTimes || 0;
 				const cost = g.d6jBegin ? ((now - g.d6jBegin) / 1000 / 60).toFixed(2) : '0';
 				const costAvg = g.d6jBegin && times ? Math.floor((now - g.d6jBegin) / 1000 / times) : 0;
-				const toLog = `六道觉已完成: ${times}次, 本次耗时: ${g.d6jCurrentBegin ? Math.floor((now - g.d6jCurrentBegin) / 1000) : 0}秒, 平均: ${costAvg}秒, 总耗时: ${cost}分`;
+				const cur = g.d6jCurrentBegin ? Math.floor((now - g.d6jCurrentBegin) / 1000) : 0;
+				const toLog = '六道觉已完成:' + times + '次, 本次:' + cur + '秒, 平均:' + costAvg + '秒, 总耗时:' + cost + '分';
 				thisScript.myToast(toLog);
 				console.log('[317]' + toLog);
 				if (conf.pushResult) {
@@ -368,7 +360,7 @@ export class Func317 implements IFuncOrigin {
 			return true;
 		}
 
-		// ── 2 获得奖励：点空白关闭
+		// 2 获得奖励：点空白关闭
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_获得奖励',
@@ -378,28 +370,28 @@ export class Func317 implements IFuncOrigin {
 			return true;
 		}
 
-		// ── 3 buff四选一：优先买六道轰雷，否则选最后一个
+		// 3 buff四选一：优先买轰雷，否则选最后一个
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_buff四选一',
 			operator: [thisOperator[10]]
 		})) {
 			if (!g.d6jHbBought && !g.d6jBuffTry) {
-				const p = this.findHonglei(thisScript);
+				const p = d6jFindHonglei(thisScript);
 				if (p) {
-					console.log('[317]四选一页发现六道轰雷，点它');
+					console.log('[317]四选一发现轰雷，点它');
 					thisScript.regionClick([[p.x - 60, p.y - 40, p.x + 60, p.y + 60, 500]]);
 					g.d6jBuffTry = 1;
 					return true;
 				}
-				console.log('[317]四选一页无六道轰雷，选最后一个');
+				console.log('[317]四选一无轰雷，选最后一个');
 			}
 			thisScript.regionClick([thisOperator[10].oper[0]]);
 			g.d6jBuffTry = 0;
 			return true;
 		}
 
-		// ── 4 buff三选一：选第一个
+		// 4 buff三选一：选第一个
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_buff三选一',
@@ -409,7 +401,7 @@ export class Func317 implements IFuncOrigin {
 			return true;
 		}
 
-		// ── 5 购买确认弹窗：确定
+		// 5 购买确认：确定并置标记
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_购买确认',
@@ -424,48 +416,48 @@ export class Func317 implements IFuncOrigin {
 			return true;
 		}
 
-		// ── 6 商店：未买则找轰雷，其余情况直接离开
+		// 6 商店：未买则找轰雷，否则直接离开
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_商店',
 			operator: [thisOperator[6]]
 		})) {
 			if (!g.d6jHbBought && !g.d6jShopTry) {
-				const p = this.findHonglei(thisScript);
+				const p = d6jFindHonglei(thisScript);
 				if (p) {
-					console.log('[317]商店发现六道轰雷，点它');
+					console.log('[317]商店发现轰雷，点它');
 					thisScript.regionClick([[p.x - 60, p.y - 40, p.x + 60, p.y + 60, 500]]);
 					g.d6jShopTry = 1;
 					return true;
 				}
-				console.log('[317]商店无六道轰雷');
+				console.log('[317]商店无轰雷');
 			}
 			thisScript.regionClick([thisOperator[6].oper[0]]);
 			g.d6jShopTry = 0;
 			return true;
 		}
 
-		// ── 7 神秘之屿：左上箭头退出
+		// 7 神秘之屿：左上箭头退出
 		if (thisScript.oper({
 			id: 317,
-			name: '六道觉_神秘之屿',
+			name: '六道觉_神秘',
 			operator: [thisOperator[5]]
 		})) {
 			thisScript.regionClick([thisOperator[5].oper[0]]);
 			return true;
 		}
 
-		// ── 8 绽放之屿展示页：右下离开
+		// 8 绽放之屿展示页：右下离开
 		if (thisScript.oper({
 			id: 317,
-			name: '六道觉_绽放之屿',
+			name: '六道觉_绽放',
 			operator: [thisOperator[16]]
 		})) {
 			thisScript.regionClick([thisOperator[16].oper[0]]);
 			return true;
 		}
 
-		// ── 9 混沌幸运宝匣：右下离开
+		// 9 混沌幸运宝匣：右下离开
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_幸运宝匣',
@@ -475,10 +467,10 @@ export class Func317 implements IFuncOrigin {
 			return true;
 		}
 
-		// ── 10 boss页（迦摩天）：挑战
+		// 10 boss页：挑战
 		if (thisScript.oper({
 			id: 317,
-			name: '六道觉_boss挑战',
+			name: '六道觉_boss',
 			operator: [thisOperator[13]]
 		})) {
 			thisScript.regionClick([thisOperator[13].oper[0]]);
@@ -486,17 +478,17 @@ export class Func317 implements IFuncOrigin {
 			return true;
 		}
 
-		// ── 11 准备页：挑战（鏖战/混沌共用）
+		// 11 准备页：挑战
 		if (thisScript.oper({
 			id: 317,
-			name: '六道觉_准备页挑战',
+			name: '六道觉_准备页',
 			operator: [thisOperator[9]]
 		})) {
 			thisScript.regionClick([thisOperator[9].oper[0]]);
 			return true;
 		}
 
-		// ── 12 鏖战选择挑战内容：固定点右侧
+		// 12 鏖战选择挑战内容：固定右侧
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_鏖战选内容',
@@ -506,7 +498,7 @@ export class Func317 implements IFuncOrigin {
 			return true;
 		}
 
-		// ── 13 选试炼式神：点第2张卡 → 确定（每局都出现）
+		// 13 选试炼式神：第2张卡 → 确定
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_选试炼式神',
@@ -515,11 +507,11 @@ export class Func317 implements IFuncOrigin {
 			thisScript.regionClick([thisOperator[1].oper[0]]);
 			sleep(300);
 			thisScript.regionClick([thisOperator[2].oper[0]]);
-			console.log('[317]已选第2张试炼式神并确定');
+			console.log('[317]已选第2张试炼式神');
 			return true;
 		}
 
-		// ── 14 阵容页：直接开启
+		// 14 阵容页：直接开启
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_阵容页',
@@ -529,14 +521,13 @@ export class Func317 implements IFuncOrigin {
 			return true;
 		}
 
-		// ── 15 玩法主页：开启，并作为新一轮的起点重置状态
+		// 15 玩法主页：开启并重置本局状态
 		if (thisScript.oper({
 			id: 317,
 			name: '六道觉_玩法主页',
 			operator: [thisOperator[0]]
 		})) {
 			const now = new Date().getTime();
-			// 2秒内不重复计次，防止重复点击时多算
 			if (!g.d6jStartAt || now - g.d6jStartAt > 2000) {
 				g.d6jStartAt = now;
 				g.d6jTimes = (g.d6jTimes || 0) + 1;
