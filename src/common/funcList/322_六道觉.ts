@@ -320,7 +320,7 @@ export class Func322 implements IFuncOrigin {
 			}
 		}
 
-		// 鏖战图标区域取色：用于建立找色色组
+		// 地图节点网格取色：整块地图区域均匀采样，用于建立节点找色色组
 		if (cfg322.debugColor) {
 			const nowArea = new Date().getTime();
 			if (!thisScript.global.currentRunTimes['d6jArea'] || nowArea - thisScript.global.currentRunTimes['d6jArea'] > 3000) {
@@ -330,19 +330,22 @@ export class Func322 implements IFuncOrigin {
 					bmpA = thisScript.helperBridge.helper.GetBitmap();
 					const aw = bmpA.getWidth();
 					const ah = bmpA.getHeight();
-					let outLine = '[322鏖战区880,405-975,495 ' + aw + 'x' + ah + ']';
-					for (let ay = 0; ay < 7; ay++) {
+					let outLine = '[322地图网格' + aw + 'x' + ah + ']';
+					// 14列 x 9行，覆盖 x100~1180 / y100~660（1280x720基准）
+					for (let ay = 0; ay < 9; ay++) {
 						outLine += ' R' + (ay + 1) + ':';
-						for (let ax = 0; ax < 10; ax++) {
-							const px2 = 880 + Math.round(ax * 9.5 * aw / 1280);
-							const py2 = 405 + Math.round(ay * 12.8 * ah / 720);
+						for (let ax = 0; ax < 14; ax++) {
+							const bx = 100 + (ax + 0.5) * 1080 / 14;
+							const by = 100 + (ay + 0.5) * 560 / 9;
+							const px2 = Math.round(bx * aw / 1280);
+							const py2 = Math.round(by * ah / 720);
 							const c2 = bmpA.getPixel(px2, py2) & 0xffffff;
 							outLine += ('000000' + c2.toString(16)).slice(-6) + ',';
 						}
 					}
 					console.log(outLine);
 				} catch (errA) {
-					console.log('[322鏖战区]取图失败');
+					console.log('[322地图网格]取图失败');
 				} finally {
 					try {
 						if (bmpA) {
