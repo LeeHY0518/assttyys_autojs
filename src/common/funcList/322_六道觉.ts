@@ -591,6 +591,9 @@ export class Func322 implements IFuncOrigin {
 					const cX = [];
 					const cY = [];
 					const cT = [];
+					let wAll = 0;
+					let rAll = 0;
+					let pAll = 0;
 					for (let gy = 290; gy <= 600; gy = gy + 24) {
 						for (let gx = 130; gx <= 1150; gx = gx + 24) {
 							let rc = 0;
@@ -619,12 +622,15 @@ export class Func322 implements IFuncOrigin {
 								}
 							}
 							let ct = '';
-							if (wc >= 16) {
+							if (wc >= 6) {
 								ct = 'W';
-							} else if (rc >= 8) {
+								wAll = wAll + 1;
+							} else if (rc >= 4) {
 								ct = 'R';
-							} else if (pc >= 8) {
+								rAll = rAll + 1;
+							} else if (pc >= 5) {
 								ct = 'P';
+								pAll = pAll + 1;
 							}
 							if (ct !== '') {
 								cX.push(gx);
@@ -633,6 +639,7 @@ export class Func322 implements IFuncOrigin {
 							}
 						}
 					}
+					console.log('[322扫量]W' + wAll + 'R' + rAll + 'P' + pAll);
 					for (let ci = 0; ci < cX.length && ci < 6; ci++) {
 						let sig = '[322签' + cT[ci] + cX[ci] + ',' + cY[ci] + ']';
 						for (let bk = 0; bk < 9; bk++) {
