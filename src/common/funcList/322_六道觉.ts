@@ -48,18 +48,22 @@ export class Func322 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1128, 606, 1217, 664, 500],
 		]
-	}, { // 1 选试炼式神_第2张卡
+	}, { // 1 选试炼式神_确定
 		desc: [
 			1280, 720,
 			[
-				[center, 640, 470, 0xd8c9a8],
-				[center, 600, 480, 0xc7b48c],
-				[center, 680, 480, 0xc7b48c],
-				[center, 640, 500, 0xb59b6e],
+				[left, 71, 72, 0x1b2129],
+				[right, 1209, 72, 0x202426],
+				[left, 71, 360, 0x426a8d],
+				[center, 213, 360, 0xd4deef],
+				[left, 71, 504, 0x494f5b],
+				[left, 71, 648, 0xccc8bc],
+				[center, 498, 648, 0xd4a449],
 			]
 		],
+		// 选式神页不选卡，页面会记住上次选择，直接点右下角确定
 		oper: [
-			[center, 1280, 720, 560, 420, 720, 540, 500],
+			[center, 1280, 720, 1145, 597, 1228, 662, 500],
 		]
 	}, { // 2 选试炼式神_确定
 		desc: [
@@ -275,6 +279,7 @@ export class Func322 implements IFuncOrigin {
 					bmp = thisScript.helperBridge.helper.GetBitmap();
 					const dw = bmp.getWidth();
 					const dh = bmp.getHeight();
+					let sig = 0;
 					let line = '[322屏' + dw + 'x' + dh + ']';
 					// 9列5行均匀采样，任一界面都能看出布局
 					for (let ry = 0; ry < 5; ry++) {
@@ -282,10 +287,16 @@ export class Func322 implements IFuncOrigin {
 							const sx = Math.min(dw - 1, Math.round(dw * (rx + 0.5) / 9));
 							const sy = Math.min(dh - 1, Math.round(dh * (ry + 0.5) / 5));
 							const px = bmp.getPixel(sx, sy) & 0xffffff;
+							sig += px;
 							line += ' ' + (ry + 1) + '-' + (rx + 1) + ':#' + ('000000' + px.toString(16)).slice(-6);
 						}
 					}
-					console.log(line);
+					// 同一屏只输出一次：画面无变化则跳过，避免日志刷屏
+					const lastSig = thisScript.global.currentRunTimes['d6jSig'] || 0;
+					if (!lastSig || Math.abs(sig - lastSig) > 2000000) {
+						console.log(line);
+						thisScript.global.currentRunTimes['d6jSig'] = sig;
+					}
 				} catch (err) {
 					console.log('[322屏]取图失败');
 				} finally {
@@ -478,16 +489,13 @@ export class Func322 implements IFuncOrigin {
 			return true;
 		}
 
-		// 选试炼式神：第2张卡后点确定
+		// 选试炼式神：不选卡，直接点右下角确定
 		if (thisScript.oper({
 			id: 322,
 			name: '六道觉_选试炼式神',
 			operator: [thisOperator[1]]
 		})) {
 			thisScript.regionClick([thisOperator[1].oper[0]]);
-			sleep(300);
-			thisScript.regionClick([thisOperator[2].oper[0]]);
-			console.log('[322]已选第2张试炼式神');
 			return true;
 		}
 
