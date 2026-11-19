@@ -266,9 +266,11 @@ export class Func317 implements IFuncOrigin {
 				Math.round(dw * 0.85), Math.round(dh * 0.72)
 			];
 			const res = thisScript.findText('轰雷', 600, region, '包含');
-			if (res && res.length) {
-				console.log('[317]文字识别命中六道轰雷，坐标:' + res[0].x + ',' + res[0].y);
-				return { x: res[0].x, y: res[0].y };
+			if (res && res.length && res[0].points && res[0].points.length) {
+				const pt = res[0].points[0];
+				// 文字识别返回的已是设备真实坐标，不再做基准换算
+				console.log('[317]文字识别命中六道轰雷，坐标:' + pt.x + ',' + pt.y);
+				return { x: pt.x, y: pt.y };
 			}
 		} catch (e) {
 			console.log('[317]文字找轰雷失败:' + e);
@@ -295,7 +297,8 @@ export class Func317 implements IFuncOrigin {
 					const cx = Math.round(rx0 + cw * (c + 0.5));
 					const cy = Math.round(ry0 + ch * (r + 0.5));
 					const px = bmp.getPixel(cx, cy) & 0xffffff;
-					line += ` (${r + 1},${c + 1}):#${px.toString(16).padStart(6, '0')}`;
+					const hex = ('000000' + px.toString(16)).slice(-6);
+					line += ' (' + (r + 1) + ',' + (c + 1) + '):#' + hex;
 				}
 			}
 			console.log(line);
@@ -317,7 +320,8 @@ export class Func317 implements IFuncOrigin {
 
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 		const conf = thisScript.scheme.config['317'] || {};
-		const g = thisScript.global;
+		// 本项目全局状态是强类型定义，新增字段不写入公共类型，这里局部断言
+		const g: any = thisScript.global;
 
 		// 诊断模式：定期打印商店列表区域颜色，用于定色组
 		if (conf.debugColor) {
