@@ -95,15 +95,22 @@ export class Func322 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1128, 606, 1217, 664, 500],
 		]
-	}, { // 4 局内地图
+	}, { // 4 局内地图_鏖战
 		desc: [
 			1280, 720,
 			[
-				[left, 60, 30, 0x1b2233],
-				[left, 74, 136, 0x0e1223],
-				[right, 1119, 617, 0x191f34],
-				[right, 1166, 114, 0x0f1123],
+				[center, 782, 72, 0x101c2f],
+				[left, 71, 360, 0xe1e7f4],
+				[center, 356, 360, 0xd8ddef],
+				[left, 71, 504, 0xb0cbd1],
+				[left, 71, 648, 0x226a9e],
+				[center, 356, 648, 0xeceff9],
+				[right, 1067, 648, 0x5e6469],
+				[right, 1209, 648, 0x4a4c50],
 			]
+		],
+		oper: [
+			[center, 1280, 720, 850, 400, 1000, 500, 500],
 		]
 	}, { // 5 神秘之屿_左上箭头
 		desc: [
@@ -313,6 +320,41 @@ export class Func322 implements IFuncOrigin {
 			}
 		}
 
+		// 鏖战图标区域取色：用于建立找色色组
+		if (cfg322.debugColor) {
+			const nowArea = new Date().getTime();
+			if (!thisScript.global.currentRunTimes['d6jArea'] || nowArea - thisScript.global.currentRunTimes['d6jArea'] > 3000) {
+				thisScript.global.currentRunTimes['d6jArea'] = nowArea;
+				let bmpA = null;
+				try {
+					bmpA = thisScript.helperBridge.helper.GetBitmap();
+					const aw = bmpA.getWidth();
+					const ah = bmpA.getHeight();
+					let outLine = '[322鏖战区880,405-975,495 ' + aw + 'x' + ah + ']';
+					for (let ay = 0; ay < 7; ay++) {
+						outLine += ' R' + (ay + 1) + ':';
+						for (let ax = 0; ax < 10; ax++) {
+							const px2 = 880 + Math.round(ax * 9.5 * aw / 1280);
+							const py2 = 405 + Math.round(ay * 12.8 * ah / 720);
+							const c2 = bmpA.getPixel(px2, py2) & 0xffffff;
+							outLine += ('000000' + c2.toString(16)).slice(-6) + ',';
+						}
+					}
+					console.log(outLine);
+				} catch (errA) {
+					console.log('[322鏖战区]取图失败');
+				} finally {
+					try {
+						if (bmpA) {
+							bmpA.recycle();
+						}
+					} catch (errA2) {
+						// 忽略回收异常
+					}
+				}
+			}
+		}
+
 		// 结算页：统计与局数管理
 		if (thisScript.oper({
 			id: 322,
@@ -356,7 +398,7 @@ export class Func322 implements IFuncOrigin {
 			return true;
 		}
 
-		// buff四选一：未买轰雷时先找轰雷，否则选最后一个
+		// buff四选一：只买六道轰雷，已有一个就不再买
 		if (thisScript.oper({
 			id: 322,
 			name: '六道觉_buff四选一',
@@ -376,18 +418,34 @@ export class Func322 implements IFuncOrigin {
 					return true;
 				}
 			}
-			thisScript.regionClick([thisOperator[10].oper[0]]);
+			// 没有轰雷或已有轰雷：不买其它buff
+			console.log('[322]四选一无轰雷或已有轰雷，跳过不买');
 			thisScript.global.d6Loop = 0;
 			return true;
 		}
 
-		// buff三选一：选第一个
+		// buff三选一：只买六道轰雷，已有一个就不再买
 		if (thisScript.oper({
 			id: 322,
 			name: '六道觉_buff三选一',
 			operator: [thisOperator[11]]
 		})) {
-			thisScript.regionClick([thisOperator[11].oper[0]]);
+			if (!thisScript.global.d6RouFeng) {
+				let point3 = null;
+				try {
+					point3 = thisScript.findMultiColor('六道觉_六道轰雷');
+				} catch (err3) {
+					console.log('[322]轰雷色组未定义');
+				}
+				if (point3) {
+					console.log('[322]三选一发现轰雷');
+					thisScript.regionClick([[point3.x - 60, point3.y - 40, point3.x + 60, point3.y + 60, 500]]);
+					thisScript.global.d6Loop = 1;
+					return true;
+				}
+			}
+			console.log('[322]三选一无轰雷或已有轰雷，跳过不买');
+			thisScript.global.d6Loop = 0;
 			return true;
 		}
 
@@ -439,6 +497,26 @@ export class Func322 implements IFuncOrigin {
 			thisScript.regionClick([thisOperator[2].oper[0]]);
 			console.log('[322]已选第三个舞技');
 			return true;
+		}
+
+		// 局内地图：找地图节点（鏖战/神秘/混沌/商店/绽放等都算），找到后点图标下方
+		if (thisScript.oper({
+			id: 322,
+			name: '六道觉_局内地图',
+			operator: [thisOperator[4]]
+		})) {
+			let mapPoint = null;
+			try {
+				mapPoint = thisScript.findMultiColor('六道觉_地图节点');
+			} catch (errMap) {
+				console.log('[322]地图节点色组未定义');
+			}
+			if (mapPoint) {
+				thisScript.regionClick([[mapPoint.x - 40, mapPoint.y + 20, mapPoint.x + 40, mapPoint.y + 80, 500]]);
+				console.log('[322]地图点节点 ' + mapPoint.x + ',' + mapPoint.y);
+				return true;
+			}
+			return false;
 		}
 
 		// 神秘之屿：左上箭头退出
