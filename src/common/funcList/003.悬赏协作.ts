@@ -6,47 +6,6 @@ import { IFuncOrigin, IFuncOperator, IFuncOperatorOrigin } from '@/interface/IFu
 const center = 1;
 const right = 2;
 
-// 1280x720 基准分辨率
-const BASE_W = 1280;
-const BASE_H = 720;
-
-// 节流：两次取图至少间隔 300ms。这类协助是抢手速的，判定必须快。
-let lastCheckTime = 0;
-
-// 奖励行扫描范围（比例）。奖励图标左右位置不固定，所以整行扫；
-// 纵向只取奖励所在的一条带，把范围限死，不碰弹窗其它区域。
-// 右边界卡在「接受」按钮左边，免得把按钮的像素也算进奖励格。
-const REWARD_X0 = 0.35;
-const REWARD_X1 = 0.64;
-const REWARD_Y0 = 0.62;
-const REWARD_Y1 = 0.78;
-
-// ——— 定点比色（沿用原版 003 的做法）———
-// 原版就是写死坐标取色、和预设色值比对，不靠大范围数色。
-// 这里同样把位置钉死：颜色必须出现在它该在的地方才算数。
-// 「接受」「拒绝」两个按钮的定点（1280x720 基准，取自实测日志）
-const ACCEPT_PT_X = 874;
-const ACCEPT_PT_Y = 498;
-const REJECT_PT_X = 878;
-const REJECT_PT_Y = 586;
-// 色块质心允许偏离定点的像素数（1280x720 基准）
-const PT_TOL = 10;
-
-// 按钮点击区域（1280x720 基准）。点矩形而不是点一个像素——
-// 原版就是点矩形，框架会在矩形里随机取点，不会次次都落在同一像素上。
-const RECT_ACCEPT = [942, 482, 972, 512];
-const RECT_REJECT = [944, 571, 974, 601];
-
-/**
- * 悬赏协作（纯像素比色版）
- *
- * 判据全部走颜色，不再调用文字识别：
- *  - 日志干净，不会再被聊天横幅里出现的字眼干扰；
- *  - 省掉一次全屏识别，抢协助更快。
- *
- * 实测确认的规律：奖励行里那个「碎片」图标，
- * 勾协是「金色底」，金币 / 体力 / 宠物粮食类都是「紫底」。
- */
 export class Func003 implements IFuncOrigin {
 	id = 3;
 	name = '悬赏协作';
@@ -74,32 +33,54 @@ export class Func003 implements IFuncOrigin {
 			default: '关闭'
 		}]
 	}];
-	// 算子表：desc 只能写「数组」或「不写」。
-	// 写成字符串会被框架拿去 multiDetectColors.ts 里查表，查不到会直接抛错。
-	// 第 0 项只用于提供「关闭按钮」的兜底坐标，不做比色匹配，因此不写 desc。
 	operator: IFuncOperatorOrigin[] = [{
-		// 0 悬赏协作弹窗 关闭兜底（仅提供坐标，不做比色）
-		oper: [
-			[center, 1280, 720, 791, 81, 816, 109, 1000],
-			[center, 1280, 720, 1209, 66, 1260, 113, 1000],
-		]
-	}, { // 1 阴阳寮成就页等杂弹窗，点空白处清掉
-		desc: [
-			1280, 720,
+		desc: [1280, 720,
 			[
-				[right, 1055, 230, 0x997242],
-				[right, 1072, 462, 0xecd7b9],
-				[center, 347, 490, 0xb8a281],
-				[center, 357, 240, 0xf5ebd5],
-				[center, 830, 150, 0xefe4d0],
-				[center, 697, 172, 0x805054],
-				[center, 827, 230, 0xb58a55],
+				[center, 533, 64, 0xe7c383],
+				[right, 810, 89, 0xd1bfb9],
+				[right, 684, 440, 0xd1c5b0],
+				[center, 540, 555, 0xd7c8b1],
+				[center, 517, 118, 0xbfa992],
+				[right, 889, 488, 0x73eba6],
+				[right, 874, 585, 0xf67246],
 			]
 		],
 		oper: [
-			[center, 1280, 720, 357, 535, 1045, 662, 1200]
+			[center, 1280, 720, 790, 71, 834, 111, 1000], // 关闭
+			[center, 1280, 720, 848, 475, 902, 526, 1000], // 接受
+			[center, 1280, 720, 846, 568, 898, 616, 1000], // 拒绝
 		]
-	}, { // 2 呱太弹窗
+	}, {
+		desc: [1280, 720,
+			[
+				[center, 519, 139, 0xb29375],
+				[center, 727, 171, 0xb29375],
+				[center, 855, 518, 0xdc6958],
+				[center, 849, 422, 0x53ae5b],
+				[center, 572, 473, 0x9d7838],
+				[center, 618, 482, 0xdba83a],
+				[center, 668, 510, 0x7746a8],
+				[center, 694, 490, 0xef492e]
+			]
+		]
+	}, { // 2 判断_阴阳寮成就页 这些乱七八糟的弹窗统一找个地方放吧，烦死了，暂时先放着:)
+		desc:
+			[
+				1280, 720,
+				[
+					[right, 1055, 230, 0x997242],
+					[right, 1072, 462, 0xecd7b9],
+					[center, 347, 490, 0xb8a281],
+					[center, 357, 240, 0xf5ebd5],
+					[center, 830, 150, 0xefe4d0],
+					[center, 697, 172, 0x805054],
+					[center, 827, 230, 0xb58a55],
+				]
+			],
+		oper: [
+			[center, 1280, 720, 357, 535, 1045, 662, 1200]	//	点击空白处
+		]
+	}, { // 3 呱太弹窗
 		desc: [1280, 720,
 			[
 				[center, 568, 225, 0xb7b052],
@@ -113,7 +94,7 @@ export class Func003 implements IFuncOrigin {
 			[center, 1280, 720, 517, 521, 841, 689, 1000],
 			[center, 1280, 720, 509, 650, 912, 716, 1000]
 		]
-	}, { // 3 其他设备登录(被顶掉)
+	}, { // 4 其他设备登录(被顶掉)
 		desc: [
 			1280, 720,
 			[
@@ -130,256 +111,103 @@ export class Func003 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 584, 382, 700, 429, 1000],
 		]
+	}, { // 5 邀约协作
+		desc: [
+			1280, 720,
+			[
+				[center, 420, 202, 0xd9bd97],
+				[center, 434, 158, 0xbc8a4d],
+				[center, 571, 149, 0xd7c3a6],
+				[center, 791, 146, 0xffeca2],
+				[center, 778, 120, 0x8c4a3a],
+				[center, 854, 438, 0x57b260],
+				[center, 857, 529, 0xdd705f],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 762, 118, 796, 151, 1000], // 关闭
+			[center, 1280, 720, 836, 410, 880, 457, 1000], // 接受
+			[center, 1280, 720, 834, 510, 880, 556, 1000], // 拒绝
+		]
 	}];
+
+	/**
+	 *
+	 * @param {*} thisScript script.js 这样可以拿到里面的对象用来做点击等操作
+	 * @param {*} thisOperator 转换过适合当前分辨率的operator
+	 */
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
-		const thisconf = thisScript.scheme.config['3'];
-		if (!thisconf) {
-			return false;
-		}
-		// 顺手清掉挡路的杂弹窗（阴阳寮成就页、呱太弹窗）
+		const thisconf = thisScript.scheme.config['3']; // 获取配置
 		if (thisScript.oper({
 			id: 3,
 			name: '清除垃圾弹窗',
-			operator: [thisOperator[1], thisOperator[2]]
+			operator: [thisOperator[2], thisOperator[3]]
 		})) {
 			return true;
 		}
-		// 被其它设备顶号：停止脚本并推送
 		if (thisScript.oper({
 			id: 3,
 			name: '意外情况,停止脚本',
-			operator: [thisOperator[3]]
+			operator: [thisOperator[4]]
 		})) {
 			thisScript.doPush(thisScript, { text: '意外情况已停止，请查看。', before() { thisScript.myToast('脚本即将停止，正在上传数据'); } });
 			thisScript.stop();
 			sleep(3000);
 			return true;
 		}
-
-		// 节流：两次取图至少间隔 300ms
-		const nowTime = new Date().getTime();
-		if (nowTime - lastCheckTime < 300) {
-			return false;
-		}
-		lastCheckTime = nowTime;
-
-		if (!thisScript.helperBridge || !thisScript.helperBridge.helper) {
-			return false;
-		}
-
-		// ——— 纯像素比色：不调 OCR，日志干净、也不会被聊天横幅干扰 ———
-		let bmp: any = null;
-		let dw = BASE_W;
-		let dh = BASE_H;
-		// 金色按奖励栏「左格 / 右格」分开统计
-		let goldL = 0;
-		let goldR = 0;
-		let purple = 0;
-		let dark = 0;
-		// 按钮诊断用：绿对勾 / 橙红叉 的像素数、质心与包围盒
-		let gN = 0;
-		let gSx = 0;
-		let gSy = 0;
-		let gMinX = 0;
-		let gMinY = 0;
-		let gMaxX = 0;
-		let gMaxY = 0;
-		let rN = 0;
-		let rSx = 0;
-		let rSy = 0;
-		let rMinX = 0;
-		let rMinY = 0;
-		let rMaxX = 0;
-		let rMaxY = 0;
-		let probeAcc = '?';
-		let probeRej = '?';
-		try {
-			bmp = thisScript.helperBridge.helper.GetBitmap();
-			if (!bmp) {
-				return false;
-			}
-			dw = bmp.getWidth();
-			dh = bmp.getHeight();
-			if (dw <= 0 || dh <= 0) {
-				bmp.recycle();
-				return false;
-			}
-			const x0 = Math.round(dw * REWARD_X0);
-			const x1 = Math.round(dw * REWARD_X1);
-			const y0 = Math.round(dh * REWARD_Y0);
-			const y1 = Math.round(dh * REWARD_Y1);
-			// 奖励栏中分线，用来区分左、右两格
-			const mid = (x0 + x1) / 2;
-			for (let y = y0; y <= y1; y += 3) {
-				for (let x = x0; x <= x1; x += 3) {
-					const c = bmp.getPixel(x, y);
-					const r = (c >> 16) & 0xff;
-					const g = (c >> 8) & 0xff;
-					const b = c & 0xff;
-					// 金色（含金底）：按左右两格分开记
-					if (r > 130 && g > 70 && b < 100 && r - b > 50 && r - g < 130) {
-						if (x < mid) {
-							goldL++;
-						} else {
-							goldR++;
-						}
-					}
-					// 紫色底
-					else if (b > 95 && b - r > 20 && r < 150 && g < 130) {
-						purple++;
-					}
-					// 深色（弹窗暗部）
-					else if (r < 75 && g < 75 && b < 75) {
-						dark++;
-					}
-				}
-			}
-			// ——— 定点比色：只在两个固定小窗里取色，不再扫大片区域 ———
-			// 协作弹窗上「接受」「拒绝」按钮的位置是固定的（1280x720 基准）：
-			//   接受按钮的浅绿对勾  中心约 (874,498)，外接框约 40x40
-			//   拒绝按钮的橙红叉    中心约 (878,586)
-			// 所以只在这两个小窗里数色，窗外的画面再花哨也进不来。
-			const sx = (v: number) => Math.round(v * dw / BASE_W);
-			const sy = (v: number) => Math.round(v * dh / BASE_H);
-			const ax0 = sx(845), ax1 = sx(905), ay0 = sy(458), ay1 = sy(536);   // 接受窗
-			const bx0 = sx(845), bx1 = sx(911), by0 = sy(552), by1 = sy(622);   // 拒绝窗
-			gMinX = 99999;
-			gMinY = 99999;
-			gMaxX = 0;
-			gMaxY = 0;
-			rMinX = 99999;
-			rMinY = 99999;
-			rMaxX = 0;
-			rMaxY = 0;
-			for (let y = ay0; y <= ay1; y += 2) {
-				for (let x = ax0; x <= ax1; x += 2) {
-					const c = bmp.getPixel(x, y);
-					const r = (c >> 16) & 0xff;
-					const g = (c >> 8) & 0xff;
-					const b = c & 0xff;
-					// 浅绿（接受按钮的对勾）
-					if (g - r > 15 && g - b > 15 && g > 110) {
-						gN++;
-						gSx += x;
-						gSy += y;
-						if (x < gMinX) { gMinX = x; }
-						if (x > gMaxX) { gMaxX = x; }
-						if (y < gMinY) { gMinY = y; }
-						if (y > gMaxY) { gMaxY = y; }
-					}
-				}
-			}
-			for (let y = by0; y <= by1; y += 2) {
-				for (let x = bx0; x <= bx1; x += 2) {
-					const c = bmp.getPixel(x, y);
-					const r = (c >> 16) & 0xff;
-					const g = (c >> 8) & 0xff;
-					const b = c & 0xff;
-					// 橙红（拒绝按钮的叉号）
-					if (r - g > 40 && r - b > 60 && r > 130) {
-						rN++;
-						rSx += x;
-						rSy += y;
-						if (x < rMinX) { rMinX = x; }
-						if (x > rMaxX) { rMaxX = x; }
-						if (y < rMinY) { rMinY = y; }
-						if (y > rMaxY) { rMaxY = y; }
-					}
-				}
-			}
-			// 顺手把两个按钮中心的真实色值记下来，供下次改成精确色组
-			const pa = (gN > 0 ? bmp.getPixel(Math.round(gSx / gN), Math.round(gSy / gN)) : bmp.getPixel(sx(874), sy(498))) & 0xffffff;
-			const pb = (rN > 0 ? bmp.getPixel(Math.round(rSx / rN), Math.round(rSy / rN)) : bmp.getPixel(sx(878), sy(586))) & 0xffffff;
-			probeAcc = '#' + ('000000' + pa.toString(16)).slice(-6);
-			probeRej = '#' + ('000000' + pb.toString(16)).slice(-6);
-		} catch (e) {
-			console.error($debug.getStackTrace(e));
-			if (bmp) {
-				bmp.recycle();
-			}
-			return false;
-		}
-		if (bmp) {
-			bmp.recycle();
-		}
-
-		const gold = goldL + goldR;
-
-		// ——— 存在性判据：定点比色 ———
-		// 两个按钮的色块必须出现在它们该在的位置上，缺一不可。
-		// 这一条专门挡「画面里没有弹窗、只是碰巧颜色相近」：
-		// 战斗/斗技这类画面再花，也很难让绿对勾和红叉同时压在这两个写死的点上。
-		//   真协作弹窗：绿 159~162，外接框 40x40，中心 (874,498)
-		//               橙红 204~208，外接框 42x38，中心 (878,586)
-		if (rN < 60) {
-			return false;
-		}
-		if (gN < 90 || gN > 600) {
-			return false;
-		}
-		if (gMaxX - gMinX > Math.round(58 * dw / BASE_W) || gMaxY - gMinY > Math.round(58 * dh / BASE_H)) {
-			return false;
-		}
-		// 色块中心到定点的偏差（换算回 1280x720 基准再比）
-		const gDx = Math.abs(Math.round(gSx / gN * BASE_W / dw) - ACCEPT_PT_X);
-		const gDy = Math.abs(Math.round(gSy / gN * BASE_H / dh) - ACCEPT_PT_Y);
-		const rDx = Math.abs(Math.round(rSx / rN * BASE_W / dw) - REJECT_PT_X);
-		const rDy = Math.abs(Math.round(rSy / rN * BASE_H / dh) - REJECT_PT_Y);
-		if (gDx > PT_TOL || gDy > PT_TOL || rDx > PT_TOL || rDy > PT_TOL) {
-			return false;
-		}
-
-		// 奖励行里没成片出现彩色图标 → 图标还没刷出来，这一轮先不动
-		if (gold + purple < 150) {
-			return false;
-		}
-
-		// 实测四种协助的奖励栏摆位：
-		//   勾协     左格 = 金底碎片，右格 = 紫底勾玉
-		//   体力协   左格 = 紫底碎片，右格 = 紫底寿司
-		//   金币协   左格 = 蓝底碎片，右格 = 金底铜钱
-		//   宠物粮食 左格 = 紫底食盆，右格 = 金底铜钱
-		// 金色本身不稀缺（金币类的金色甚至更多），
-		// 只有勾协才有的特征是「金底出现在左格」。
-		const isGou = gold >= 90 && goldL > goldR;
-		const toBx = (v: number) => Math.round(v * BASE_W / dw);
-		const toBy = (v: number) => Math.round(v * BASE_H / dh);
-		console.log('悬赏协作: 左金=' + goldL + ' 右金=' + goldR + ' 紫=' + purple + ' 深=' + dark + ' → ' + (isGou ? '勾协' : '非勾协'));
-		console.log('定点比色: 接受点 n=' + gN + ' 中心(' + toBx(gSx / gN) + ',' + toBy(gSy / gN) + ') 偏差(' + gDx + ',' + gDy + ') 取色=' + probeAcc
-			+ ' | 拒绝点 n=' + rN + ' 中心(' + toBx(rSx / rN) + ',' + toBy(rSy / rN) + ') 偏差(' + rDx + ',' + rDy + ') 取色=' + probeRej
-			+ ' | 容差=' + PT_TOL + ' (1280x720基准)');
-
-		// 点矩形（原版就是点矩形）：框架会在矩形里随机取点，
-		// 不会次次都打在同一像素上。
-		const clickRect = (rect: number[]) => {
-			const px0 = Math.round(rect[0] * dw / BASE_W);
-			const py0 = Math.round(rect[1] * dh / BASE_H);
-			const px1 = Math.round(rect[2] * dw / BASE_W);
-			const py1 = Math.round(rect[3] * dh / BASE_H);
-			thisScript.helperBridge.regionClick([[px0, py0, px1, py1, 800]], 0, 0);
-		};
-
-		const type = (thisconf.type || '关闭') as string;
-
-		// 仅接受勾协：不是勾协就关掉
-		if (thisconf.switch && type === '接受') {
-			if (isGou) {
-				clickRect(RECT_ACCEPT);
-				thisScript.doPush(thisScript, { text: '✅ 已接受到勾协（勾玉协作）！勾玉是游戏内重要资源，请留意。', before() { thisScript.myToast('接到勾协！正在推送提醒'); } });
+		if (thisconf.switch && thisconf.type === '接受' && thisScript.oper({
+			id: 3,
+			name: '悬赏协作',
+			operator: [{
+				desc: [thisOperator[0].desc[0] as [number, number, number, number]]
+			}]
+		})) {
+			if (thisScript.findMultiColor('勾协判定')) {
+				thisScript.oper({
+					id: 3,
+					name: '悬赏协作_' + thisconf.type + '_勾协',
+					operator: [{
+						oper: [thisOperator[0].oper[1]]
+					}]
+				})
+				thisScript.doPush(thisScript, { text: '接受到勾协，请确认是否影响到主体方案', before() { thisScript.myToast('正在上传数据'); } });
+				return true;
+			} else if (thisScript.oper({
+				name: '悬赏协作_' + thisconf.type + '_非勾协关闭',
+				operator: [{
+					desc: thisOperator[0].desc,
+					oper: [thisOperator[0].oper[0]]
+				}]
+			}, 0)) {
 				return true;
 			}
-			clickRect(RECT_REJECT);
-			return true;
+		} else {
+			return thisScript.oper({
+				id: 3,
+				name: '悬赏协作_' + thisconf.type,
+				operator: [{
+					desc: thisOperator[0].desc,
+					oper: [thisOperator[0].oper[{
+						'关闭': 0,
+						'接受': 1,
+						'拒绝': 2
+					}[thisconf.type as string]]]
+				}]
+			}) || thisScript.oper({
+				id: 3,
+				name: '邀约协作_' + (thisconf.yytype || '关闭'),
+				operator: [{
+					desc: thisOperator[5].desc,
+					oper: [thisOperator[5].oper[{
+						'关闭': 0,
+						'接受': 1,
+						'拒绝': 2
+					}[(thisconf.yytype || '关闭') as string]]]
+				}]
+			});
 		}
-
-		if (type === '接受') {
-			clickRect(RECT_ACCEPT);
-			return true;
-		}
-		// 拒绝 / 关闭
-		clickRect(RECT_REJECT);
-		return true;
 	}
 }
+
 
 export default new Func003();

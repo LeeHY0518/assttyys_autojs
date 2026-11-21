@@ -1,4 +1,3 @@
-#trigger3
 name: release_to_github_page
 
 on:
