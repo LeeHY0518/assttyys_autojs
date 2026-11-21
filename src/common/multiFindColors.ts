@@ -2029,6 +2029,86 @@ const multiFindColors: IMultiFindColorsOrigin = {
 			],
 		]
 	},
+	'六道觉_升级buff': {
+		region: [center, 1280, 720, 160, 149, 827, 200],
+		desc: [
+			[
+				1280, 720,
+				[   // 第三个柔风
+					[right, 752, 208, 0xffffff],
+					[right, 748, 268, 0xa14f84],
+					[right, 771, 232, 0x29deec],
+					[right, 778, 193, 0x38cae5],
+					[right, 754, 167, 0xffe4a8],
+				]
+			], [
+				1280, 720,
+				[	// 第一个柔风
+					[left, 208, 168, 0xffe4a6],
+					[left, 204, 207, 0xffffff],
+					[left, 226, 233, 0x2bdce3],
+					[left, 200, 268, 0xa14f84],
+					[left, 237, 224, 0x31e2e5]
+				]
+			], [
+				1280, 720,
+				[	// 第二个柔风
+					[center, 482, 167, 0xffe6af],
+					[center, 477, 208, 0xffffff],
+					[center, 500, 234, 0x30dde2],
+					[center, 475, 268, 0xa14f84],
+					[center, 513, 223, 0x33e2e4]
+				]
+			]
+		],
+	},
+	'六道觉_购买buff': {
+		region: [center, 1280, 720, 0, 0, 1279, 719],
+		desc: [
+			[
+				1280, 720,
+				[
+					[right, 1071, 153, 0x2bdaf1],
+					[right, 1074, 157, 0x2ee3e4],
+					[right, 1069, 165, 0xa25287],
+					[right, 1056, 164, 0xa55284],
+					[right, 1060, 138, 0xffffff],
+				]
+			]
+		],
+	},
+	'六道觉_事件': {
+		region: [left, 1280, 720, 79, 86, 1020, 631],
+		desc: [
+			[ // 神秘
+				1280, 720,
+				[
+					[center, 643, 408, 0xf2e4c9],
+					[center, 643, 409, 0xf0e2c7],
+					[center, 643, 410, 0xeadcc2],
+					[center, 643, 411, 0xe9dcc1],
+				]
+			],
+			[ // 混沌
+				1280, 720,
+				[
+					[center, 724, 427, 0xf2e4c9],
+					[center, 725, 427, 0xf2e4c9],
+					[center, 725, 428, 0xf2e4c9],
+					[center, 724, 428, 0xf1e3c8],
+				]
+			],
+			[ // 鏖战
+				1280, 720,
+				[
+					[center, 915, 482, 0xf4e9d3],
+					[center, 916, 482, 0xf4e9d3],
+					[center, 916, 481, 0xf3e8d2],
+					[center, 915, 481, 0xf4e9d3],
+				]
+			],
+		]
+	},
 	'返回图标': {
 		region: [left, 1280, 720, 0, 0, 253, 145],
 		desc: [[ // 准备界面、站斗界面的左上角返回图标

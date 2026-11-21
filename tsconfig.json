@@ -1,6 +1,7 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
+        "skipLibCheck": true, // 跳过依赖类型定义检查，避免 node_modules 里多套 Auto.js 声明冲突导致红波浪线
         "outDir": "./dist/", // 打包到的目录
         "sourceMap": false, // 是否生成sourceMap（用于浏览器调试）
         "noImplicitAny": false,
