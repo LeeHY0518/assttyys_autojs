@@ -9,8 +9,8 @@ const REPO = 'assttyys_autojs';
 const BRANCH = 'master';
 const API = 'https://api.github.com';
 
-// 所有输出同时写入 推送记录.txt，方便事后查看
-const LOG_FILE = path.join(REPO_DIR, '推送记录.txt');
+// 所有输出同时写入 push_log.txt，方便事后查看（英文名避免 cmd 编码问题）
+const LOG_FILE = path.join(REPO_DIR, 'push_log.txt');
 const _log = console.log;
 const _err = console.error;
 function writeLog(line) {
@@ -85,7 +85,7 @@ async function api(url, options = {}, retries = 8) {
   } catch {}
 
   // 日志文件只留在本地，不参与推送对比
-  const SKIP = new Set(['推送记录.txt']);
+  const SKIP = new Set(['push_log.txt', '推送记录.txt']);
   const allLocal = [...new Set([...tracked, ...untracked])].filter(p => !SKIP.has(path.basename(p)));
   console.log(`本地文件: ${allLocal.length}（跟踪 ${tracked.length}，新文件 ${untracked.length}）`);
 
