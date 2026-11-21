@@ -1,7 +1,6 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
-        "skipLibCheck": true, // 跳过 node_modules 里类型定义的冲突检查
         "outDir": "./dist/", // 打包到的目录
         "sourceMap": false, // 是否生成sourceMap（用于浏览器调试）
         "noImplicitAny": false,
