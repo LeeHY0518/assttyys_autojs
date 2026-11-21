@@ -84,7 +84,9 @@ async function api(url, options = {}, retries = 8) {
     untracked = ut.split('\0').filter(Boolean).filter(f => !f.startsWith('.git/'));
   } catch {}
 
-  const allLocal = [...new Set([...tracked, ...untracked])];
+  // 日志文件只留在本地，不参与推送对比
+  const SKIP = new Set(['推送记录.txt']);
+  const allLocal = [...new Set([...tracked, ...untracked])].filter(p => !SKIP.has(path.basename(p)));
   console.log(`本地文件: ${allLocal.length}（跟踪 ${tracked.length}，新文件 ${untracked.length}）`);
 
   // 远程 master 树
