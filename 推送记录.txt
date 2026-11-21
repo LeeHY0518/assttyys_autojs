@@ -1,0 +1,21 @@
+============================================
+  开始推送：2026/11/21 12:56:57
+============================================
+目标仓库: LeeHY0518/assttyys_autojs (master)
+本地文件: 364（跟踪 361，新文件 3）
+改动: 覆盖 264 / 新增 3 / 删除 0
+  覆盖: .autojs.build.ignore, .autojs.sync.ignore, .gitignore, .vs/VSWorkspaceState.json, LICENSE, assets/lib/nlp/bihuashu.txt, assets/lib/nlp/bushou.txt, assets/lib/nlp/jiegou.txt, assets/lib/nlp/sijiao.txt, assets/lib/nlp/userdefine.txt, babel.config.js, config/app.js, config/devUnpack.js, config/index.js, config/webpack.auto.config.js ...
+  新增: push_to_github.js, 一键推送.bat, 推送记录.txt
+  上传进度 20/267
+  上传进度 40/267
+  上传进度 60/267
+  上传进度 80/267
+  上传进度 100/267
+  上传进度 120/267
+  上传进度 140/267
+  上传进度 160/267
+  上传进度 180/267
+  上传进度 200/267
+  上传进度 220/267
+  上传进度 240/267
+  上传进度 260/267
