@@ -37,12 +37,12 @@ export class Func314 implements IFuncOrigin {
 		desc: [
 			1280, 720,
 			[
-				[left, 25, 43, 0xe8eaf5],
-				[left, 250, 40, 0x593716],
-				[left, 155, 50, 0xf8f3e0],
-				[left, 54, 648, 0x272d42],
-				[right, 1175, 598, 0x58452f],
-				[right, 1186, 626, 0x5b4730],
+				[left, 22, 41, 0xf1f3f8],
+				[left, 125, 52, 0xf8f3e0],
+				[left, 249, 39, 0x573514],
+				[left, 66, 657, 0x185c8e],
+				[right, 1147, 647, 0xebebeb],
+				[right, 1140, 606, 0xe8e8e8],
 			]
 		],
 	}, { // 1 点固定事件位置
@@ -55,12 +55,12 @@ export class Func314 implements IFuncOrigin {
 		desc: [
 			1280, 720,
 			[
-				[left, 25, 43, 0xe8eaf5],
-				[left, 250, 40, 0x593716],
-				[left, 155, 50, 0xf8f3e0],
-				[left, 54, 648, 0x272d42],
-				[right, 1148, 648, 0xebebeb],
-				[right, 1150, 614, 0x505050],
+				[left, 22, 41, 0xf1f3f8],
+				[left, 125, 52, 0xf8f3e0],
+				[left, 249, 39, 0x573514],
+				[left, 66, 657, 0x185c8e],
+				[right, 1147, 647, 0xebebeb],
+				[right, 1140, 606, 0xe8e8e8],
 			]
 		]
 	}, { // 3 已适配66 鏖战
