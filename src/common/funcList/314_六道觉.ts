@@ -81,7 +81,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 800, 230, 930, 380, 500], // 右怪 武士之灵
 		]
-	}, { // 4 buff抉择_四选一(选第4个舞技强化)
+	}, { // 4 buff抉择_四选一(固定选第4个舞技强化)
 		desc: [
 			1280, 720,
 			[
@@ -89,7 +89,7 @@ export class Func314 implements IFuncOrigin {
 				[center, 531, 570, 0x414141],
 				[right, 805, 571, 0x444444],
 				[right, 1125, 575, 0x414141],
-				[right, 1100, 199, 0xfffcd6],
+				[right, 1100, 199, 0xfffcd6], // 舞技强化金色图标,仅用于区分本页,不判断有无
 			]
 		],
 		oper: [
@@ -590,10 +590,9 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_事件购买buff',
 			operator: [{ desc: thisOperator[4].desc }]
 		})) {
-			// 四选一 buff 页：识别点已含第4个卡片的舞技强化金色图标，
-			// 命中即说明有舞技强化 → 直接点第4个"选择"；没有则识别不到、自动跳过
+			// 四选一 buff 页：打完小怪后此页必定有舞技强化，无需判断，固定点第4个"选择"
 			thisScript.regionClick([thisOperator[4].oper[0]]);
-			log('已选第4个舞技强化');
+			log('固定选第4个舞技强化');
 			return true;
 		}
 
