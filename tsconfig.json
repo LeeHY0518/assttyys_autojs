@@ -2,24 +2,25 @@
     "compileOnSave": false,
     "compilerOptions": {
         "skipLibCheck": true, // 跳过依赖类型定义检查，避免 node_modules 里多套 Auto.js 声明冲突导致红波浪线
+        "rootDir": "./src", // 明确源码根目录，避免新版 TS 报 common source directory 错误
         "outDir": "./dist/", // 打包到的目录
         "sourceMap": false, // 是否生成sourceMap（用于浏览器调试）
+        "strict": false, // 关闭严格检查，兼容原项目写法（新版 TS 默认 strict 会误报大量 undefined）
         "noImplicitAny": false,
         "noUnusedLocals": false,
         "noUnusedParameters": false,
         "declaration": false, // 是否生成声明文件
         // "declarationDir": "./dist/types/",// 声明文件打包的位置
         "declarationMap": false, // 是否生成声明文件map文件（便于调试）
-        "moduleResolution": "node",
+        "moduleResolution": "bundler", // 新版写法，替代已弃用的 node/node10
         "module": "esnext",
-        "target": "es5", // 转化成的目标语言
-        "baseUrl": "./",
+        "target": "es2015", // 新版最低支持，替代已弃用的 es5
         // "types": [],
         "typeRoots": ["./node_modules/@types/", "./node_modules/@autojs/"],
-        "lib": ["es2015"],
+        "lib": ["es2015", "dom"], // dom 提供 console 等全局声明，避免新版 TS 报找不到 console
         "allowJs": true,
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": ["./src/*"]
         }
     },
     "include": ["src/**/*", "./node_modules/@auto.pro/core/src/global.d.ts"], // 要打包的文件

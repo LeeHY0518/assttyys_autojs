@@ -1,22 +1,8 @@
 import { isRoot } from '@auto.pro/core';
 import Bezier from 'bezier-js';
-import drawFloaty from '@/system/drawFloaty';
 
 // @ts-expect-error d.ts文件问题
 export const myShell = isRoot ? new Shell(true) : undefined;
-
-// ==================== 【调试用·只显示不点击】开关 ====================
-// 当设置里打开「绘制调试」开关(屏幕上会画彩色框)时：
-//   true  = 只画框、找位置，【不真正点击/滑动】——你能慢慢看清，界面停住不动
-//   false = 原版行为：一边画框一边照常点击
-// 想恢复原版就把下面的 true 改成 false，然后重新打包。
-const NO_CLICK_WHEN_DRAWING = true;
-// ====================================================================
-
-// 每一类真实动作前都调用它：绘图调试开着 + 上面的开关为 true 时，跳过动作
-function shouldSkipAction(): boolean {
-	return NO_CLICK_WHEN_DRAWING && !!drawFloaty.instacne;
-}
 
 export interface IMyAutomator {
 	tapType: number;
@@ -63,10 +49,6 @@ class MyAutomator implements IMyAutomator {
 	}
 
 	press(x: number, y: number, delay: number): void {
-		if (shouldSkipAction()) {
-			console.log(`[只显示模式] 本应点击 (${Math.trunc(x)}, ${Math.trunc(y)})，已跳过`);
-			return;
-		}
 		if (this.dirctionReverse) {
 			const dm = context.getResources().getDisplayMetrics();
 			const wm = context.getSystemService(context.WINDOW_SERVICE);
@@ -87,10 +69,6 @@ class MyAutomator implements IMyAutomator {
 	}
 
 	swipe(x0: number, y0: number, x1: number, y1: number, delay: number): void {
-		if (shouldSkipAction()) {
-			console.log(`[只显示模式] 本应滑动 (${Math.trunc(x0)}, ${Math.trunc(y0)})→(${Math.trunc(x1)}, ${Math.trunc(y1)})，已跳过`);
-			return;
-		}
 		if (this.dirctionReverse) {
 			const dm = context.getResources().getDisplayMetrics();
 			const wm = context.getSystemService(context.WINDOW_SERVICE);
@@ -116,21 +94,10 @@ class MyAutomator implements IMyAutomator {
 		}
 	}
 
-	// 手势：包一层以支持只显示不点击
-	gesture = (...args) => {
-		if (shouldSkipAction()) {
-			console.log('[只显示模式] 本应手势滑动，已跳过');
-			return;
-		}
-		return (gesture as any)(...args);
-	};
+	gesture = gesture;
 
 	// helperBridge过来的
 	regionBezierSwipe(transedOperS: Array<number>, transedOperE: Array<number>, duration: Array<number>, baseSleep: number, randomSleep: number, _type?: number): void {
-		if (shouldSkipAction()) {
-			console.log('[只显示模式] 本应曲线滑动，已跳过');
-			return;
-		}
 		const time = random(duration[0], duration[1])
 		// swipe(
 		//     random(transedOperS[0], transedOperS[2]), // x1
