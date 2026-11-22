@@ -569,6 +569,19 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 245, 552, 410, 594, 500],
 		]
+	}, { // 37 强化选择_三卡页(固定选第1个 力量强化)
+		desc: [1280, 720,
+			[
+				[left, 290, 327, 0xe4ba56],
+				[center, 640, 327, 0xe1b755],
+				[right, 995, 327, 0xe5ba5b],
+				[left, 291, 509, 0x123763],
+				[center, 647, 509, 0x143664],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 220, 495, 365, 532, 500], // 力量强化 前排蓝色"选择"按钮
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -593,6 +606,17 @@ export class Func314 implements IFuncOrigin {
 			// 四选一 buff 页：打完小怪后此页必定有舞技强化，无需判断，固定点第4个"选择"
 			thisScript.regionClick([thisOperator[4].oper[0]]);
 			log('固定选第4个舞技强化');
+			return true;
+		}
+
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_强化选择_三卡页',
+			operator: [thisOperator[37]]
+		})) {
+			// 强化三选一页：固定选第1个(力量强化)
+			thisScript.regionClick([thisOperator[37].oper[0]]);
+			log('强化三选一：固定选第1个(力量强化)');
 			return true;
 		}
 
