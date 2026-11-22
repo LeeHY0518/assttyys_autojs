@@ -14,7 +14,7 @@
         "declarationMap": false, // 是否生成声明文件map文件（便于调试）
         "moduleResolution": "bundler", // 新版写法，替代已弃用的 node/node10
         "module": "esnext",
-        "target": "es2015", // 新版最低支持，替代已弃用的 es5
+        "target": "es5", // 改回 es5：Auto.js 内核不支持 ES6 的 class 语法
         // "types": [],
         "typeRoots": ["./node_modules/@types/", "./node_modules/@autojs/"],
         "lib": ["es2015", "dom"], // dom 提供 console 等全局声明，避免新版 TS 报找不到 console
