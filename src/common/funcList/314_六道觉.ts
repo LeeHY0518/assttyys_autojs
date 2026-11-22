@@ -582,6 +582,19 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 220, 495, 365, 532, 500], // 力量强化 前排蓝色"选择"按钮
 		]
+	}, { // 38 强化选择_两卡页(力量满10级消失,固定选第1个 技巧强化)
+		desc: [1280, 720,
+			[
+				[center, 465, 327, 0xe2bc5b], // 技巧强化 金色装饰线
+				[center, 820, 327, 0xe4ba58], // 魅力强化 金色装饰线
+				[center, 470, 250, 0x3575f1], // 技巧强化 蓝色图标
+				[center, 820, 250, 0xffc1e5], // 魅力强化 粉色图标
+				[center, 469, 509, 0x274977], // 技巧强化 前排蓝色"选择"按钮
+			]
+		],
+		oper: [
+			[center, 1280, 720, 395, 495, 545, 532, 500], // 技巧强化 前排蓝色"选择"按钮
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -617,6 +630,17 @@ export class Func314 implements IFuncOrigin {
 			// 强化三选一页：固定选第1个(力量强化)
 			thisScript.regionClick([thisOperator[37].oper[0]]);
 			log('强化三选一：固定选第1个(力量强化)');
+			return true;
+		}
+
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_强化选择_两卡页',
+			operator: [thisOperator[38]]
+		})) {
+			// 强化二选一页(力量满10级消失)：固定选第1个(技巧强化)
+			thisScript.regionClick([thisOperator[38].oper[0]]);
+			log('强化二选一：固定选第1个(技巧强化)');
 			return true;
 		}
 
