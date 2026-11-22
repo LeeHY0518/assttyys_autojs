@@ -556,6 +556,21 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1001, 608, 1091, 633, 500],
 		]
+	}, {
+		desc: [1280, 720,
+			[
+				[center, 321, 187, 0xe0b5be],
+				[right, 648, 201, 0x3175dc],
+				[right, 931, 218, 0xfff8ce],
+				[left, 130, 147, 0xffffff],
+				[center, 329, 209, 0xce7e93],
+				[center, 357, 572, 0x474747],
+				[left, 253, 527, 0x3c434e],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 245, 552, 410, 594, 500],
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -711,6 +726,17 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
+		// 首次三选一buff：本局只点一次（选第一个极道轰炸）
+		if (!thisScript.global.d6FirstBuffDone && thisScript.oper({
+			id: 314,
+			name: '六道觉_首次buff_选第一个',
+			operator: [thisOperator[36]]
+		})) {
+			thisScript.global.d6FirstBuffDone = true;
+			console.log('首次buff已选（极道轰炸），本局不再重复');
+			return true;
+		}
+
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_执行个别事件',
@@ -733,6 +759,7 @@ export class Func314 implements IFuncOrigin {
 		})) {
 			thisScript.global.d6Loop = 0;
 			thisScript.global.d6RouFeng = 1;
+			thisScript.global.d6FirstBuffDone = false;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();
