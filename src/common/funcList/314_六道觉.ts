@@ -541,6 +541,21 @@ export class Func314 implements IFuncOrigin {
 				[left, 31, 94, 0x3a2417],
 			]
 		]
+	}, {
+		desc: [1280, 720,
+			[
+				[right, 865, 122, 0x85babc],
+				[right, 727, 79, 0xd1dadb],
+				[left, 267, 370, 0x3c3821],
+				[right, 669, 389, 0xac6462],
+				[right, 1045, 378, 0x762a06],
+				[right, 814, 512, 0x2d334a],
+				[right, 1039, 359, 0x6f1d03],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1001, 608, 1091, 633, 500],
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -686,6 +701,14 @@ export class Func314 implements IFuncOrigin {
 				thisScript.myToast('柔风已满，进入速通模式');
 				console.log('检测到柔风满层，进入速通模式');
 			}
+		}
+
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_精进舞技_祈愿之舞',
+			operator: [thisOperator[35]]
+		})) {
+			return true;
 		}
 
 		if (thisScript.oper({
