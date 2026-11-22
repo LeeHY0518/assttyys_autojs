@@ -41,8 +41,8 @@ export class Func314 implements IFuncOrigin {
 				[left, 125, 52, 0xf8f3e0],
 				[left, 249, 39, 0x573514],
 				[left, 66, 657, 0x185c8e],
-				[right, 1147, 647, 0xebebeb],
-				[right, 1140, 606, 0xe8e8e8],
+				[right, 1156, 608, 0xf6eec8],
+				[right, 1174, 641, 0xf8f3c9],
 			]
 		],
 	}, { // 1 点固定事件位置
