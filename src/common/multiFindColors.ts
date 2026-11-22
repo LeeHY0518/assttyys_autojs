@@ -2083,10 +2083,19 @@ const multiFindColors: IMultiFindColorsOrigin = {
 			[ // 神秘
 				1280, 720,
 				[
-					[center, 643, 408, 0xf2e4c9],
-					[center, 643, 409, 0xf0e2c7],
-					[center, 643, 410, 0xeadcc2],
-					[center, 643, 411, 0xe9dcc1],
+					[center, 387, 390, 0xfdfdfd],
+					[center, 388, 390, 0xfdfdfd],
+					[center, 388, 391, 0xeff2f2],
+					[center, 387, 391, 0xfbfbfb],
+				]
+			],
+			[ // 鏖战
+				1280, 720,
+				[
+					[right, 921, 419, 0xd8e3e3],
+					[right, 922, 419, 0xe6eded],
+					[right, 922, 420, 0xbdd0d0],
+					[right, 921, 420, 0xbfd1d1],
 				]
 			],
 			[ // 混沌
@@ -2096,15 +2105,6 @@ const multiFindColors: IMultiFindColorsOrigin = {
 					[center, 725, 427, 0xf2e4c9],
 					[center, 725, 428, 0xf2e4c9],
 					[center, 724, 428, 0xf1e3c8],
-				]
-			],
-			[ // 鏖战
-				1280, 720,
-				[
-					[center, 915, 482, 0xf4e9d3],
-					[center, 916, 482, 0xf4e9d3],
-					[center, 916, 481, 0xf3e8d2],
-					[center, 915, 481, 0xf4e9d3],
 				]
 			],
 		]
