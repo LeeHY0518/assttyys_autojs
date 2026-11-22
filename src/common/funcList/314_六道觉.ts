@@ -241,13 +241,12 @@ export class Func314 implements IFuncOrigin {
 		desc: [
 			1280, 720,
 			[
-				[center, 913, 678, 0x39607c],
-				[center, 871, 230, 0x2ee1e5],
-				[right, 1137, 665, 0x2a1d11],
-				[center, 947, 65, 0x1d212c],
-				[right, 1008, 84, 0x171b23],
-				[left, 26, 39, 0xf3f4fb],
-				[left, 265, 40, 0x593716],
+				[left, 20, 40, 0xf0f2f7],
+				[right, 908, 62, 0x3b4d7e],
+				[right, 927, 80, 0x465783],
+				[right, 867, 210, 0xe0b5be],
+				[right, 905, 676, 0x39607b],
+				[right, 1132, 659, 0x271b10],
 			]
 		],
 		oper: [
