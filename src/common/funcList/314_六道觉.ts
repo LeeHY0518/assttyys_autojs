@@ -81,19 +81,19 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 800, 230, 930, 380, 500], // 右怪 武士之灵
 		]
-	}, { // 4 buff抉择
+	}, { // 4 buff抉择_四选一(选第4个舞技强化)
 		desc: [
 			1280, 720,
 			[
-				[left, 256, 597, 0x3f3f3f],
-				[center, 530, 599, 0x494949],
-				[center, 807, 596, 0x494949],
-				[right, 1131, 601, 0x353535],
-				[right, 1085, 227, 0xdbd5c7],
+				[left, 265, 571, 0x363636],
+				[center, 531, 570, 0x414141],
+				[right, 805, 571, 0x444444],
+				[right, 1125, 575, 0x414141],
+				[right, 1100, 199, 0xfffcd6],
 			]
 		],
 		oper: [
-			[center, 1280, 720, 1034, 578, 1137, 621, 1000], // 万相之赐
+			[center, 1280, 720, 1018, 553, 1148, 591, 500], // 第4个 选择(舞技强化)
 		]
 	}, { // 5 已适配66 混沌_宝箱
 		desc: [
@@ -590,44 +590,10 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_事件购买buff',
 			operator: [{ desc: thisOperator[4].desc }]
 		})) {
-			if (thisScript.global.d6RouFeng < 5) {//  柔风达标前选buff
-				const point = thisScript.findMultiColor('六道觉_升级buff');
-				if (point) {//  有升级按钮_选择升级
-					const oper = [[
-						point.x - 40,
-						point.y + 410,
-						point.x + 70,
-						point.y + 440,
-						500
-					]];
-					thisScript.regionClick(oper);
-					thisScript.global.d6RouFeng++;
-					console.log('当前柔风数量:' + thisScript.global.d6RouFeng);
-					return true;
-				}
-				else if (thisScript.oper({
-					id: 314,
-					name: '六道觉_低级buff',
-					operator: [thisOperator[25]]
-				})) {//  有低级buff_选择跳过
-					console.log('有低级buff');
-					thisScript.regionClick([thisOperator[4].oper[0]]);
-					return true;
-				} else if (thisScript.oper({ // 无升级按钮_选择刷新
-					name: '六道觉_刷新buff',
-					operator: [thisOperator[17], thisOperator[18]]
-				})) {
-					console.log('无升级按钮_选择刷新');
-					return true;
-				} else { // 无升级按钮无刷新_选择跳过
-					console.log('无升级按钮无刷新_选择跳过');
-					thisScript.regionClick([thisOperator[4].oper[0]]);
-					return true;
-				}
-			} else {
-				thisScript.regionClick([thisOperator[4].oper[0]]);
-			}
-			log('当前柔风数量:' + thisScript.global.d6RouFeng);
+			// 四选一 buff 页：识别点已含第4个卡片的舞技强化金色图标，
+			// 命中即说明有舞技强化 → 直接点第4个"选择"；没有则识别不到、自动跳过
+			thisScript.regionClick([thisOperator[4].oper[0]]);
+			log('已选第4个舞技强化');
 			return true;
 		}
 
