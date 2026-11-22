@@ -2083,19 +2083,19 @@ const multiFindColors: IMultiFindColorsOrigin = {
 			[ // 神秘
 				1280, 720,
 				[
-					[center, 387, 390, 0xfdfdfd],
-					[center, 388, 390, 0xfdfdfd],
-					[center, 388, 391, 0xeff2f2],
-					[center, 387, 391, 0xfbfbfb],
+					[center, 400, 420, 0xd1e6eb],
+					[center, 391, 405, 0x399fc7],
+					[center, 392, 441, 0x51d4de],
+					[center, 401, 407, 0x3f98ba],
 				]
 			],
 			[ // 鏖战
 				1280, 720,
 				[
-					[right, 921, 419, 0xd8e3e3],
-					[right, 922, 419, 0xe6eded],
-					[right, 922, 420, 0xbdd0d0],
-					[right, 921, 420, 0xbfd1d1],
+					[center, 925, 430, 0xf7ffff],
+					[center, 920, 470, 0x35b9c8],
+					[center, 936, 447, 0x2696ae],
+					[center, 926, 468, 0x4dc2c9],
 				]
 			],
 			[ // 混沌
