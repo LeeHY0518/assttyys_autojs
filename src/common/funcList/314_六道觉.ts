@@ -659,6 +659,21 @@ export class Func314 implements IFuncOrigin {
 			[center, 1280, 720, 930, 560, 930, 560, 1000], // 起点(buff区下部)
 			[center, 1280, 720, 930, 160, 930, 160, 1000], // 终点(buff区上部)
 		]
+	}, { // 44 商店_购买六道·轰雷确认框：标题"是否购买六道·轰雷"5点唯一指纹(整图唯一/跨图0误命中)
+		desc: [
+			1280, 720,
+			[
+				[center, 674, 315, 0x453f38],
+				[center, 594, 324, 0x2a2723],
+				[center, 749, 305, 0x2c2824],
+				[center, 716, 322, 0x322e29],
+				[center, 646, 312, 0x464039],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 700, 415, 815, 462, 1000], // 确定(金色按钮)
+			[center, 1280, 720, 450, 415, 610, 465, 1000], // 取消(红色按钮)
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -676,6 +691,27 @@ export class Func314 implements IFuncOrigin {
 			log('商店：进入，复位刷新/滑动状态');
 		} else if (!shopNow) {
 			thisScript.global.d6InShop = false; // 已离开商店，下次进入会触发复位
+		}
+
+		// 商店_购买六道·轰雷确认框：标题"是否购买六道·轰雷"指纹全局唯一(跨5图0误命中)，
+		// 确保只有买轰雷的确认弹窗才会+1，不会和其他地方的"确定"框混淆。
+		// 弹窗出现时背景变暗、商店分支不会命中，故放在这里独立处理：点"确定"后 d6HongLeiCount++。
+		// 用 d6HongLeiPending 防重复：点图标后置true，这里处理完清零，避免弹窗多帧重复计数。
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_商店_轰雷购买确认',
+			operator: [thisOperator[44]]
+		})) {
+			if (thisScript.global.d6HongLeiPending) {
+				thisScript.regionClick([thisOperator[44].oper[0]]); // 点"确定"完成购买
+				thisScript.global.d6HongLeiCount++;
+				log('确认购买六道·轰雷：点确定，计数=' + thisScript.global.d6HongLeiCount);
+			} else {
+				thisScript.regionClick([thisOperator[44].oper[1]]); // 非本流程弹出的确认框→点取消
+				log('确认购买六道·轰雷：非本流程，点取消');
+			}
+			thisScript.global.d6HongLeiPending = false;
+			return true;
 		}
 
 		// 混沌之屿宝箱页(幸运宝匣)：必须放在最前面。此页左上标题与式神页相似,
@@ -807,13 +843,13 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 
-			// ① 当前页找轰雷
+			// ① 当前页找轰雷：点图标只是弹出确认框，不算买到(没钱也能点)，此处不+1。
+			// 计数改在"轰雷购买确认框"分支点"确定"后才+1(见operatorFunc开头)。
 			const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
 			if (hongLei) {
 				thisScript.regionClick([[hongLei.x - 10, hongLei.y + 50, hongLei.x + 10, hongLei.y + 140, 500]]);
-				thisScript.regionClick([thisOperator[23].oper[1]]); // 点购买后退出商店(沿用柔风购买模式)
-				thisScript.global.d6HongLeiCount++;
-				log('商店：购买六道·轰雷 第' + thisScript.global.d6HongLeiCount + '个 (' + hongLei.x + ',' + hongLei.y + ')');
+				thisScript.global.d6HongLeiPending = true; // 等确认框点确定后才真正计数
+				log('商店：点击轰雷图标，等待确认框 (' + hongLei.x + ',' + hongLei.y + ')');
 				return true;
 			}
 
@@ -838,6 +874,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.regionClick([thisOperator[23].oper[1]]);
 			thisScript.global.d6ShopSwiped = false;
 			thisScript.global.d6ShopRefreshCount = 0;
+			thisScript.global.d6HongLeiPending = false; // 清掉可能残留的等待确认状态
 			log('商店：刷新2次仍无轰雷，离开');
 			return true;
 		}
@@ -931,6 +968,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6RouFeng = 1;
 			thisScript.global.d6FirstBuffDone = false;
 			thisScript.global.d6HongLeiCount = 0; // 六道·轰雷购买次数清零(每局从0开始)
+			thisScript.global.d6HongLeiPending = false; // 轰雷待确认状态清零
 			thisScript.global.d6ShopSwiped = false; // 商店滑动状态清零
 			thisScript.global.d6ShopRefreshCount = 0; // 商店刷新次数清零
 			thisScript.global.d6InShop = false; // 商店在场状态清零

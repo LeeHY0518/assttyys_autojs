@@ -93,6 +93,7 @@ export type globalRootType = {
 	d6ShopSwiped: boolean;// 六道觉本轮商店是否已滑动过buff区(滑动后找轰雷,找不到则刷新并重置)
 	d6ShopRefreshCount: number;// 六道觉本轮商店刷新次数(0开始,点1次+1,到2不再刷新)
 	d6InShop: boolean;// 六道觉当前帧是否在商店页(边缘检测:进入时复位本轮刷新/滑动状态)
+	d6HongLeiPending: boolean;// 六道觉点了轰雷图标待确认(确认框点确定后才计数,防重复)
 	upYuHun: boolean;//      强化御魂记录界面次数
 	upYuHunIni: boolean;//      强化御魂初设置
 	bgyxLastCapture: number; // 上次截图的时间戳
@@ -250,6 +251,7 @@ export const globalRoot: globalRootType = {
 	d6ShopSwiped: false,
 	d6ShopRefreshCount: 0,
 	d6InShop: false,
+	d6HongLeiPending: false,
 	upYuHun: false,
 	upYuHunIni: true,
 	bgyxLastCapture: undefined,
