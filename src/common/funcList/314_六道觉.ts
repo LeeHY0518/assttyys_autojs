@@ -865,13 +865,13 @@ export class Func314 implements IFuncOrigin {
 			if (hongLei) {
 				// 走到这里说明还在本页：上一次点击没生效(点偏/动画没走完)，继续点，最多4次
 				if (thisScript.global.d6HongLeiTry < 4) {
-					// 轰雷命中锚点x → 对应"选择"按钮中心 = x+56
-					// (第1格锚点187→按钮中心243,三格间距273,按钮宽约99)
-					const btnCx = hongLei.x + 56;
-					thisScript.regionClick([[btnCx - 49, 553, btnCx + 49, 591, 1000]]);
+					// 点击"选择"：轰雷指纹锚点是第1点(226,184)，卡片图标中心在锚点左侧约7px；
+					// 实测三个"选择"按钮中心(219/492/765, y572)正好对齐各自图标中心，故以图标中心±38点击。
+					const cardCx = hongLei.x - 7;
+					thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
 					thisScript.global.d6HongLeiTry++;
 					thisScript.global.d6HongLeiPending = true; // 等"离开本页"确认后才算真获得
-					log('四选一buff：点轰雷对应选择 (' + hongLei.x + ',' + hongLei.y + ')→按钮x' + btnCx + '，第' + thisScript.global.d6HongLeiTry + '次，等待确认');
+					log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + '→按钮中心x' + cardCx + ')，第' + thisScript.global.d6HongLeiTry + '次，等待确认');
 					sleep(600); // 等选择动画/页面跳转
 					return true;
 				}
