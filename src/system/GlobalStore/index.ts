@@ -88,13 +88,9 @@ export type globalRootType = {
 	d6Loop: number;//     椒图事件点击循环数
 	d6RouFeng: number;//     椒图柔风实时buff数
 	d6FirstBuffDone: boolean;// 六道觉本局首次三选一buff是否已选
-	d6BfzyCount: number;//  六道觉绽放之屿次数(已弃用,改看唤息亮暗)
-	d6HongLeiCount: number;// 六道觉本局六道·轰雷购买次数(每局从0,买1个即停)
-	d6ShopSwiped: boolean;// 六道觉商店当前是否在底部视口(false=顶部视口露上方buff,true=已上滑露下方buff)
-	d6ShopRefreshCount: number;// 六道觉本轮商店刷新次数(0开始,点1次+1,到2不再刷新)
-	d6InShop: boolean;// 六道觉当前帧是否在商店页(边缘检测:进入时复位本轮刷新/滑动状态)
-	d6HongLeiPending: boolean;// 六道觉点了轰雷图标待确认(确认框点确定后才计数,防重复)
-	d6ShopNeedScrollTop: boolean;// 六道觉刷新后需先下滑回顶部(刷新不重置滚动位置,停在底部,先露上方buff判定)
+	d6HongLeiGot: boolean;// 六道觉本局是否已确认真正获得六道·轰雷(获得后不再找/不刷新,四选一直接选第4个)
+	d6HongLeiPending: boolean;// 六道觉已点轰雷卡片"选择",等待"离开四选一页"确认(确认后才置Got)
+	d6HongLeiTry: number;// 六道觉轰雷"选择"连点次数(防坐标不准导致死循环,到4次兜底选第4个)
 	upYuHun: boolean;//      强化御魂记录界面次数
 	upYuHunIni: boolean;//      强化御魂初设置
 	bgyxLastCapture: number; // 上次截图的时间戳
@@ -247,13 +243,9 @@ export const globalRoot: globalRootType = {
 	d6Loop: 0,
 	d6RouFeng: 1,
 	d6FirstBuffDone: false,
-	d6BfzyCount: 0,
-	d6HongLeiCount: 0,
-	d6ShopSwiped: false,
-	d6ShopRefreshCount: 0,
-	d6InShop: false,
+	d6HongLeiGot: false,
 	d6HongLeiPending: false,
-	d6ShopNeedScrollTop: false,
+	d6HongLeiTry: 0,
 	upYuHun: false,
 	upYuHunIni: true,
 	bgyxLastCapture: undefined,

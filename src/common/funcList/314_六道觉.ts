@@ -655,42 +655,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1155, 635, 1211, 687, 1000], // 右下角"离开"
 		]
-	}, { // 42 商店_刷新按钮(底部火苗图标,用户取色6点原始图偏差全0)
-		desc: [
-			1280, 720,
-			[
-				[center, 610, 632, 0xfff9df],
-				[center, 603, 620, 0xd2e3db],
-				[center, 621, 607, 0x77b5d3],
-				[center, 629, 623, 0xe4ecde],
-				[right, 661, 673, 0xfffdf4],
-				[right, 675, 673, 0xfcfaf1],
-			]
-		],
-		oper: [
-			[center, 1280, 720, 580, 593, 649, 649, 1000], // 刷新按钮点击框
-		]
-	}, { // 43 商店_buff区滑动(从下往上滑一次露出下方buff)
-		oper: [
-			[center, 1280, 720, 930, 560, 930, 560, 1000], // 起点(buff区下部)
-			[center, 1280, 720, 930, 160, 930, 160, 1000], // 终点(buff区上部)
-		]
-	}, { // 44 商店_购买六道·轰雷确认框：标题"是否购买六道·轰雷"5点唯一指纹(整图唯一/跨图0误命中)
-		desc: [
-			1280, 720,
-			[
-				[center, 674, 315, 0x453f38],
-				[center, 594, 324, 0x2a2723],
-				[center, 749, 305, 0x2c2824],
-				[center, 716, 322, 0x322e29],
-				[center, 646, 312, 0x464039],
-			]
-		],
-		oper: [
-			[center, 1280, 720, 700, 415, 815, 462, 1000], // 确定(金色按钮)
-			[center, 1280, 720, 450, 415, 610, 465, 1000], // 取消(红色按钮)
-		]
-	}, { // 45 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：点弹窗外空白处关闭
+	}, { // 42 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：点弹窗外空白处关闭
 		// 用户取9点原始PNG偏差全0,跨34图唯一(仅本弹窗9/9)。模态框会遮挡其它页面,处理分支放operatorFunc最前。
 		desc: [
 			1280, 720,
@@ -709,6 +674,41 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 447, 535, 830, 665, 1000], // 点弹窗外下方空白处关闭(不点"暂时离开/放弃试炼")
 		]
+	}, { // 43 四选一buff页_刷新按钮_亮(可点击)：10点原始PNG偏差全0,亮图10/10/暗图0/10
+		desc: [
+			1280, 720,
+			[
+				[right, 1205, 658, 0xeffaff],
+				[right, 1199, 648, 0xdcfbff],
+				[right, 1203, 633, 0x9af4f7],
+				[right, 1216, 634, 0xa6fcfe],
+				[right, 1225, 646, 0xd2fbfe],
+				[right, 1221, 659, 0xe4ffff],
+				[right, 1204, 623, 0xb2a779],
+				[right, 1185, 649, 0x2b4564],
+				[right, 1241, 652, 0x2f4867],
+				[right, 1158, 695, 0xd3bd91],
+			]
+		],
+		oper: [
+			[right, 1280, 720, 1174, 616, 1231, 673, 500], // 右下角圆形刷新图标
+		]
+	}, { // 44 四选一buff页_刷新按钮_暗(不可点击,剩0次)：10点原始PNG偏差全0,暗图10/10/亮图0/10
+		desc: [
+			1280, 720,
+			[
+				[right, 1204, 657, 0xf6f6f6],
+				[right, 1199, 649, 0xf2f2f2],
+				[right, 1202, 634, 0xe3e3e3],
+				[right, 1216, 634, 0xe2e2e2],
+				[right, 1224, 643, 0xeeeeee],
+				[right, 1221, 659, 0xf7f7f7],
+				[right, 1184, 651, 0x424242],
+				[right, 1240, 646, 0x414241],
+				[right, 1158, 695, 0xbebebe],
+				[right, 1204, 623, 0xa5a5a5],
+			]
+		],
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -717,49 +717,28 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_意外确认弹窗_关闭',
-			operator: [thisOperator[45]]
+			operator: [thisOperator[42]]
 		})) {
-			thisScript.regionClick([thisOperator[45].oper[0]]);
+			thisScript.regionClick([thisOperator[42].oper[0]]);
 			log('意外弹窗：点弹窗外空白处关闭');
 			return true;
 		}
 
-		// 商店进入边缘检测(每帧执行)：从"非商店"进入"商店"的那一帧复位本轮刷新/滑动状态。
-		// 这样无论上次怎么离开商店(正常离开/买到轰雷/异常中断)，下次进商店都从干净状态开始。
-		const shopNow = thisScript.oper({
-			id: 314,
-			name: '六道觉_商店状态检测',
-			operator: [{ desc: thisOperator[7].desc }]
-		});
-		if (shopNow && !thisScript.global.d6InShop) {
-			thisScript.global.d6InShop = true;
-			thisScript.global.d6ShopSwiped = false;
-			thisScript.global.d6ShopRefreshCount = 0;
-			thisScript.global.d6ShopNeedScrollTop = false;
-			log('商店：进入，复位刷新/滑动状态');
-		} else if (!shopNow) {
-			thisScript.global.d6InShop = false; // 已离开商店，下次进入会触发复位
-		}
-
-		// 商店_购买六道·轰雷确认框：标题"是否购买六道·轰雷"指纹全局唯一(跨5图0误命中)，
-		// 确保只有买轰雷的确认弹窗才会+1，不会和其他地方的"确定"框混淆。
-		// 弹窗出现时背景变暗、商店分支不会命中，故放在这里独立处理：点"确定"后 d6HongLeiCount++。
-		// 用 d6HongLeiPending 防重复：点图标后置true，这里处理完清零，避免弹窗多帧重复计数。
-		if (thisScript.oper({
-			id: 314,
-			name: '六道觉_商店_轰雷购买确认',
-			operator: [thisOperator[44]]
-		})) {
-			if (thisScript.global.d6HongLeiPending) {
-				thisScript.regionClick([thisOperator[44].oper[0]]); // 点"确定"完成购买
-				thisScript.global.d6HongLeiCount++;
-				log('确认购买六道·轰雷：点确定，计数=' + thisScript.global.d6HongLeiCount);
-			} else {
-				thisScript.regionClick([thisOperator[44].oper[1]]); // 非本流程弹出的确认框→点取消
-				log('确认购买六道·轰雷：非本流程，点取消');
+		// 轰雷"真实获得"确认：上一帧点了轰雷卡片的"选择"，如果这一帧已经不在四选一页，
+		// 说明选择确实生效、页面已跳走(选完轰雷回地图)，这时才置 d6HongLeiGot=true。
+		// 只点一下"选择"就置真不可靠(可能点偏/动画没走完)，必须靠"页面已离开"来确认。
+		if (thisScript.global.d6HongLeiPending) {
+			const stillBuffPage = thisScript.oper({
+				id: 314,
+				name: '六道觉_四选一页_轰雷获得确认',
+				operator: [{ desc: thisOperator[4].desc }]
+			});
+			if (!stillBuffPage) {
+				thisScript.global.d6HongLeiPending = false;
+				thisScript.global.d6HongLeiTry = 0;
+				thisScript.global.d6HongLeiGot = true;
+				log('轰雷：已确认获得(选择生效、已离开四选一页)，本局后续不再找轰雷');
 			}
-			thisScript.global.d6HongLeiPending = false;
-			return true;
 		}
 
 		// 混沌之屿宝箱页(幸运宝匣)：必须放在最前面。此页左上标题与式神页相似,
@@ -786,25 +765,12 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		// 绽放之屿：不再按次数计数，改看右下角"唤息"亮暗状态。
-		// 用 operator[0](唤息亮6点金黄)判断：亮→点右下角唤息进宁息(商店)；暗→点岛进内部页。
-		// 验证：绽放图右下角唤息亮时 operator[0] 6/6命中、operator[2]仅4/6公共点，区分可靠。
+		// 绽放之屿：不再判断唤息亮暗，识别到直接点岛进内部页(后续"绽放之屿_离开"分支会点右下角离开)。
+		// 不再走"唤息亮→进宁息商店"分支——后续不进商店。
 		const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿', undefined, undefined, true);
 		if (pBfzy) {
-			const huanxiLiang = thisScript.oper({
-				id: 314,
-				name: '六道觉_绽放之屿_唤息亮判断',
-				operator: [{ desc: thisOperator[0].desc }]
-			});
-			if (huanxiLiang) {
-				// 唤息亮：点右下角"唤息"进宁息(商店)
-				thisScript.regionClick([[1120, 585, 1215, 690, 1000]]);
-				log('绽放之屿：唤息亮，点右下角唤息进宁息商店');
-			} else {
-				// 唤息暗：点岛进内部页
-				thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
-				log('绽放之屿：唤息暗，点岛 (' + pBfzy.x + ',' + pBfzy.y + ')');
-			}
+			thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
+			log('绽放之屿：点岛 (' + pBfzy.x + ',' + pBfzy.y + ')');
 			return true;
 		}
 
@@ -836,9 +802,60 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_事件购买buff',
 			operator: [{ desc: thisOperator[4].desc }]
 		})) {
-			// 四选一 buff 页：打完小怪后此页必定有舞技强化，无需判断，固定点第4个"选择"
+			// 四选一 buff 页：前3张随机 buff，第4张固定舞技强化。
+			// 本局流程：① 已确认拿到轰雷 → 不再找、不刷新，直接选第4个舞技强化；
+			//           ② 还没拿到 → 前3格找轰雷，找到点它正下方"选择"(点完等确认)；
+			//           ③ 没轰雷且刷新"亮" → 点刷新继续找；
+			//           ④ 刷新"暗"(剩0次)仍没轰雷 → 选第4个舞技强化兜底。
+
+			// ① 本局已经确认获得过轰雷：不识别、不刷新，直接选第4个
+			if (thisScript.global.d6HongLeiGot) {
+				thisScript.regionClick([thisOperator[4].oper[0]]);
+				log('四选一buff：本局已获得轰雷，直接选第4个舞技强化');
+				return true;
+			}
+
+			// ② 前3格找轰雷 → 点它正下方"选择"
+			const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
+			if (hongLei) {
+				// 走到这里说明还在本页：上一次点击没生效(点偏/动画没走完)，继续点，最多4次
+				if (thisScript.global.d6HongLeiTry < 4) {
+					// 轰雷命中锚点x → 对应"选择"按钮中心 = x+56
+					// (第1格锚点187→按钮中心243,三格间距273,按钮宽约99)
+					const btnCx = hongLei.x + 56;
+					thisScript.regionClick([[btnCx - 49, 553, btnCx + 49, 591, 1000]]);
+					thisScript.global.d6HongLeiTry++;
+					thisScript.global.d6HongLeiPending = true; // 等"离开本页"确认后才算真获得
+					log('四选一buff：点轰雷对应选择 (' + hongLei.x + ',' + hongLei.y + ')→按钮x' + btnCx + '，第' + thisScript.global.d6HongLeiTry + '次，等待确认');
+					sleep(600); // 等选择动画/页面跳转
+					return true;
+				}
+				// 连点4次还在本页(疑似坐标不准) → 兜底选第4个，避免死循环；下次buff页重新计数
+				thisScript.global.d6HongLeiPending = false;
+				thisScript.global.d6HongLeiTry = 0;
+				thisScript.regionClick([thisOperator[4].oper[0]]);
+				log('四选一buff：轰雷选择连点4次未生效，兜底选第4个舞技强化');
+				return true;
+			}
+
+			// ③ 刷新"亮"=可点击：点刷新后等待动画，下一帧重新找轰雷
+			const refreshBright = thisScript.oper({
+				id: 314,
+				name: '六道觉_四选一_刷新亮',
+				operator: [{ desc: thisOperator[43].desc }]
+			});
+			if (refreshBright) {
+				thisScript.regionClick([thisOperator[43].oper[0]]);
+				thisScript.global.d6HongLeiTry = 0; // 换了一批卡，连点计数归零
+				log('四选一buff：无轰雷，点刷新继续找');
+				sleep(800); // 等刷新动画完成
+				return true;
+			}
+
+			// ④ 刷新"暗"或不可点(剩0次)且无轰雷→固定选第4个舞技强化兜底
+			thisScript.global.d6HongLeiTry = 0;
 			thisScript.regionClick([thisOperator[4].oper[0]]);
-			log('固定选第4个舞技强化');
+			log('四选一buff：刷新不可用且无轰雷，选第4个舞技强化');
 			return true;
 		}
 
@@ -875,69 +892,14 @@ export class Func314 implements IFuncOrigin {
 			log('当前柔风数量:' + thisScript.global.d6RouFeng);
 			return true;
 		}
-		if (shopNow) {
-			// 进入复位见 operatorFunc 开头的边缘检测；④离开时也显式复位(双保险)。
-			// 商店流程(每帧推进一步,用global状态记住进度,避免循环里疯狂滑动/刷新)。
-			// 关键：刷新"不会"把buff区滚回顶部,而是停在刷新前的视口(通常是上滑后的底部)。
-			// 所以每一轮都要完整判定"上方+下方"两个视口,顺序为:
-			//   ① 判定当前视口找轰雷(顶部视口 = 上方buff)
-			//   ② 顶部没有 → 上滑(下→上)露出下方buff,下一帧判定底部视口
-			//   ③ 底部也没有 → 点刷新(计数<2),并标记"刷新后需先下滑回顶部"
-			//   ⓪ 刷新后的下一帧先下滑(上→下)回顶部,再重走①②③
-			//   ④ 刷新计数到2且上下都判定过仍没有 → 离开商店
-			// 状态:d6ShopSwiped=当前是否在底部视口;d6ShopNeedScrollTop=刷新后待下滑回顶部;
-			//      d6ShopRefreshCount=刷新次数。每局清零,进出商店也复位。
-
-			// 已买轰雷：后续遇到商店直接离开
-			if (thisScript.global.d6HongLeiCount >= 1) {
-				thisScript.regionClick([thisOperator[23].oper[1]]);
-				log('商店：已买轰雷，直接离开');
-				return true;
-			}
-
-			// ⓪ 刷新后：先下滑回顶部,露出上方buff再判定(刷新不会自动回顶)
-			if (thisScript.global.d6ShopNeedScrollTop) {
-				thisScript.regionSwipe(thisOperator[43].oper[1], thisOperator[43].oper[0], [500, 600], 500); // 上→下:回顶部
-				thisScript.global.d6ShopNeedScrollTop = false;
-				thisScript.global.d6ShopSwiped = false; // 现在处于顶部视口
-				log('商店：刷新后下滑回顶部，判定上方buff');
-				return true;
-			}
-
-			// ① 当前视口找轰雷：点图标只是弹出确认框，不算买到(没钱也能点)，此处不+1。
-			// 计数改在"轰雷购买确认框"分支点"确定"后才+1(见operatorFunc开头)。
-			const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
-			if (hongLei) {
-				thisScript.regionClick([[hongLei.x - 10, hongLei.y + 50, hongLei.x + 10, hongLei.y + 140, 500]]);
-				thisScript.global.d6HongLeiPending = true; // 等确认框点确定后才真正计数
-				log('商店：' + (thisScript.global.d6ShopSwiped ? '下方' : '上方') + '视口点击轰雷图标，等待确认框 (' + hongLei.x + ',' + hongLei.y + ')');
-				return true;
-			}
-
-			// ② 顶部视口没找到 → 上滑(下→上)露出下方buff,下一帧判定底部视口
-			if (!thisScript.global.d6ShopSwiped) {
-				thisScript.regionSwipe(thisOperator[43].oper[0], thisOperator[43].oper[1], [500, 600], 500);
-				thisScript.global.d6ShopSwiped = true;
-				log('商店：上滑露出下方buff');
-				return true;
-			}
-
-			// ③ 底部视口也没有 → 点刷新(计数<2),并标记下一帧先下滑回顶部
-			if (thisScript.global.d6ShopRefreshCount < 2) {
-				thisScript.regionClick([thisOperator[42].oper[0]]);
-				thisScript.global.d6ShopRefreshCount++;
-				thisScript.global.d6ShopNeedScrollTop = true; // 刷新后停在底部,须先下滑回顶部
-				log('商店：点击刷新 第' + thisScript.global.d6ShopRefreshCount + '次，下一帧下滑回顶部');
-				return true;
-			}
-
-			// ④ 刷新2次、上下视口都判定过仍无轰雷 → 离开商店并复位本轮状态
-			thisScript.regionClick([thisOperator[23].oper[1]]);
-			thisScript.global.d6ShopSwiped = false;
-			thisScript.global.d6ShopRefreshCount = 0;
-			thisScript.global.d6ShopNeedScrollTop = false;
-			thisScript.global.d6HongLeiPending = false; // 清掉可能残留的等待确认状态
-			log('商店：刷新2次仍无轰雷，离开');
+		// 商店(宁息之屿)：后续不进商店、不做任何购买/刷新/滑动，识别到直接点右下角退出。
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_商店_直接离开',
+			operator: [{ desc: thisOperator[7].desc }]
+		})) {
+			thisScript.regionClick([thisOperator[7].oper[1]]); // 退出商店
+			log('商店：直接点退出离开');
 			return true;
 		}
 
@@ -1029,12 +991,9 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6Loop = 0;
 			thisScript.global.d6RouFeng = 1;
 			thisScript.global.d6FirstBuffDone = false;
-			thisScript.global.d6HongLeiCount = 0; // 六道·轰雷购买次数清零(每局从0开始)
-			thisScript.global.d6HongLeiPending = false; // 轰雷待确认状态清零
-			thisScript.global.d6ShopSwiped = false; // 商店滑动状态清零
-			thisScript.global.d6ShopRefreshCount = 0; // 商店刷新次数清零
-			thisScript.global.d6ShopNeedScrollTop = false; // 商店刷新后下滑标记清零
-			thisScript.global.d6InShop = false; // 商店在场状态清零
+			thisScript.global.d6HongLeiGot = false; // 新一局：重新允许寻找轰雷
+			thisScript.global.d6HongLeiPending = false;
+			thisScript.global.d6HongLeiTry = 0;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();
