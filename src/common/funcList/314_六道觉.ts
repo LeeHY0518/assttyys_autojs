@@ -622,8 +622,37 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1155, 635, 1211, 687, 1000], // 右下角"离开"
 		]
+	}, { // 41 混沌之屿_宝箱页(幸运宝匣)：点右下角离开(不要点宝箱)
+		desc: [
+			1280, 720,
+			[
+				[left, 24, 40, 0xf9f9fc],
+				[left, 120, 43, 0xf8f3e0],
+				[left, 186, 50, 0xf8f3e0],
+				[left, 213, 30, 0xf8f3e0],
+				[right, 1203, 657, 0xe9d6b4],
+				[right, 1167, 658, 0xe9d4b4],
+				[right, 744, 364, 0xc2aead],
+				[right, 718, 371, 0xb8c1ce],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1155, 635, 1211, 687, 1000], // 右下角"离开"
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
+
+		// 混沌之屿宝箱页(幸运宝匣)：必须放在最前面。此页左上标题与式神页相似,
+		// 容易被当成式神页误点宝箱；识别到直接点右下角"离开"回地图。
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_混沌之屿_宝箱页_离开',
+			operator: [thisOperator[41]]
+		})) {
+			thisScript.regionClick([thisOperator[41].oper[0]]);
+			log('混沌之屿宝箱页：点右下角离开');
+			return true;
+		}
 
 		// 绽放之屿内部页(式神页)：识别到直接点右下角"离开"，回到地图。
 		// 必须放在"点岛指纹"之前，否则内部页的伞面/白笔画可能误命中点岛指纹
