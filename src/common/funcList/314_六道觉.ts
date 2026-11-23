@@ -387,7 +387,8 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 491, 419, 615, 471, 1000],
 		]
-	}, { // 23 商店确认购买
+	}, { // 23 [已废弃]商店确认购买：对应处理分支已删除(现在遇到商店只点右下角退出,不购买)。
+		// 定义保留仅为不打乱后续 operator 下标(thisOperator[24]~[45])，运行时不会被引用。
 		desc: [
 			1280, 720,
 			[
@@ -400,8 +401,8 @@ export class Func314 implements IFuncOrigin {
 			]
 		],
 		oper: [
-			[center, 1280, 720, 678, 409, 837, 453, 500], // 确认购买
-			[center, 1280, 720, 1174, 588, 1241, 649, 500], // 退出商店
+			[center, 1280, 720, 678, 409, 837, 453, 500], // (废弃)确认购买
+			[center, 1280, 720, 1174, 588, 1241, 649, 500], // (废弃)退出商店
 		]
 	}, { // 24 御神经验
 		desc: [
@@ -933,21 +934,8 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		if (thisScript.oper({
-			id: 314,
-			name: '六道觉_商店确认购买',
-			operator: [{ desc: thisOperator[23].desc }]
-		})) {
-			if (leaveCooling) return true; // 刚点过右下角退出，画面切换中，别重复点(否则回到地图会误点唤息)
-			thisScript.regionClick([thisOperator[23].oper[0]]);
-			thisScript.regionClick([thisOperator[23].oper[1]]);
-			thisScript.global.d6LeaveClickAt = new Date().getTime(); // 点了右下角"退出商店"，进入2秒冷却
-			thisScript.global.d6RouFeng++;
-			log('当前柔风数量:' + thisScript.global.d6RouFeng);
-			sleep(1200); // 等画面切回地图，避免过渡帧重复点击
-			return true;
-		}
 		// 商店(宁息之屿)：后续不进商店、不做任何购买/刷新/滑动，识别到直接点右下角退出。
+		// (原"商店确认购买"分支已删除：现在遇到商店一律只点右下角退出，不购买任何东西。)
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_商店_直接离开',
@@ -968,9 +956,14 @@ export class Func314 implements IFuncOrigin {
 				thisOperator[15]
 			]
 		})) {
-			// 神秘之屿(背包仿造页)：不做仿造，直接点左上角返回退出
+			// 神秘之屿(背包仿造页)：不做仿造，直接点左上角返回退出。
+			// 与右下角"离开"共用2秒冷却：点下去后画面要切换，指纹在过渡帧仍可能命中，
+			// 再点一次会落到地图页左上角的其他按钮上，故冷却期内直接跳过。
+			if (leaveCooling) return true;
 			thisScript.regionClick([thisOperator[15].oper[0]]);
+			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			log('神秘之屿：点左上角返回退出');
+			sleep(1200); // 等画面切回地图
 			return true;
 		}
 
