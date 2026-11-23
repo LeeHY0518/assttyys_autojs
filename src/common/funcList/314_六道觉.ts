@@ -688,6 +688,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6InShop = true;
 			thisScript.global.d6ShopSwiped = false;
 			thisScript.global.d6ShopRefreshCount = 0;
+			thisScript.global.d6ShopNeedScrollTop = false;
 			log('商店：进入，复位刷新/滑动状态');
 		} else if (!shopNow) {
 			thisScript.global.d6InShop = false; // 已离开商店，下次进入会触发复位
@@ -829,12 +830,16 @@ export class Func314 implements IFuncOrigin {
 		}
 		if (shopNow) {
 			// 进入复位见 operatorFunc 开头的边缘检测；④离开时也显式复位(双保险)。
-			// 商店流程(每帧推进一步,用global状态记住进度,避免循环里疯狂滑动/刷新):
-			// ① 找轰雷 → 找到就买,买到后以后所有商店直接离开
-			// ② 没找到 → 滑动buff区(下→上)露出下方,下一帧再找
-			// ③ 滑动后还没有 → 点刷新(计数<2,点1次+1),刷新后回顶部重走①②
-			// ④ 刷新计数到2仍没有 → 离开商店
-			// 状态 d6ShopSwiped/d6ShopRefreshCount 每局在"开始_重置参数"清零,退出商店时也复位。
+			// 商店流程(每帧推进一步,用global状态记住进度,避免循环里疯狂滑动/刷新)。
+			// 关键：刷新"不会"把buff区滚回顶部,而是停在刷新前的视口(通常是上滑后的底部)。
+			// 所以每一轮都要完整判定"上方+下方"两个视口,顺序为:
+			//   ① 判定当前视口找轰雷(顶部视口 = 上方buff)
+			//   ② 顶部没有 → 上滑(下→上)露出下方buff,下一帧判定底部视口
+			//   ③ 底部也没有 → 点刷新(计数<2),并标记"刷新后需先下滑回顶部"
+			//   ⓪ 刷新后的下一帧先下滑(上→下)回顶部,再重走①②③
+			//   ④ 刷新计数到2且上下都判定过仍没有 → 离开商店
+			// 状态:d6ShopSwiped=当前是否在底部视口;d6ShopNeedScrollTop=刷新后待下滑回顶部;
+			//      d6ShopRefreshCount=刷新次数。每局清零,进出商店也复位。
 
 			// 已买轰雷：后续遇到商店直接离开
 			if (thisScript.global.d6HongLeiCount >= 1) {
@@ -843,37 +848,47 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 
-			// ① 当前页找轰雷：点图标只是弹出确认框，不算买到(没钱也能点)，此处不+1。
+			// ⓪ 刷新后：先下滑回顶部,露出上方buff再判定(刷新不会自动回顶)
+			if (thisScript.global.d6ShopNeedScrollTop) {
+				thisScript.regionSwipe(thisOperator[43].oper[1], thisOperator[43].oper[0], [500, 600], 500); // 上→下:回顶部
+				thisScript.global.d6ShopNeedScrollTop = false;
+				thisScript.global.d6ShopSwiped = false; // 现在处于顶部视口
+				log('商店：刷新后下滑回顶部，判定上方buff');
+				return true;
+			}
+
+			// ① 当前视口找轰雷：点图标只是弹出确认框，不算买到(没钱也能点)，此处不+1。
 			// 计数改在"轰雷购买确认框"分支点"确定"后才+1(见operatorFunc开头)。
 			const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
 			if (hongLei) {
 				thisScript.regionClick([[hongLei.x - 10, hongLei.y + 50, hongLei.x + 10, hongLei.y + 140, 500]]);
 				thisScript.global.d6HongLeiPending = true; // 等确认框点确定后才真正计数
-				log('商店：点击轰雷图标，等待确认框 (' + hongLei.x + ',' + hongLei.y + ')');
+				log('商店：' + (thisScript.global.d6ShopSwiped ? '下方' : '上方') + '视口点击轰雷图标，等待确认框 (' + hongLei.x + ',' + hongLei.y + ')');
 				return true;
 			}
 
-			// ② 没找到轰雷且本轮未滑动过 → 滑动buff区,下一帧再找
+			// ② 顶部视口没找到 → 上滑(下→上)露出下方buff,下一帧判定底部视口
 			if (!thisScript.global.d6ShopSwiped) {
 				thisScript.regionSwipe(thisOperator[43].oper[0], thisOperator[43].oper[1], [500, 600], 500);
 				thisScript.global.d6ShopSwiped = true;
-				log('商店：滑动buff区找轰雷');
+				log('商店：上滑露出下方buff');
 				return true;
 			}
 
-			// ③ 滑动后仍没有 → 点刷新(计数<2)
+			// ③ 底部视口也没有 → 点刷新(计数<2),并标记下一帧先下滑回顶部
 			if (thisScript.global.d6ShopRefreshCount < 2) {
 				thisScript.regionClick([thisOperator[42].oper[0]]);
 				thisScript.global.d6ShopRefreshCount++;
-				thisScript.global.d6ShopSwiped = false; // 刷新后buff回顶部,重走①②
-				log('商店：点击刷新 第' + thisScript.global.d6ShopRefreshCount + '次');
+				thisScript.global.d6ShopNeedScrollTop = true; // 刷新后停在底部,须先下滑回顶部
+				log('商店：点击刷新 第' + thisScript.global.d6ShopRefreshCount + '次，下一帧下滑回顶部');
 				return true;
 			}
 
-			// ④ 刷新2次仍无轰雷 → 离开商店并复位本轮状态
+			// ④ 刷新2次、上下视口都判定过仍无轰雷 → 离开商店并复位本轮状态
 			thisScript.regionClick([thisOperator[23].oper[1]]);
 			thisScript.global.d6ShopSwiped = false;
 			thisScript.global.d6ShopRefreshCount = 0;
+			thisScript.global.d6ShopNeedScrollTop = false;
 			thisScript.global.d6HongLeiPending = false; // 清掉可能残留的等待确认状态
 			log('商店：刷新2次仍无轰雷，离开');
 			return true;
@@ -971,6 +986,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6HongLeiPending = false; // 轰雷待确认状态清零
 			thisScript.global.d6ShopSwiped = false; // 商店滑动状态清零
 			thisScript.global.d6ShopRefreshCount = 0; // 商店刷新次数清零
+			thisScript.global.d6ShopNeedScrollTop = false; // 商店刷新后下滑标记清零
 			thisScript.global.d6InShop = false; // 商店在场状态清零
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
