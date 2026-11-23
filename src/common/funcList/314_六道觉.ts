@@ -610,6 +610,15 @@ export class Func314 implements IFuncOrigin {
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
+		// 绽放之屿是浮动事件(背景会有其它事件的浮动图形干扰),
+		// 用独有指纹(绽字白笔画)优先识别,必须放在"选事件"之前,
+		// 否则会先命中唤息亮的选事件分支、误点背景浮动图形
+		if (thisScript.findMultiColor('六道觉_绽放之屿')) {
+			thisScript.regionClick([thisOperator[39].oper[0]]);
+			log('点击绽放之屿');
+			return true;
+		}
+
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_选事件',
@@ -621,16 +630,6 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 			return false;
-		}
-
-		if (thisScript.oper({
-			id: 314,
-			name: '六道觉_绽放之屿',
-			operator: [thisOperator[39]]
-		})) {
-			thisScript.regionClick([thisOperator[39].oper[0]]);
-			log('点击绽放之屿');
-			return true;
 		}
 
 		if (thisScript.oper({

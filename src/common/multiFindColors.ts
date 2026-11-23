@@ -2109,6 +2109,19 @@ const multiFindColors: IMultiFindColorsOrigin = {
 			],
 		]
 	},
+	'六道觉_绽放之屿': {
+		region: [center, 1280, 720, 469, 292, 796, 546],
+		similar: 99, // 白点指纹在雪地背景上易误命中,收紧相似度确保唯一
+		desc: [[ // 绽放之屿 "绽"字白色笔画(4点密集指纹)
+			1280, 720,
+			[
+				[right, 675, 388, 0xf8f8f9],
+				[right, 676, 388, 0xffffff],
+				[right, 676, 389, 0xffffff],
+				[right, 675, 389, 0xf8f9f9],
+			]
+		],]
+	},
 	'返回图标': {
 		region: [left, 1280, 720, 0, 0, 253, 145],
 		desc: [[ // 准备界面、站斗界面的左上角返回图标
