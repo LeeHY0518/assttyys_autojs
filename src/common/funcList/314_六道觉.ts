@@ -638,15 +638,14 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		// 绽放之屿是浮动事件(背景会有其它事件的浮动图形干扰),
-		// 用独有指纹(绽字白笔画)优先识别,点击位置跟随指纹偏移(不写死固定框),
-		// 岛浮动到哪就点到哪
-		const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿');
-		if (pBfzy) {
-			thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
-			log('点击绽放之屿 指纹(' + pBfzy.x + ',' + pBfzy.y + ')');
-			return true;
-		}
+		// 【已屏蔽】绽放之屿点岛指纹：该白指纹在宁息图标上误命中(实测坐标472,481等),
+		// 导致一直卡在绽放分支反复点宁息位置、走不到事件优先级。等重新提取唯一指纹后再恢复。
+		// const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿');
+		// if (pBfzy) {
+		// 	thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
+		// 	log('点击绽放之屿 指纹(' + pBfzy.x + ',' + pBfzy.y + ')');
+		// 	return true;
+		// }
 
 		if (thisScript.oper({
 			id: 314,
