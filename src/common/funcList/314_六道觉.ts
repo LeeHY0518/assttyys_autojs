@@ -662,6 +662,22 @@ export class Func314 implements IFuncOrigin {
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
+		// 商店进入边缘检测(每帧执行)：从"非商店"进入"商店"的那一帧复位本轮刷新/滑动状态。
+		// 这样无论上次怎么离开商店(正常离开/买到轰雷/异常中断)，下次进商店都从干净状态开始。
+		const shopNow = thisScript.oper({
+			id: 314,
+			name: '六道觉_商店状态检测',
+			operator: [{ desc: thisOperator[7].desc }]
+		});
+		if (shopNow && !thisScript.global.d6InShop) {
+			thisScript.global.d6InShop = true;
+			thisScript.global.d6ShopSwiped = false;
+			thisScript.global.d6ShopRefreshCount = 0;
+			log('商店：进入，复位刷新/滑动状态');
+		} else if (!shopNow) {
+			thisScript.global.d6InShop = false; // 已离开商店，下次进入会触发复位
+		}
+
 		// 混沌之屿宝箱页(幸运宝匣)：必须放在最前面。此页左上标题与式神页相似,
 		// 容易被当成式神页误点宝箱；识别到直接点右下角"离开"回地图。
 		if (thisScript.oper({
@@ -775,11 +791,8 @@ export class Func314 implements IFuncOrigin {
 			log('当前柔风数量:' + thisScript.global.d6RouFeng);
 			return true;
 		}
-		if (thisScript.oper({
-			id: 314,
-			name: '六道觉_商店购买buff',
-			operator: [{ desc: thisOperator[7].desc }]
-		})) {
+		if (shopNow) {
+			// 进入复位见 operatorFunc 开头的边缘检测；④离开时也显式复位(双保险)。
 			// 商店流程(每帧推进一步,用global状态记住进度,避免循环里疯狂滑动/刷新):
 			// ① 找轰雷 → 找到就买,买到后以后所有商店直接离开
 			// ② 没找到 → 滑动buff区(下→上)露出下方,下一帧再找
@@ -920,6 +933,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6HongLeiCount = 0; // 六道·轰雷购买次数清零(每局从0开始)
 			thisScript.global.d6ShopSwiped = false; // 商店滑动状态清零
 			thisScript.global.d6ShopRefreshCount = 0; // 商店刷新次数清零
+			thisScript.global.d6InShop = false; // 商店在场状态清零
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();
