@@ -2077,37 +2077,66 @@ const multiFindColors: IMultiFindColorsOrigin = {
 			]
 		],
 	},
-	'六道觉_事件': {
+	// 六道觉地图事件指纹：每个事件独立字典，优先级由 314_六道觉.ts 的 eventPriority 数组决定
+	'六道觉_事件_神秘': {
 		region: [left, 1280, 720, 79, 86, 1020, 631],
-		desc: [
-			[ // 神秘
-				1280, 720,
-				[
-					[center, 400, 420, 0xd1e6eb],
-					[center, 391, 405, 0x399fc7],
-					[center, 392, 441, 0x51d4de],
-					[center, 401, 407, 0x3f98ba],
-				]
-			],
-			[ // 鏖战
-				1280, 720,
-				[
-					[center, 925, 430, 0xf7ffff],
-					[center, 920, 470, 0x35b9c8],
-					[center, 936, 447, 0x2696ae],
-					[center, 926, 468, 0x4dc2c9],
-				]
-			],
-			[ // 混沌
-				1280, 720,
-				[
-					[center, 724, 427, 0xf2e4c9],
-					[center, 725, 427, 0xf2e4c9],
-					[center, 725, 428, 0xf2e4c9],
-					[center, 724, 428, 0xf1e3c8],
-				]
-			],
-		]
+		desc: [[ // 神秘（旧指纹，待重新取色验证）
+			1280, 720,
+			[
+				[center, 400, 420, 0xd1e6eb],
+				[center, 391, 405, 0x399fc7],
+				[center, 392, 441, 0x51d4de],
+				[center, 401, 407, 0x3f98ba],
+			]
+		],]
+	},
+	'六道觉_事件_鏖战': {
+		region: [left, 1280, 720, 79, 86, 1020, 631],
+		desc: [[ // 鏖战（整图唯一命中2处=左右两个鏖战，点哪个都可以）
+			1280, 720,
+			[
+				[left, 217, 332, 0xfefefe],
+				[left, 222, 344, 0xffffff],
+				[left, 215, 345, 0xfdfdfd],
+				[left, 218, 349, 0xffffff],
+				[left, 211, 366, 0xf9ffff],
+				[left, 219, 370, 0xf7fbfb],
+				[left, 214, 376, 0xebf7fb],
+				[left, 227, 384, 0xd9f4f4],
+			]
+		],]
+	},
+	'六道觉_事件_宁息': {
+		region: [left, 1280, 720, 79, 86, 1020, 631],
+		desc: [[ // 宁息/商店（整图唯一命中1处）
+			1280, 720,
+			[
+				[center, 465, 459, 0xfcfdfd],
+				[center, 474, 457, 0xffffff],
+				[center, 485, 458, 0xfefefe],
+				[center, 473, 479, 0xffffff],
+				[center, 473, 487, 0xffffff],
+				[center, 469, 495, 0xf1fcfc],
+				[center, 478, 495, 0xf6fcfc],
+				[center, 478, 509, 0xc9f2f2],
+			]
+		],]
+	},
+	'六道觉_事件_混沌': {
+		region: [left, 1280, 720, 79, 86, 1020, 631],
+		desc: [[ // 混沌（整图唯一命中1处）
+			1280, 720,
+			[
+				[right, 900, 465, 0xffffff],
+				[right, 897, 473, 0xfafaf6],
+				[right, 897, 483, 0xffffff],
+				[right, 908, 465, 0xffffff],
+				[right, 913, 478, 0xffffff],
+				[right, 909, 498, 0xffffff],
+				[right, 907, 508, 0xffffff],
+				[right, 915, 516, 0xd3f4f4],
+			]
+		],]
 	},
 	'六道觉_绽放之屿': {
 		region: [center, 1280, 720, 469, 292, 796, 546],

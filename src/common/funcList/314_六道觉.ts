@@ -639,11 +639,12 @@ export class Func314 implements IFuncOrigin {
 		}
 
 		// 绽放之屿是浮动事件(背景会有其它事件的浮动图形干扰),
-		// 用独有指纹(绽字白笔画)优先识别,必须放在"选事件"之前,
-		// 否则会先命中唤息亮的选事件分支、误点背景浮动图形
-		if (thisScript.findMultiColor('六道觉_绽放之屿')) {
-			thisScript.regionClick([thisOperator[39].oper[0]]);
-			log('点击绽放之屿');
+		// 用独有指纹(绽字白笔画)优先识别,点击位置跟随指纹偏移(不写死固定框),
+		// 岛浮动到哪就点到哪
+		const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿');
+		if (pBfzy) {
+			thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
+			log('点击绽放之屿 指纹(' + pBfzy.x + ',' + pBfzy.y + ')');
 			return true;
 		}
 
@@ -652,10 +653,19 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_选事件',
 			operator: [{ desc: thisOperator[0].desc }, { desc: thisOperator[2].desc }]
 		}, 200)) {
-			const p = thisScript.findMultiColor('六道觉_事件');
-			if (p) {
-				thisScript.regionClick([[p.x - 40, p.y + 20, p.x + 40, p.y + 80, 200]])
-				return true;
+			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 鏖战>宁息>混沌）
+			const eventPriority = [
+				'六道觉_事件_鏖战',
+				'六道觉_事件_宁息',
+				'六道觉_事件_混沌',
+			];
+			for (const key of eventPriority) {
+				const p = thisScript.findMultiColor(key, undefined, undefined, true);
+				if (p) {
+					thisScript.regionClick([[p.x - 40, p.y + 20, p.x + 40, p.y + 80, 200]])
+					log('点击事件 ' + key + ' (' + p.x + ',' + p.y + ')');
+					return true;
+				}
 			}
 			return false;
 		}
