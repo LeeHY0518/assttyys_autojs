@@ -690,8 +690,39 @@ export class Func314 implements IFuncOrigin {
 			[center, 1280, 720, 700, 415, 815, 462, 1000], // 确定(金色按钮)
 			[center, 1280, 720, 450, 415, 610, 465, 1000], // 取消(红色按钮)
 		]
+	}, { // 45 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：点弹窗外空白处关闭
+		// 用户取9点原始PNG偏差全0,跨34图唯一(仅本弹窗9/9)。模态框会遮挡其它页面,处理分支放operatorFunc最前。
+		desc: [
+			1280, 720,
+			[
+				[center, 535, 351, 0xe2faff],
+				[center, 553, 341, 0xcbfbff],
+				[right, 746, 357, 0xba4a4a],
+				[right, 728, 336, 0xafffff],
+				[right, 730, 320, 0xb0a273],
+				[center, 535, 399, 0xdde2eb],
+				[center, 577, 401, 0xe1e7ef],
+				[right, 707, 405, 0xf0f5fb],
+				[right, 751, 399, 0xdee4ec],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 447, 535, 830, 665, 1000], // 点弹窗外下方空白处关闭(不点"暂时离开/放弃试炼")
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
+
+		// 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：
+		// 这是模态框，会遮挡其它页面，必须放在最前面优先处理，点弹窗外空白处关闭，不点两个按钮。
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_意外确认弹窗_关闭',
+			operator: [thisOperator[45]]
+		})) {
+			thisScript.regionClick([thisOperator[45].oper[0]]);
+			log('意外弹窗：点弹窗外空白处关闭');
+			return true;
+		}
 
 		// 商店进入边缘检测(每帧执行)：从"非商店"进入"商店"的那一帧复位本轮刷新/滑动状态。
 		// 这样无论上次怎么离开商店(正常离开/买到轰雷/异常中断)，下次进商店都从干净状态开始。
