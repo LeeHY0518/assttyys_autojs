@@ -666,22 +666,24 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		// 绽放之屿：整局出现3次。用新9点唯一指纹识别(原始图验证容差±8仍唯一,不误命中宁息/鏖战/混沌)。
-		// 前2次：点岛进内部页看式神；第3次：点右下角"唤息"进商店买buff。
-		// 计数每局重置(见"六道觉_开始_重置参数"分支 d6BfzyCount=0)，上限3防止只显示模式重复识别刷屏。
+		// 绽放之屿：不再按次数计数，改看右下角"唤息"亮暗状态。
+		// 用 operator[0](唤息亮6点金黄)判断：亮→点右下角唤息进宁息(商店)；暗→点岛进内部页。
+		// 验证：绽放图右下角唤息亮时 operator[0] 6/6命中、operator[2]仅4/6公共点，区分可靠。
 		const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿', undefined, undefined, true);
 		if (pBfzy) {
-			thisScript.global.d6BfzyCount = Math.min((thisScript.global.d6BfzyCount || 0) + 1, 3);
-			const bfCount = thisScript.global.d6BfzyCount;
-			log('绽放之屿第' + bfCount + '次 (' + pBfzy.x + ',' + pBfzy.y + ')');
-			if (bfCount >= 3) {
-				// 第3次：点右下角"唤息"按钮进商店
+			const huanxiLiang = thisScript.oper({
+				id: 314,
+				name: '六道觉_绽放之屿_唤息亮判断',
+				operator: [{ desc: thisOperator[0].desc }]
+			});
+			if (huanxiLiang) {
+				// 唤息亮：点右下角"唤息"进宁息(商店)
 				thisScript.regionClick([[1120, 585, 1215, 690, 1000]]);
-				log('绽放之屿第3次：点右下角唤息进商店');
+				log('绽放之屿：唤息亮，点右下角唤息进宁息商店');
 			} else {
-				// 前2次：点岛进内部页
+				// 唤息暗：点岛进内部页
 				thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
-				log('绽放之屿第' + bfCount + '次：点岛');
+				log('绽放之屿：唤息暗，点岛 (' + pBfzy.x + ',' + pBfzy.y + ')');
 			}
 			return true;
 		}
@@ -758,9 +760,9 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_商店购买buff',
 			operator: [{ desc: thisOperator[7].desc }]
 		})) {
-			// 绽放之屿第3次进商店：买六道·轰雷。目标1个,封顶2个防手抖/只显示模式重复识别。
+			// 买六道·轰雷：计数每局从0开始(d6HongLeiCount),买到1个就不再买(<1)。
 			// 指纹唯一(容差±8整图命中1处),商店格子轮换也能跟图标走。放在柔风逻辑之前。
-			if (thisScript.global.d6BfzyCount >= 3 && thisScript.global.d6HongLeiCount < 2) {
+			if (thisScript.global.d6HongLeiCount < 1) {
 				const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
 				if (hongLei) {
 					thisScript.regionClick([[hongLei.x - 10, hongLei.y + 50, hongLei.x + 10, hongLei.y + 140, 500]]);
@@ -881,7 +883,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6Loop = 0;
 			thisScript.global.d6RouFeng = 1;
 			thisScript.global.d6FirstBuffDone = false;
-			thisScript.global.d6BfzyCount = 0; // 绽放之屿出现次数清零
+			thisScript.global.d6HongLeiCount = 0; // 六道·轰雷购买次数清零(每局从0开始)
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();
