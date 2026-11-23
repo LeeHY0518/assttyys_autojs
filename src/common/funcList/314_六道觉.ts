@@ -813,11 +813,12 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_选事件',
 			operator: [{ desc: thisOperator[0].desc }, { desc: thisOperator[2].desc }]
 		}, 200)) {
-			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 鏖战>混沌>神秘>宁息）
+			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 神秘>混沌>鏖战>宁息/商店）
+			// 宁息之屿就是商店(点进去后"商店_直接离开"分支会立刻退出)，所以它排在最后=优先级最低。
 			const eventPriority = [
-				'六道觉_事件_鏖战',
-				'六道觉_事件_混沌',
 				'六道觉_事件_神秘',
+				'六道觉_事件_混沌',
+				'六道觉_事件_鏖战',
 				'六道觉_事件_宁息',
 			];
 			for (const key of eventPriority) {
