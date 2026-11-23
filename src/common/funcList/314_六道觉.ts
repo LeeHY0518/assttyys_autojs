@@ -595,6 +595,18 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 395, 495, 545, 532, 500], // 技巧强化 前排蓝色"选择"按钮
 		]
+	}, { // 39 绽放之屿(地图中央岛)
+		desc: [1280, 720,
+			[
+				[right, 675, 388, 0xf8f8f9],
+				[right, 676, 388, 0xffffff],
+				[right, 676, 389, 0xffffff],
+				[right, 675, 389, 0xf8f9f9],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 469, 292, 796, 546, 1000], // 点绽放之屿岛
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -609,6 +621,16 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 			return false;
+		}
+
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_绽放之屿',
+			operator: [thisOperator[39]]
+		})) {
+			thisScript.regionClick([thisOperator[39].oper[0]]);
+			log('点击绽放之屿');
+			return true;
 		}
 
 		if (thisScript.oper({
