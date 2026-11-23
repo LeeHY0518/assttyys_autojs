@@ -738,6 +738,12 @@ export class Func314 implements IFuncOrigin {
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
+		// 右下角"离开/退出"点击冷却(2.5秒)：这类按钮点下去后画面要淡出切换，
+		// 但它的指纹在淡出的几帧里仍可能命中；如果这时再点一次，画面已回到地图，
+		// 而右下角同一个位置就是"唤息"按钮 → 会误点唤息(用户实机反馈)。
+		// 因此点过一次后在冷却期内不再点，冷却期内命中也直接跳过。
+		const leaveCooling = new Date().getTime() - (thisScript.global.d6LeaveClickAt || 0) < 2500;
+
 		// 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：
 		// 这是模态框，会遮挡其它页面，必须放在最前面优先处理，点弹窗外空白处关闭，不点两个按钮。
 		if (thisScript.oper({
@@ -775,8 +781,11 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_混沌之屿_宝箱页_离开',
 			operator: [thisOperator[41]]
 		})) {
+			if (leaveCooling) return true; // 刚点过离开，画面切换中，别再点右下角(否则误点唤息)
 			thisScript.regionClick([thisOperator[41].oper[0]]);
+			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			log('混沌之屿宝箱页：点右下角离开');
+			sleep(1200); // 等画面切回地图，避免下一帧还在过渡又点一次
 			return true;
 		}
 
@@ -787,18 +796,24 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_绽放之屿_离开',
 			operator: [thisOperator[40]]
 		})) {
+			if (leaveCooling) return true; // 刚点过离开，画面切换中，别再点右下角(否则回到地图会误点唤息)
 			thisScript.regionClick([thisOperator[40].oper[0]]);
+			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			log('绽放之屿内部页：点右下角离开');
+			sleep(1200); // 等画面切回地图，避免下一帧还在过渡又点一次
 			return true;
 		}
 
 		// 绽放之屿：不再判断唤息亮暗，识别到直接点岛进内部页(后续"绽放之屿_离开"分支会点右下角离开)。
 		// 不再走"唤息亮→进宁息商店"分支——后续不进商店。
-		const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿', undefined, undefined, true);
-		if (pBfzy) {
-			thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
-			log('绽放之屿：点岛 (' + pBfzy.x + ',' + pBfzy.y + ')');
-			return true;
+		// 离开内部页后的 2.5 秒内不点岛(冷却中)，避免"离开→地图→又点岛"来回打转。
+		if (!leaveCooling) {
+			const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿', undefined, undefined, true);
+			if (pBfzy) {
+				thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
+				log('绽放之屿：点岛 (' + pBfzy.x + ',' + pBfzy.y + ')');
+				return true;
+			}
 		}
 
 		if (thisScript.oper({
@@ -806,12 +821,12 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_选事件',
 			operator: [{ desc: thisOperator[0].desc }, { desc: thisOperator[2].desc }]
 		}, 200)) {
-			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 神秘>宁息>鏖战>混沌）
+			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 鏖战>混沌>神秘>宁息）
 			const eventPriority = [
-				'六道觉_事件_神秘',
-				'六道觉_事件_宁息',
 				'六道觉_事件_鏖战',
 				'六道觉_事件_混沌',
+				'六道觉_事件_神秘',
+				'六道觉_事件_宁息',
 			];
 			for (const key of eventPriority) {
 				const p = thisScript.findMultiColor(key, undefined, undefined, true);
@@ -954,8 +969,11 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_商店_直接离开',
 			operator: [{ desc: thisOperator[7].desc }]
 		})) {
+			if (leaveCooling) return true; // 刚点过右下角离开/退出，画面切换中，别重复点(否则回到地图会误点唤息)
 			thisScript.regionClick([thisOperator[7].oper[1]]); // 退出商店
+			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			log('商店：直接点退出离开');
+			sleep(1200);
 			return true;
 		}
 
