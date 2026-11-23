@@ -738,11 +738,11 @@ export class Func314 implements IFuncOrigin {
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
-		// 右下角"离开/退出"点击冷却(2.5秒)：这类按钮点下去后画面要淡出切换，
+		// 右下角"离开/退出"点击冷却(2秒)：这类按钮点下去后画面要淡出切换，
 		// 但它的指纹在淡出的几帧里仍可能命中；如果这时再点一次，画面已回到地图，
 		// 而右下角同一个位置就是"唤息"按钮 → 会误点唤息(用户实机反馈)。
 		// 因此点过一次后在冷却期内不再点，冷却期内命中也直接跳过。
-		const leaveCooling = new Date().getTime() - (thisScript.global.d6LeaveClickAt || 0) < 2500;
+		const leaveCooling = new Date().getTime() - (thisScript.global.d6LeaveClickAt || 0) < 2000;
 
 		// 轰雷"选择"点击冷却(2秒)：点了轰雷卡的"选择"后置 d6HongLeiGot=true，
 		// 但画面切换有几帧延迟，若下一帧仍识别到四选一页(有时会连续出现两个buff页)，
@@ -793,7 +793,7 @@ export class Func314 implements IFuncOrigin {
 
 		// 绽放之屿：不再判断唤息亮暗，识别到直接点岛进内部页(后续"绽放之屿_离开"分支会点右下角离开)。
 		// 不再走"唤息亮→进宁息商店"分支——后续不进商店。
-		// 离开内部页后的 2.5 秒内不点岛(冷却中)，避免"离开→地图→又点岛"来回打转。
+		// 离开内部页后的 2 秒内不点岛(冷却中)，避免"离开→地图→又点岛"来回打转。
 		if (!leaveCooling) {
 			const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿', undefined, undefined, true);
 			if (pBfzy) {
@@ -938,10 +938,13 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_商店确认购买',
 			operator: [{ desc: thisOperator[23].desc }]
 		})) {
+			if (leaveCooling) return true; // 刚点过右下角退出，画面切换中，别重复点(否则回到地图会误点唤息)
 			thisScript.regionClick([thisOperator[23].oper[0]]);
 			thisScript.regionClick([thisOperator[23].oper[1]]);
+			thisScript.global.d6LeaveClickAt = new Date().getTime(); // 点了右下角"退出商店"，进入2秒冷却
 			thisScript.global.d6RouFeng++;
 			log('当前柔风数量:' + thisScript.global.d6RouFeng);
+			sleep(1200); // 等画面切回地图，避免过渡帧重复点击
 			return true;
 		}
 		// 商店(宁息之屿)：后续不进商店、不做任何购买/刷新/滑动，识别到直接点右下角退出。
