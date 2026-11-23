@@ -755,7 +755,7 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_意外确认弹窗_关闭',
-			operator: [thisOperator[42]]
+			operator: [{ desc: thisOperator[42].desc }] // 只取desc识别：传完整operator会被oper()自动点击，再手动点就成了双击
 		})) {
 			thisScript.regionClick([thisOperator[42].oper[0]]);
 			log('意外弹窗：点弹窗外空白处关闭');
@@ -767,7 +767,9 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_混沌之屿_宝箱页_离开',
-			operator: [thisOperator[41]]
+			// 只取desc：传完整operator会被oper()自动点击一次，再regionClick就成了双击，
+			// 第二击落到已切回地图的同一位置=误点"唤息"(用户实机反馈)。
+			operator: [{ desc: thisOperator[41].desc }]
 		})) {
 			if (leaveCooling) return true; // 刚点过离开，画面切换中，别再点右下角(否则误点唤息)
 			thisScript.regionClick([thisOperator[41].oper[0]]);
@@ -782,7 +784,9 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_绽放之屿_离开',
-			operator: [thisOperator[40]]
+			// 只取desc：传完整operator会被oper()自动点击一次，再regionClick就成了双击，
+			// 第二击落到已切回地图的同一位置=误点"唤息"。
+			operator: [{ desc: thisOperator[40].desc }]
 		})) {
 			if (leaveCooling) return true; // 刚点过离开，画面切换中，别再点右下角(否则回到地图会误点唤息)
 			thisScript.regionClick([thisOperator[40].oper[0]]);
@@ -915,7 +919,8 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_强化选择_三卡页',
-			operator: [thisOperator[37]]
+			// 只取desc：传完整operator会被oper()自动点一次，这里再regionClick会双击到新页面同位置。
+			operator: [{ desc: thisOperator[37].desc }]
 		})) {
 			// 强化三选一页：固定选第1个(力量强化)
 			thisScript.regionClick([thisOperator[37].oper[0]]);
@@ -926,7 +931,7 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_强化选择_两卡页',
-			operator: [thisOperator[38]]
+			operator: [{ desc: thisOperator[38].desc }]
 		})) {
 			// 强化二选一页(力量满10级消失)：固定选第1个(技巧强化)
 			thisScript.regionClick([thisOperator[38].oper[0]]);
@@ -952,8 +957,9 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_神秘之屿_退出',
+			// 只取desc(不传oper)：传完整operator会被oper()自动点一次，这里再regionClick就变双击。
 			operator: [
-				thisOperator[15]
+				{ desc: thisOperator[15].desc }
 			]
 		})) {
 			// 神秘之屿(背包仿造页)：不做仿造，直接点左上角返回退出。
@@ -1019,7 +1025,10 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		if (thisScript.oper({
+		// 离开页面后的冷却期内不做这类"个别事件"点击：这个分支命中会自动点击(挑战/开始等)，
+		// 而地图右下角"唤息"与挑战/开始是同一位置的同款圆形按钮，画面刚切回地图时若误判，
+		// 点了就会误触"唤息"。
+		if (!leaveCooling && thisScript.oper({
 			id: 314,
 			name: '六道觉_执行个别事件',
 			operator: [
