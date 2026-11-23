@@ -744,6 +744,11 @@ export class Func314 implements IFuncOrigin {
 		// 因此点过一次后在冷却期内不再点，冷却期内命中也直接跳过。
 		const leaveCooling = new Date().getTime() - (thisScript.global.d6LeaveClickAt || 0) < 2500;
 
+		// 轰雷"选择"点击冷却(2秒)：点了轰雷卡的"选择"后置 d6HongLeiGot=true，
+		// 但画面切换有几帧延迟，若下一帧仍识别到四选一页(有时会连续出现两个buff页)，
+		// 会立刻走"已获得→点第4个"，在过渡帧上误点。冷却期内四选一页不做任何操作。
+		const buffCooling = new Date().getTime() - (thisScript.global.d6BuffClickAt || 0) < 2000;
+
 		// 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：
 		// 这是模态框，会遮挡其它页面，必须放在最前面优先处理，点弹窗外空白处关闭，不点两个按钮。
 		if (thisScript.oper({
@@ -754,24 +759,6 @@ export class Func314 implements IFuncOrigin {
 			thisScript.regionClick([thisOperator[42].oper[0]]);
 			log('意外弹窗：点弹窗外空白处关闭');
 			return true;
-		}
-
-		// 轰雷"真实获得"确认：上一帧点了轰雷卡片的"选择"，如果这一帧已经不在四选一页，
-		// 说明选择确实生效、页面已跳走(选完轰雷回地图)，这时才置 d6HongLeiGot=true。
-		// 只点一下"选择"就置真不可靠(可能点偏/动画没走完)，必须靠"页面已离开"来确认。
-		if (thisScript.global.d6HongLeiPending) {
-			const stillBuffPage = thisScript.oper({
-				id: 314,
-				name: '六道觉_四选一页_轰雷获得确认',
-				operator: [{ desc: thisOperator[4].desc }]
-			});
-			if (!stillBuffPage) {
-				thisScript.global.d6HongLeiPending = false;
-				thisScript.global.d6HongLeiTry = 0;
-				thisScript.global.d6BuffRefreshCnt = 0;
-				thisScript.global.d6HongLeiGot = true;
-				log('轰雷：已确认获得(选择生效、已离开四选一页)，本局后续不再找轰雷');
-			}
 		}
 
 		// 混沌之屿宝箱页(幸运宝匣)：必须放在最前面。此页左上标题与式神页相似,
@@ -845,14 +832,20 @@ export class Func314 implements IFuncOrigin {
 			operator: [{ desc: thisOperator[4].desc }]
 		})) {
 			// 四选一 buff 页：前3张随机 buff，第4张固定舞技强化。
-			// 本局流程：① 已确认拿到轰雷 → 不再找、不刷新，直接选第4个舞技强化；
-			//           ② 还没拿到 → 前3格找轰雷，找到点它正下方"选择"(点完等确认)；
+			// 本页点"选择"必定获得该 buff(与商店不同，没有二次确认/扣费失败的可能)，
+			// 所以只要识别到轰雷并点了它下方"选择"，就是真拿到了，直接置 d6HongLeiGot。
+			// 本局流程：① 已获得轰雷 → 不再找、不刷新，直接选第4个舞技强化；
+			//           ② 还没获得 → 前3格找轰雷，找到点它正下方"选择"，即视为获得；
 			//           ③ 出现"万相铃不足"(没钱) → 刷新无效，不再刷新，直接选第4个；
 			//           ④ 本页已刷3次还亮着(刷新没生效) → 停止刷新，直接选第4个(防死循环)；
 			//           ⑤ 没轰雷且刷新"亮" → 点刷新继续找；
 			//           ⑥ 刷新"暗"(剩0次)仍没轰雷 → 选第4个舞技强化兜底。
 
-			// ① 本局已经确认获得过轰雷：不识别、不刷新，直接选第4个
+			// 刚点过轰雷"选择"（2秒内）：画面切换有几帧延迟，有时还会连着来第二个buff页，
+			// 过渡期间不做任何点击，否则会在淡出帧上误点第4个。
+			if (buffCooling) return true;
+
+			// ① 本局已经获得过轰雷：不识别、不刷新，直接选第4个
 			if (thisScript.global.d6HongLeiGot) {
 				thisScript.global.d6BuffRefreshCnt = 0;
 				thisScript.regionClick([thisOperator[4].oper[0]]);
@@ -860,26 +853,18 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 
-			// ② 前3格找轰雷 → 点它正下方"选择"
+			// ② 前3格找轰雷 → 点它正下方"选择"，点下即获得
 			const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
 			if (hongLei) {
-				// 走到这里说明还在本页：上一次点击没生效(点偏/动画没走完)，继续点，最多4次
-				if (thisScript.global.d6HongLeiTry < 4) {
-					// 点击"选择"：轰雷指纹锚点是第1点(226,184)，卡片图标中心在锚点左侧约7px；
-					// 实测三个"选择"按钮中心(219/492/765, y572)正好对齐各自图标中心，故以图标中心±38点击。
-					const cardCx = hongLei.x - 7;
-					thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
-					thisScript.global.d6HongLeiTry++;
-					thisScript.global.d6HongLeiPending = true; // 等"离开本页"确认后才算真获得
-					log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + '→按钮中心x' + cardCx + ')，第' + thisScript.global.d6HongLeiTry + '次，等待确认');
-					sleep(600); // 等选择动画/页面跳转
-					return true;
-				}
-				// 连点4次还在本页(疑似坐标不准) → 兜底选第4个，避免死循环；下次buff页重新计数
-				thisScript.global.d6HongLeiPending = false;
-				thisScript.global.d6HongLeiTry = 0;
-				thisScript.regionClick([thisOperator[4].oper[0]]);
-				log('四选一buff：轰雷选择连点4次未生效，兜底选第4个舞技强化');
+				// 点击"选择"：轰雷指纹锚点是第1点(226,184)，卡片图标中心在锚点左侧约7px；
+				// 实测三个"选择"按钮中心(219/492/765, y572)正好对齐各自图标中心，故以图标中心±38点击。
+				const cardCx = hongLei.x - 7;
+				thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
+				thisScript.global.d6HongLeiGot = true; // 本页点了就必得，无需二次确认
+				thisScript.global.d6BuffClickAt = new Date().getTime(); // 2秒冷却，等画面切走
+				thisScript.global.d6BuffRefreshCnt = 0;
+				log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + '→按钮中心x' + cardCx + ')，已获得轰雷，本局后续直接选第4个');
+				sleep(1200); // 等选择动画/页面跳转
 				return true;
 			}
 
@@ -890,7 +875,6 @@ export class Func314 implements IFuncOrigin {
 				name: '六道觉_四选一_万相铃不足',
 				operator: [{ desc: thisOperator[45].desc }]
 			})) {
-				thisScript.global.d6HongLeiTry = 0;
 				thisScript.global.d6BuffRefreshCnt = 0;
 				thisScript.regionClick([thisOperator[4].oper[0]]);
 				log('四选一buff：万相铃不足(刷新无效)，直接选第4个舞技强化');
@@ -901,7 +885,6 @@ export class Func314 implements IFuncOrigin {
 			//    说明刷新没生效(异常/提示未识别)，不再刷，直接选第4个，杜绝死循环。
 			if (thisScript.global.d6BuffRefreshCnt >= 3) {
 				thisScript.global.d6BuffRefreshCnt = 0;
-				thisScript.global.d6HongLeiTry = 0;
 				thisScript.regionClick([thisOperator[4].oper[0]]);
 				log('四选一buff：本页刷新3次仍未生效，停止刷新，选第4个舞技强化');
 				return true;
@@ -916,14 +899,12 @@ export class Func314 implements IFuncOrigin {
 			if (refreshBright) {
 				thisScript.regionClick([thisOperator[43].oper[0]]);
 				thisScript.global.d6BuffRefreshCnt++; // 本页刷新计数+1(上限兜底用)
-				thisScript.global.d6HongLeiTry = 0; // 换了一批卡，连点计数归零
 				log('四选一buff：无轰雷，点刷新继续找(本页第' + thisScript.global.d6BuffRefreshCnt + '次)');
 				sleep(800); // 等刷新动画完成
 				return true;
 			}
 
 			// ⑥ 刷新"暗"或不可点(剩0次)且无轰雷→固定选第4个舞技强化兜底
-			thisScript.global.d6HongLeiTry = 0;
 			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.regionClick([thisOperator[4].oper[0]]);
 			log('四选一buff：刷新不可用且无轰雷，选第4个舞技强化');
@@ -1066,9 +1047,8 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6RouFeng = 1;
 			thisScript.global.d6FirstBuffDone = false;
 			thisScript.global.d6HongLeiGot = false; // 新一局：重新允许寻找轰雷
-			thisScript.global.d6HongLeiPending = false;
-			thisScript.global.d6HongLeiTry = 0;
 			thisScript.global.d6BuffRefreshCnt = 0;
+			thisScript.global.d6BuffClickAt = 0;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();

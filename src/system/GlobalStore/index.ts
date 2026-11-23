@@ -88,10 +88,9 @@ export type globalRootType = {
 	d6Loop: number;//     椒图事件点击循环数
 	d6RouFeng: number;//     椒图柔风实时buff数
 	d6FirstBuffDone: boolean;// 六道觉本局首次三选一buff是否已选
-	d6HongLeiGot: boolean;// 六道觉本局是否已确认真正获得六道·轰雷(获得后不再找/不刷新,四选一直接选第4个)
-	d6HongLeiPending: boolean;// 六道觉已点轰雷卡片"选择",等待"离开四选一页"确认(确认后才置Got)
-	d6HongLeiTry: number;// 六道觉轰雷"选择"连点次数(防坐标不准导致死循环,到4次兜底选第4个)
+	d6HongLeiGot: boolean;// 六道觉本局是否已获得六道·轰雷(四选一页点了轰雷卡"选择"即视为获得;之后不再找/不刷新,直接选第4个)
 	d6BuffRefreshCnt: number;// 六道觉当前四选一页已点刷新次数(上限3次,防止刷新无效时死循环)
+	d6BuffClickAt: number;// 六道觉上次点轰雷卡"选择"的时间戳(2秒冷却:连续两个四选一页时,避免在过渡帧误点第4个)
 	d6LeaveClickAt: number;// 六道觉上次点右下角"离开"的时间戳(冷却期内不再点,防画面切换中重复点误触地图唤息)
 	upYuHun: boolean;//      强化御魂记录界面次数
 	upYuHunIni: boolean;//      强化御魂初设置
@@ -246,9 +245,8 @@ export const globalRoot: globalRootType = {
 	d6RouFeng: 1,
 	d6FirstBuffDone: false,
 	d6HongLeiGot: false,
-	d6HongLeiPending: false,
-	d6HongLeiTry: 0,
 	d6BuffRefreshCnt: 0,
+	d6BuffClickAt: 0,
 	d6LeaveClickAt: 0,
 	upYuHun: false,
 	upYuHunIni: true,
