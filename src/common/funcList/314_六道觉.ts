@@ -607,8 +607,36 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 469, 292, 796, 546, 1000], // 点绽放之屿岛
 		]
+	}, { // 40 绽放之屿_内部页(式神页,点右下角离开)
+		desc: [1280, 720,
+			[
+				[left, 21, 41, 0xf4f5f9],
+				[left, 121, 43, 0xf8f3e0],
+				[left, 145, 40, 0xf8f3e0],
+				[left, 43, 300, 0x783a3a],
+				[center, 441, 296, 0x8f4545],
+				[right, 846, 311, 0x763a3a],
+				[center, 335, 606, 0x758da8],
+				[right, 646, 621, 0x748aa2],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1155, 635, 1211, 687, 1000], // 右下角"离开"
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
+
+		// 绽放之屿内部页(式神页)：识别到直接点右下角"离开"，回到地图。
+		// 必须放在"点岛指纹"之前，否则内部页的伞面/白笔画可能误命中点岛指纹
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_绽放之屿_离开',
+			operator: [thisOperator[40]]
+		})) {
+			thisScript.regionClick([thisOperator[40].oper[0]]);
+			log('绽放之屿内部页：点右下角离开');
+			return true;
+		}
 
 		// 绽放之屿是浮动事件(背景会有其它事件的浮动图形干扰),
 		// 用独有指纹(绽字白笔画)优先识别,必须放在"选事件"之前,
