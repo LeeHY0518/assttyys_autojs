@@ -652,10 +652,10 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_选事件',
 			operator: [{ desc: thisOperator[0].desc }, { desc: thisOperator[2].desc }]
 		}, 200)) {
-			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 鏖战>宁息>混沌）
+			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 宁息>鏖战>混沌）
 			const eventPriority = [
-				'六道觉_事件_鏖战',
 				'六道觉_事件_宁息',
+				'六道觉_事件_鏖战',
 				'六道觉_事件_混沌',
 			];
 			for (const key of eventPriority) {
