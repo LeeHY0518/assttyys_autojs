@@ -2094,13 +2094,18 @@ const multiFindColors: IMultiFindColorsOrigin = {
 	// 六道觉地图事件指纹：每个事件独立字典，优先级由 314_六道觉.ts 的 eventPriority 数组决定
 	'六道觉_事件_神秘': {
 		region: [left, 1280, 720, 79, 86, 1020, 631],
-		desc: [[ // 神秘（旧指纹，待重新取色验证）
+		similar: 97, // 新8点白笔画:原图偏差0,容差±8整图唯一命中,与其他三事件0互串
+		desc: [[ // 神秘（用户新取8点，取自 MuMu-20261123-122927-931.png）
 			1280, 720,
 			[
-				[center, 400, 420, 0xd1e6eb],
-				[center, 391, 405, 0x399fc7],
-				[center, 392, 441, 0x51d4de],
-				[center, 401, 407, 0x3f98ba],
+				[center, 386, 390, 0xfcfdfd],
+				[center, 385, 404, 0xffffff],
+				[center, 385, 412, 0xf9f9fa],
+				[center, 392, 397, 0xffffff],
+				[center, 402, 404, 0xf8f8f9],
+				[center, 385, 428, 0xffffff],
+				[center, 394, 436, 0xeaf4f4],
+				[center, 403, 439, 0xc6fefd],
 			]
 		],]
 	},
