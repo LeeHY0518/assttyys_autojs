@@ -639,6 +639,26 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1155, 635, 1211, 687, 1000], // 右下角"离开"
 		]
+	}, { // 42 商店_刷新按钮(底部火苗图标,用户取色6点原始图偏差全0)
+		desc: [
+			1280, 720,
+			[
+				[center, 610, 632, 0xfff9df],
+				[center, 603, 620, 0xd2e3db],
+				[center, 621, 607, 0x77b5d3],
+				[center, 629, 623, 0xe4ecde],
+				[right, 661, 673, 0xfffdf4],
+				[right, 675, 673, 0xfcfaf1],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 580, 593, 649, 649, 1000], // 刷新按钮点击框
+		]
+	}, { // 43 商店_buff区滑动(从下往上滑一次露出下方buff)
+		oper: [
+			[center, 1280, 720, 930, 560, 930, 560, 1000], // 起点(buff区下部)
+			[center, 1280, 720, 930, 160, 930, 160, 1000], // 终点(buff区上部)
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -760,39 +780,53 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_商店购买buff',
 			operator: [{ desc: thisOperator[7].desc }]
 		})) {
-			// 买六道·轰雷：计数每局从0开始(d6HongLeiCount),买到1个就不再买(<1)。
-			// 指纹唯一(容差±8整图命中1处),商店格子轮换也能跟图标走。放在柔风逻辑之前。
-			if (thisScript.global.d6HongLeiCount < 1) {
-				const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
-				if (hongLei) {
-					thisScript.regionClick([[hongLei.x - 10, hongLei.y + 50, hongLei.x + 10, hongLei.y + 140, 500]]);
-					thisScript.global.d6HongLeiCount++;
-					log('购买六道·轰雷 第' + thisScript.global.d6HongLeiCount + '个 (' + hongLei.x + ',' + hongLei.y + ')');
-					return true; // 等下次循环识别"确认购买"弹窗
-				}
-			}
-			if (thisScript.global.d6RouFeng < 5) {//  柔风达标前购买buff
-				const point = thisScript.findMultiColor('六道觉_购买buff');
-				if (point) {//  有购买按钮_选择购买
-					const oper = [[
-						point.x - 10,
-						point.y + 50,
-						point.x + 10,
-						point.y + 140,
-						500
-					]];
-					thisScript.regionClick(oper);
-					thisScript.regionClick([thisOperator[23].oper[1]]);
-				} else {
-					thisScript.regionClick([thisOperator[23].oper[1]]);
-					log('当前柔风数量:' + thisScript.global.d6RouFeng);
-					return true;
-				}
-			} else {
+			// 商店流程(每帧推进一步,用global状态记住进度,避免循环里疯狂滑动/刷新):
+			// ① 找轰雷 → 找到就买,买到后以后所有商店直接离开
+			// ② 没找到 → 滑动buff区(下→上)露出下方,下一帧再找
+			// ③ 滑动后还没有 → 点刷新(计数<2,点1次+1),刷新后回顶部重走①②
+			// ④ 刷新计数到2仍没有 → 离开商店
+			// 状态 d6ShopSwiped/d6ShopRefreshCount 每局在"开始_重置参数"清零,退出商店时也复位。
+
+			// 已买轰雷：后续遇到商店直接离开
+			if (thisScript.global.d6HongLeiCount >= 1) {
 				thisScript.regionClick([thisOperator[23].oper[1]]);
-				console.log('当前柔风数量:' + thisScript.global.d6RouFeng);
+				log('商店：已买轰雷，直接离开');
 				return true;
 			}
+
+			// ① 当前页找轰雷
+			const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
+			if (hongLei) {
+				thisScript.regionClick([[hongLei.x - 10, hongLei.y + 50, hongLei.x + 10, hongLei.y + 140, 500]]);
+				thisScript.regionClick([thisOperator[23].oper[1]]); // 点购买后退出商店(沿用柔风购买模式)
+				thisScript.global.d6HongLeiCount++;
+				log('商店：购买六道·轰雷 第' + thisScript.global.d6HongLeiCount + '个 (' + hongLei.x + ',' + hongLei.y + ')');
+				return true;
+			}
+
+			// ② 没找到轰雷且本轮未滑动过 → 滑动buff区,下一帧再找
+			if (!thisScript.global.d6ShopSwiped) {
+				thisScript.regionSwipe(thisOperator[43].oper[0], thisOperator[43].oper[1], [500, 600], 500);
+				thisScript.global.d6ShopSwiped = true;
+				log('商店：滑动buff区找轰雷');
+				return true;
+			}
+
+			// ③ 滑动后仍没有 → 点刷新(计数<2)
+			if (thisScript.global.d6ShopRefreshCount < 2) {
+				thisScript.regionClick([thisOperator[42].oper[0]]);
+				thisScript.global.d6ShopRefreshCount++;
+				thisScript.global.d6ShopSwiped = false; // 刷新后buff回顶部,重走①②
+				log('商店：点击刷新 第' + thisScript.global.d6ShopRefreshCount + '次');
+				return true;
+			}
+
+			// ④ 刷新2次仍无轰雷 → 离开商店并复位本轮状态
+			thisScript.regionClick([thisOperator[23].oper[1]]);
+			thisScript.global.d6ShopSwiped = false;
+			thisScript.global.d6ShopRefreshCount = 0;
+			log('商店：刷新2次仍无轰雷，离开');
+			return true;
 		}
 
 		if (thisScript.oper({
@@ -884,6 +918,8 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6RouFeng = 1;
 			thisScript.global.d6FirstBuffDone = false;
 			thisScript.global.d6HongLeiCount = 0; // 六道·轰雷购买次数清零(每局从0开始)
+			thisScript.global.d6ShopSwiped = false; // 商店滑动状态清零
+			thisScript.global.d6ShopRefreshCount = 0; // 商店刷新次数清零
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();

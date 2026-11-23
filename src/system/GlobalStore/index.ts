@@ -90,6 +90,8 @@ export type globalRootType = {
 	d6FirstBuffDone: boolean;// 六道觉本局首次三选一buff是否已选
 	d6BfzyCount: number;//  六道觉绽放之屿次数(已弃用,改看唤息亮暗)
 	d6HongLeiCount: number;// 六道觉本局六道·轰雷购买次数(每局从0,买1个即停)
+	d6ShopSwiped: boolean;// 六道觉本轮商店是否已滑动过buff区(滑动后找轰雷,找不到则刷新并重置)
+	d6ShopRefreshCount: number;// 六道觉本轮商店刷新次数(0开始,点1次+1,到2不再刷新)
 	upYuHun: boolean;//      强化御魂记录界面次数
 	upYuHunIni: boolean;//      强化御魂初设置
 	bgyxLastCapture: number; // 上次截图的时间戳
@@ -244,6 +246,8 @@ export const globalRoot: globalRootType = {
 	d6FirstBuffDone: false,
 	d6BfzyCount: 0,
 	d6HongLeiCount: 0,
+	d6ShopSwiped: false,
+	d6ShopRefreshCount: 0,
 	upYuHun: false,
 	upYuHunIni: true,
 	bgyxLastCapture: undefined,
