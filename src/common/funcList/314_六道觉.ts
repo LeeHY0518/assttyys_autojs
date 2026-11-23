@@ -638,14 +638,25 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		// 【已屏蔽】绽放之屿点岛指纹：该白指纹在宁息图标上误命中(实测坐标472,481等),
-		// 导致一直卡在绽放分支反复点宁息位置、走不到事件优先级。等重新提取唯一指纹后再恢复。
-		// const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿');
-		// if (pBfzy) {
-		// 	thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
-		// 	log('点击绽放之屿 指纹(' + pBfzy.x + ',' + pBfzy.y + ')');
-		// 	return true;
-		// }
+		// 绽放之屿：整局出现3次。用新9点唯一指纹识别(原始图验证容差±8仍唯一,不误命中宁息/鏖战/混沌)。
+		// 前2次：点岛进内部页看式神；第3次：点右下角"唤息"进商店买buff。
+		// 计数每局重置(见"六道觉_开始_重置参数"分支 d6BfzyCount=0)，上限3防止只显示模式重复识别刷屏。
+		const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿', undefined, undefined, true);
+		if (pBfzy) {
+			thisScript.global.d6BfzyCount = Math.min((thisScript.global.d6BfzyCount || 0) + 1, 3);
+			const bfCount = thisScript.global.d6BfzyCount;
+			log('绽放之屿第' + bfCount + '次 (' + pBfzy.x + ',' + pBfzy.y + ')');
+			if (bfCount >= 3) {
+				// 第3次：点右下角"唤息"按钮进商店
+				thisScript.regionClick([[1120, 585, 1215, 690, 1000]]);
+				log('绽放之屿第3次：点右下角唤息进商店');
+			} else {
+				// 前2次：点岛进内部页
+				thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
+				log('绽放之屿第' + bfCount + '次：点岛');
+			}
+			return true;
+		}
 
 		if (thisScript.oper({
 			id: 314,
@@ -829,6 +840,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6Loop = 0;
 			thisScript.global.d6RouFeng = 1;
 			thisScript.global.d6FirstBuffDone = false;
+			thisScript.global.d6BfzyCount = 0; // 绽放之屿出现次数清零
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();
