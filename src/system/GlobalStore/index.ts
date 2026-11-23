@@ -89,6 +89,7 @@ export type globalRootType = {
 	d6RouFeng: number;//     椒图柔风实时buff数
 	d6FirstBuffDone: boolean;// 六道觉本局首次三选一buff是否已选
 	d6BfzyCount: number;//  六道觉本局绽放之屿出现次数(0~3)
+	d6HongLeiCount: number;// 六道觉本局六道·轰雷购买次数(目标1,封顶2)
 	upYuHun: boolean;//      强化御魂记录界面次数
 	upYuHunIni: boolean;//      强化御魂初设置
 	bgyxLastCapture: number; // 上次截图的时间戳
@@ -242,6 +243,7 @@ export const globalRoot: globalRootType = {
 	d6RouFeng: 1,
 	d6FirstBuffDone: false,
 	d6BfzyCount: 0,
+	d6HongLeiCount: 0,
 	upYuHun: false,
 	upYuHunIni: true,
 	bgyxLastCapture: undefined,

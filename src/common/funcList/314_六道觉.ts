@@ -729,6 +729,17 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_商店购买buff',
 			operator: [{ desc: thisOperator[7].desc }]
 		})) {
+			// 绽放之屿第3次进商店：买六道·轰雷。目标1个,封顶2个防手抖/只显示模式重复识别。
+			// 指纹唯一(容差±8整图命中1处),商店格子轮换也能跟图标走。放在柔风逻辑之前。
+			if (thisScript.global.d6BfzyCount >= 3 && thisScript.global.d6HongLeiCount < 2) {
+				const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
+				if (hongLei) {
+					thisScript.regionClick([[hongLei.x - 10, hongLei.y + 50, hongLei.x + 10, hongLei.y + 140, 500]]);
+					thisScript.global.d6HongLeiCount++;
+					log('购买六道·轰雷 第' + thisScript.global.d6HongLeiCount + '个 (' + hongLei.x + ',' + hongLei.y + ')');
+					return true; // 等下次循环识别"确认购买"弹窗
+				}
+			}
 			if (thisScript.global.d6RouFeng < 5) {//  柔风达标前购买buff
 				const point = thisScript.findMultiColor('六道觉_购买buff');
 				if (point) {//  有购买按钮_选择购买
