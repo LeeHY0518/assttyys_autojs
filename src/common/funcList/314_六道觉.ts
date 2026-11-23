@@ -110,17 +110,17 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1160, 609, 1227, 659, 500],
 		]
-	}, { // 6 混沌_怪物
+	}, { // 6 混沌_怪物（精英怪页）
 		desc: [
 			1280, 720,
 			[
-				[left, 73, 532, 0x676a83],
-				[left, 121, 577, 0x636882],
-				[left, 105, 28, 0xf6f1de],
-				[left, 119, 43, 0xf8f3e0],
-				[left, 147, 28, 0xf8f3e0],
-				[left, 154, 51, 0xf8f3e0],
-				[left, 154, 38, 0xf7f2df],
+				[left, 105, 28, 0xf1ecda],
+				[left, 120, 43, 0xf8f3e0],
+				[left, 148, 29, 0xf8f3e0],
+				[left, 153, 41, 0xf8f3e0],
+				[left, 154, 52, 0xf8f3e0],
+				[left, 146, 579, 0x48768f],
+				[left, 209, 628, 0x4d7497],
 			]
 		],
 		oper: [
