@@ -709,6 +709,32 @@ export class Func314 implements IFuncOrigin {
 				[right, 1204, 623, 0xa5a5a5],
 			]
 		],
+	}, { // 45 四选一buff页_"万相铃不足"提示(没钱时刷新按钮仍亮但点了不刷新,会死循环刷新)
+		// 18点取自 MuMu-20261123-165534-923.png 提示文字,原始PNG偏差全0,跨39图唯一(本图18/18,其余最高1/18)。
+		// 识别到就不再点刷新,直接选第4个舞技强化。
+		desc: [
+			1280, 720,
+			[
+				[center, 574, 232, 0xe5e5e4],
+				[center, 583, 232, 0xf0f0f0],
+				[center, 593, 231, 0xd9d9d9],
+				[center, 574, 247, 0xfaf9f9],
+				[center, 589, 238, 0xffffff],
+				[center, 586, 248, 0xfdfdfd],
+				[center, 606, 236, 0xf7f7f7],
+				[center, 606, 246, 0xe7e7e7],
+				[center, 613, 237, 0xeaeaea],
+				[center, 621, 247, 0xfafafa],
+				[center, 633, 240, 0xfbfbfb],
+				[right, 646, 243, 0xfdfdfd],
+				[right, 644, 249, 0xe7e7e7],
+				[right, 669, 232, 0xe3e4e4],
+				[right, 667, 247, 0xffffff],
+				[right, 699, 231, 0xf8f8f8],
+				[right, 695, 240, 0xf9f9f9],
+				[right, 702, 249, 0xffffff],
+			]
+		],
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -736,6 +762,7 @@ export class Func314 implements IFuncOrigin {
 			if (!stillBuffPage) {
 				thisScript.global.d6HongLeiPending = false;
 				thisScript.global.d6HongLeiTry = 0;
+				thisScript.global.d6BuffRefreshCnt = 0;
 				thisScript.global.d6HongLeiGot = true;
 				log('轰雷：已确认获得(选择生效、已离开四选一页)，本局后续不再找轰雷');
 			}
@@ -805,11 +832,14 @@ export class Func314 implements IFuncOrigin {
 			// 四选一 buff 页：前3张随机 buff，第4张固定舞技强化。
 			// 本局流程：① 已确认拿到轰雷 → 不再找、不刷新，直接选第4个舞技强化；
 			//           ② 还没拿到 → 前3格找轰雷，找到点它正下方"选择"(点完等确认)；
-			//           ③ 没轰雷且刷新"亮" → 点刷新继续找；
-			//           ④ 刷新"暗"(剩0次)仍没轰雷 → 选第4个舞技强化兜底。
+			//           ③ 出现"万相铃不足"(没钱) → 刷新无效，不再刷新，直接选第4个；
+			//           ④ 本页已刷3次还亮着(刷新没生效) → 停止刷新，直接选第4个(防死循环)；
+			//           ⑤ 没轰雷且刷新"亮" → 点刷新继续找；
+			//           ⑥ 刷新"暗"(剩0次)仍没轰雷 → 选第4个舞技强化兜底。
 
 			// ① 本局已经确认获得过轰雷：不识别、不刷新，直接选第4个
 			if (thisScript.global.d6HongLeiGot) {
+				thisScript.global.d6BuffRefreshCnt = 0;
 				thisScript.regionClick([thisOperator[4].oper[0]]);
 				log('四选一buff：本局已获得轰雷，直接选第4个舞技强化');
 				return true;
@@ -838,7 +868,31 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 
-			// ③ 刷新"亮"=可点击：点刷新后等待动画，下一帧重新找轰雷
+			// ③ 没钱时的"万相铃不足"提示：此时刷新按钮虽亮，但点了不会刷新、也不会变暗，
+			//    继续点会死循环。识别到提示就放弃刷新，直接选第4个舞技强化。
+			if (thisScript.oper({
+				id: 314,
+				name: '六道觉_四选一_万相铃不足',
+				operator: [{ desc: thisOperator[45].desc }]
+			})) {
+				thisScript.global.d6HongLeiTry = 0;
+				thisScript.global.d6BuffRefreshCnt = 0;
+				thisScript.regionClick([thisOperator[4].oper[0]]);
+				log('四选一buff：万相铃不足(刷新无效)，直接选第4个舞技强化');
+				return true;
+			}
+
+			// ④ 刷新上限兜底：本页已点3次刷新(刷新次数上限就是剩3次)却还亮着，
+			//    说明刷新没生效(异常/提示未识别)，不再刷，直接选第4个，杜绝死循环。
+			if (thisScript.global.d6BuffRefreshCnt >= 3) {
+				thisScript.global.d6BuffRefreshCnt = 0;
+				thisScript.global.d6HongLeiTry = 0;
+				thisScript.regionClick([thisOperator[4].oper[0]]);
+				log('四选一buff：本页刷新3次仍未生效，停止刷新，选第4个舞技强化');
+				return true;
+			}
+
+			// ⑤ 刷新"亮"=可点击：点刷新后等待动画，下一帧重新找轰雷
 			const refreshBright = thisScript.oper({
 				id: 314,
 				name: '六道觉_四选一_刷新亮',
@@ -846,14 +900,16 @@ export class Func314 implements IFuncOrigin {
 			});
 			if (refreshBright) {
 				thisScript.regionClick([thisOperator[43].oper[0]]);
+				thisScript.global.d6BuffRefreshCnt++; // 本页刷新计数+1(上限兜底用)
 				thisScript.global.d6HongLeiTry = 0; // 换了一批卡，连点计数归零
-				log('四选一buff：无轰雷，点刷新继续找');
+				log('四选一buff：无轰雷，点刷新继续找(本页第' + thisScript.global.d6BuffRefreshCnt + '次)');
 				sleep(800); // 等刷新动画完成
 				return true;
 			}
 
-			// ④ 刷新"暗"或不可点(剩0次)且无轰雷→固定选第4个舞技强化兜底
+			// ⑥ 刷新"暗"或不可点(剩0次)且无轰雷→固定选第4个舞技强化兜底
 			thisScript.global.d6HongLeiTry = 0;
+			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.regionClick([thisOperator[4].oper[0]]);
 			log('四选一buff：刷新不可用且无轰雷，选第4个舞技强化');
 			return true;
@@ -994,6 +1050,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6HongLeiGot = false; // 新一局：重新允许寻找轰雷
 			thisScript.global.d6HongLeiPending = false;
 			thisScript.global.d6HongLeiTry = 0;
+			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();
