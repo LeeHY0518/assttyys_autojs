@@ -250,23 +250,23 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 17, 20, 52, 58, 500],
 		]
-	}, { // 15 神秘_仿造
+	}, { // 15 神秘之屿(背包仿造页)：识别到直接点左上角返回退出
 		desc: [
 			1280, 720,
 			[
-				[right, 1227, 240, 0xdfd5be],
-				[right, 1215, 276, 0xe0dbda],
-				[right, 1212, 392, 0x343849],
-				[right, 1225, 387, 0x323746],
-				[right, 1182, 640, 0x8c7e60],
-				[right, 1230, 668, 0x8c7e60],
+				[left, 22, 42, 0xf0f2f7],
+				[left, 109, 36, 0xf8f3e0],
+				[left, 107, 51, 0xe7e4d4],
+				[left, 122, 37, 0xf8f3e0],
+				[left, 140, 34, 0xf8f3e0],
+				[left, 159, 48, 0xf8f3e0],
+				[right, 1157, 627, 0x968e62],
+				[right, 1184, 623, 0x96895b],
+				[right, 1219, 657, 0x968656],
 			]
 		],
 		oper: [
-			[center, 1280, 720, 830, 192, 900, 242, 500],
-			[center, 1280, 720, 1168, 626, 1245, 688, 500],
-			[center, 1280, 720, 677, 406, 838, 456, 500],
-			[center, 1280, 720, 17, 20, 52, 58, 500],
+			[center, 1280, 720, 17, 20, 52, 58, 500], // 左上角返回
 		]
 	}, { // 16 结束
 		desc: [
@@ -766,13 +766,14 @@ export class Func314 implements IFuncOrigin {
 
 		if (thisScript.oper({
 			id: 314,
-			name: '六道觉_神秘仿造',
+			name: '六道觉_神秘之屿_退出',
 			operator: [
 				thisOperator[15]
 			]
 		})) {
-			thisScript.global.d6RouFeng++;
-			log('当前柔风数量:' + thisScript.global.d6RouFeng);
+			// 神秘之屿(背包仿造页)：不做仿造，直接点左上角返回退出
+			thisScript.regionClick([thisOperator[15].oper[0]]);
+			log('神秘之屿：点左上角返回退出');
 			return true;
 		}
 
