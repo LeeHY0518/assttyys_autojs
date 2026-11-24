@@ -45,13 +45,7 @@ export class Func314 implements IFuncOrigin {
 				[right, 1174, 641, 0xf8f3c9],
 			]
 		],
-	}, { // 1 点固定事件位置
-		oper: [
-			[center, 1280, 720, 625, 474, 734, 544, 0], // 位置:2位
-			[center, 1280, 720, 335, 434, 466, 496, 0], // 位置:1位
-			[center, 1280, 720, 880, 468, 1038, 543, 0], // 位置:3位
-		]
-	}, { // 2 事件 唤息暗
+	}, { // 1 事件 唤息暗
 		desc: [
 			1280, 720,
 			[
@@ -63,7 +57,7 @@ export class Func314 implements IFuncOrigin {
 				[right, 1140, 606, 0xe8e8e8],
 			]
 		]
-	}, { // 3 已适配66 鏖战
+	}, { // 2 已适配66 鏖战
 		desc: [
 			1280, 720,
 			[
@@ -81,7 +75,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 800, 230, 930, 380, 500], // 右怪 武士之灵
 		]
-	}, { // 4 buff抉择_四选一(固定选第4个舞技强化)
+	}, { // 3 buff抉择_四选一(固定选第4个舞技强化)
 		desc: [
 			1280, 720,
 			[
@@ -95,7 +89,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1018, 553, 1148, 591, 500], // 第4个 选择(舞技强化)
 		]
-	}, { // 5 已适配66 混沌_宝箱
+	}, { // 4 已适配66 混沌_宝箱
 		desc: [
 			1280, 720,
 			[
@@ -110,7 +104,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1160, 609, 1227, 659, 500],
 		]
-	}, { // 6 混沌_怪物（精英怪页）
+	}, { // 5 混沌_怪物（精英怪页）
 		desc: [
 			1280, 720,
 			[
@@ -127,7 +121,7 @@ export class Func314 implements IFuncOrigin {
 			[center, 1280, 720, 680, 292, 801, 379, 0],
 			// [center, 1280, 720, 1120, 597, 1231, 682, 500], // 挑战
 		]
-	}, { // 7 商店(宁息之屿)：右侧商店tab亮笔画+底部备战,两图100%一致/地图页0命中
+	}, { // 6 商店(宁息之屿)：右侧商店tab亮笔画+底部备战,两图100%一致/地图页0命中
 		desc: [
 			1280, 720,
 			[
@@ -142,7 +136,7 @@ export class Func314 implements IFuncOrigin {
 			[center, 1280, 720, 678, 409, 837, 453, 500], // 确认购买
 			[center, 1280, 720, 1174, 588, 1241, 649, 500], // 退出商店
 		]
-	}, { // 8 已适配66 星之屿
+	}, { // 7 已适配66 星之屿
 		desc: [
 			1280, 720,
 			[
@@ -160,7 +154,7 @@ export class Func314 implements IFuncOrigin {
 			[center, 1280, 720, 456, 274, 566, 347, 0],
 			// [center, 1280, 720, 1120, 597, 1231, 682, 500], // 挑战
 		]
-	}, { // 9 开始_开启
+	}, { // 8 开始_开启
 		desc: [
 			1280, 720,
 			[
@@ -176,7 +170,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1128, 606, 1217, 664, 500],
 		]
-	}, { // 10 开始_确定
+	}, { // 9 开始_确定
 		desc: [
 			1280, 720,
 			[
@@ -190,7 +184,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1145, 597, 1228, 662, 500],
 		]
-	}, { // 11 已适配66 开始_开启_60体
+	}, { // 10 已适配66 开始_开启_60体
 		desc: [
 			1280, 720,
 			[
@@ -206,7 +200,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1142, 595, 1230, 659, 500],
 		]
-	}, { // 12 开始_选择柔风
+	}, { // 11 开始_选择柔风
 		desc: [
 			1280, 720,
 			[
@@ -222,7 +216,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 268, 574, 374, 617, 500],
 		]
-	}, { // 13 确认奖励
+	}, { // 12 确认奖励
 		desc: [1280, 720,
 			[
 				[center, 554, 142, 0xfede96],
@@ -235,7 +229,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[right, 1280, 720, 913, 129, 1245, 648, 500],
 		]
-	}, { // 14 已适配66 神秘_转换
+	}, { // 13 已适配66 神秘_转换
 		desc: [
 			1280, 720,
 			[
@@ -250,7 +244,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 17, 20, 52, 58, 500],
 		]
-	}, { // 15 神秘之屿(背包仿造页)：识别到直接点左上角返回退出
+	}, { // 14 神秘之屿(背包仿造页)：识别到直接点左上角返回退出
 		desc: [
 			1280, 720,
 			[
@@ -268,7 +262,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 17, 20, 52, 58, 500], // 左上角返回
 		]
-	}, { // 16 结束(结算页)：用户新取9点(右下"分享"按钮米色笔画)，原始PNG偏差全0，跨图唯一(仅结算页9/9)
+	}, { // 15 结束(结算页)：用户新取9点(右下"分享"按钮米色笔画)，原始PNG偏差全0，跨图唯一(仅结算页9/9)
 		// 旧7点全失效(偏差112~148，那里已变成"分享"深色按钮)→结算页识别不到。
 		// oper点击框[517,657,1007,710]指向底部"点击空白处继续"，保持不变。
 		desc: [
@@ -288,37 +282,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 517, 657, 1007, 710, 500],
 		]
-	}, { // 17 十位数的5
-		desc: [
-			1280, 720,
-			[
-				[right, 1211, 657, 0xbbab7f],
-				[right, 1225, 633, 0xb8a67d],
-				[right, 1201, 32, 0x45413c],
-				[right, 1201, 37, 0x878279],
-				[right, 1207, 41, 0x282422],
-				[right, 1200, 44, 0x8a857d],
-			]
-		],
-		oper: [
-			[center, 1280, 720, 1191, 621, 1243, 676, 2000],
-		]
-	}, { // 18 十位数的0
-		desc: [
-			1280, 720,
-			[
-				[right, 1211, 657, 0xbbab7f],
-				[right, 1225, 633, 0xb8a67d],
-				[right, 1197, 35, 0xa49e94],
-				[right, 1205, 36, 0x948e85],
-				[right, 1201, 45, 0x7e7972],
-				[right, 1201, 37, 0x1f191d],
-			]
-		],
-		oper: [
-			[center, 1280, 720, 1191, 621, 1243, 676, 2000],
-		]
-	}, { // 19 boss_挑战(恋色障道等boss页)：用户新取12点,原始PNG偏差全0,34图唯一(仅本图12/12)
+	}, { // 16 boss_挑战(恋色障道等boss页)：用户新取12点,原始PNG偏差全0,34图唯一(仅本图12/12)
 		// 前5点=左上boss名"恋色障道"米色笔画;中3点=场景色;后4点=右下"挑战"按钮暗色边框。
 		// 旧6点全失效(偏差63~216)→boss页识别不到→不点挑战。oper点击框[1120,586,1229,678]覆盖挑战按钮中心(1160,625),不变。
 		desc: [
@@ -341,7 +305,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1120, 586, 1229, 678, 500],
 		]
-	}, { // 20 已适配66 boss_跳过
+	}, { // 17 已适配66 boss_跳过
 		desc: [
 			1280, 720,
 			[
@@ -356,7 +320,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1130, 19, 1232, 43, 500],
 		]
-	}, { // 21 使用极的双倍
+	}, { // 18 使用极的双倍
 		desc: [
 			1280, 720,
 			[
@@ -373,7 +337,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 671, 419, 794, 467, 1000],
 		]
-	}, { // 22 双倍 点取消
+	}, { // 19 双倍 点取消
 		desc: [
 			1280, 720,
 			[
@@ -387,51 +351,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 491, 419, 615, 471, 1000],
 		]
-	}, { // 23 [已废弃]商店确认购买：对应处理分支已删除(现在遇到商店只点右下角退出,不购买)。
-		// 定义保留仅为不打乱后续 operator 下标(thisOperator[24]~[45])，运行时不会被引用。
-		desc: [
-			1280, 720,
-			[
-				[left, 115, 37, 0x66645c],
-				[left, 212, 30, 0x66645c],
-				[center, 463, 428, 0xdf6851],
-				[center, 700, 436, 0xf3b25e],
-				[right, 1200, 166, 0x56534f],
-				[right, 1202, 310, 0x11141c],
-			]
-		],
-		oper: [
-			[center, 1280, 720, 678, 409, 837, 453, 500], // (废弃)确认购买
-			[center, 1280, 720, 1174, 588, 1241, 649, 500], // (废弃)退出商店
-		]
-	}, { // 24 御神经验
-		desc: [
-			1280, 720,
-			[
-				[center, 581, 138, 0xfff0b7],
-				[center, 610, 134, 0xffeeb3],
-				[center, 674, 138, 0xfff2bc],
-				[center, 708, 137, 0xfff0bc],
-				[center, 694, 649, 0x69759f],
-				[center, 589, 644, 0xbfcad6],
-			]
-		],
-		oper: [
-			[right, 1280, 720, 872, 146, 1197, 539, 500],
-		]
-	}, { // 25 低级buff
-		desc: [
-			1280, 720,
-			[
-				[center, 217, 171, 0x4786d8],
-				[center, 490, 171, 0x4687d9],
-				[center, 762, 172, 0x4583d0],
-				[center, 262, 216, 0x5ba0f2],
-				[center, 536, 216, 0x5893de],
-				[center, 809, 216, 0x5aa1f5],
-			]
-		]
-	}, { // 26 万象赐福取消购买
+	}, { // 20 万象赐福取消购买
 		desc: [
 			1280, 720,
 			[
@@ -445,7 +365,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 939, 148, 1179, 281, 1000],
 		]
-	}, { // 27 挑战
+	}, { // 21 挑战
 		desc: [
 			1280, 720,
 			[
@@ -460,7 +380,7 @@ export class Func314 implements IFuncOrigin {
 			[right, 1280, 720, 1120, 597, 1231, 682, 500], // 挑战
 		]
 	}, {
-		// 28 战斗失败选择放弃前行
+		// 22 战斗失败选择放弃前行
 		desc: [
 			1280, 720,
 			[
@@ -477,7 +397,7 @@ export class Func314 implements IFuncOrigin {
 			[center, 1280, 720, 673, 406, 844, 458, 1000],
 		]
 	}, {
-		// 29 战斗失败确定放弃
+		// 23 战斗失败确定放弃
 		desc: [
 			1280, 720,
 			[
@@ -494,7 +414,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 680, 397, 802, 448, 1000],
 		]
-	}, { // 30 进入月之海
+	}, { // 24 进入月之海
 		desc: [1280, 720,
 			[
 				[left, 74, 136, 0x0e1223],
@@ -507,12 +427,12 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 354, 173, 371, 256, 1000],
 		]
-	}, { // 31 进入六道之门
+	}, { // 25 进入六道之门
 		desc: '探索地图界面',
 		oper: [
 			[center, 1280, 720, 936, 649, 977, 683, 1000],
 		]
-	}, { // 32 继续
+	}, { // 26 继续
 		desc: [1280, 720,
 			[
 				[right, 1125, 601, 0xfff3bd],
@@ -526,7 +446,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1133, 601, 1207, 653, 1000],
 		]
-	}, { // 33 双倍次数为0
+	}, { // 27 双倍次数为0
 		desc: [1280, 720,
 			[
 				[right, 1192, 33, 0xd4d2c1],
@@ -536,19 +456,6 @@ export class Func314 implements IFuncOrigin {
 				[right, 1195, 40, 0x0e0e0f],
 				[right, 1191, 46, 0xd3d1c1],
 				[right, 1198, 46, 0xd4d2c1],
-			]
-		]
-	}, { // 34 柔风满层
-		desc: [1280, 720,
-			[
-				[left, 25, 91, 0xfcf5e0],
-				[left, 25, 92, 0xfaf4de],
-				[left, 25, 93, 0xf9f4df],
-				[left, 25, 94, 0xfbf6e1],
-				[left, 27, 89, 0x3f2719],
-				[left, 27, 100, 0x402b1b],
-				[left, 23, 94, 0x392417],
-				[left, 31, 94, 0x3a2417],
 			]
 		]
 	}, {
@@ -581,7 +488,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 245, 552, 410, 594, 500],
 		]
-	}, { // 37 强化选择_三卡页(固定选第1个 力量强化)
+	}, { // 30 强化选择_三卡页(固定选第1个 力量强化)
 		desc: [1280, 720,
 			[
 				[left, 290, 327, 0xe4ba56],
@@ -594,7 +501,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 220, 495, 365, 532, 500], // 力量强化 前排蓝色"选择"按钮
 		]
-	}, { // 38 强化选择_两卡页(力量满10级消失,固定选第1个 技巧强化)
+	}, { // 31 强化选择_两卡页(力量满10级消失,固定选第1个 技巧强化)
 		desc: [1280, 720,
 			[
 				[center, 473, 267, 0x0f2461],
@@ -607,19 +514,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 395, 495, 545, 532, 500], // 技巧强化 前排蓝色"选择"按钮
 		]
-	}, { // 39 绽放之屿(地图中央岛)
-		desc: [1280, 720,
-			[
-				[right, 675, 388, 0xf8f8f9],
-				[right, 676, 388, 0xffffff],
-				[right, 676, 389, 0xffffff],
-				[right, 675, 389, 0xf8f9f9],
-			]
-		],
-		oper: [
-			[center, 1280, 720, 469, 292, 796, 546, 1000], // 点绽放之屿岛
-		]
-	}, { // 40 绽放之屿_内部页(式神页,点右下角离开)
+	}, { // 32 绽放之屿_内部页(式神页,点右下角离开)
 		desc: [1280, 720,
 			[
 				[left, 21, 41, 0xf4f5f9],
@@ -635,7 +530,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1155, 635, 1211, 687, 1000], // 右下角"离开"
 		]
-	}, { // 41 混沌之屿_宝箱页(幸运宝匣)：点右下角离开(不要点宝箱)
+	}, { // 33 混沌之屿_宝箱页(幸运宝匣)：点右下角离开(不要点宝箱)
 		// 用户重新取色9点(原始PNG偏差全0)：前6点=右下角"离开"按钮,后3点=场景/左上标题(区分绽放内部页)。
 		// 旧8点中[right,744,364]偏差83/[right,718,371]偏差49已失效→宝箱页识别不到→掉到绽放分支点p±40误点宝箱。
 		// 交叉验证:本图9/9;另一宝箱页8/9;绽放内部页6/9(右下离开按钮同款,但场景3点不同)→均不误判(需全中)。
@@ -656,7 +551,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1155, 635, 1211, 687, 1000], // 右下角"离开"
 		]
-	}, { // 42 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：点弹窗外空白处关闭
+	}, { // 34 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：点弹窗外空白处关闭
 		// 用户取9点原始PNG偏差全0,跨34图唯一(仅本弹窗9/9)。模态框会遮挡其它页面,处理分支放operatorFunc最前。
 		desc: [
 			1280, 720,
@@ -675,7 +570,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 447, 535, 830, 665, 1000], // 点弹窗外下方空白处关闭(不点"暂时离开/放弃试炼")
 		]
-	}, { // 43 四选一buff页_刷新按钮_亮(可点击)：10点原始PNG偏差全0,亮图10/10/暗图0/10
+	}, { // 35 四选一buff页_刷新按钮_亮(可点击)：10点原始PNG偏差全0,亮图10/10/暗图0/10
 		desc: [
 			1280, 720,
 			[
@@ -694,23 +589,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[right, 1280, 720, 1174, 616, 1231, 673, 500], // 右下角圆形刷新图标
 		]
-	}, { // 44 四选一buff页_刷新按钮_暗(不可点击,剩0次)：10点原始PNG偏差全0,暗图10/10/亮图0/10
-		desc: [
-			1280, 720,
-			[
-				[right, 1204, 657, 0xf6f6f6],
-				[right, 1199, 649, 0xf2f2f2],
-				[right, 1202, 634, 0xe3e3e3],
-				[right, 1216, 634, 0xe2e2e2],
-				[right, 1224, 643, 0xeeeeee],
-				[right, 1221, 659, 0xf7f7f7],
-				[right, 1184, 651, 0x424242],
-				[right, 1240, 646, 0x414241],
-				[right, 1158, 695, 0xbebebe],
-				[right, 1204, 623, 0xa5a5a5],
-			]
-		],
-	}, { // 45 四选一buff页_"万相铃不足"提示(没钱时刷新按钮仍亮但点了不刷新,会死循环刷新)
+	}, { // 36 四选一buff页_"万相铃不足"提示(没钱时刷新按钮仍亮但点了不刷新,会死循环刷新)
 		// 18点取自 MuMu-20261123-165534-923.png 提示文字,原始PNG偏差全0,跨39图唯一(本图18/18,其余最高1/18)。
 		// 识别到就不再点刷新,直接选第4个舞技强化。
 		desc: [
@@ -736,7 +615,7 @@ export class Func314 implements IFuncOrigin {
 				[right, 702, 249, 0xffffff],
 			]
 		],
-	}, { // 46 六道之门·孔雀国世界横幅(识别到直接点横幅进入该世界/副本)
+	}, { // 37 六道之门·孔雀国世界横幅(识别到直接点横幅进入该世界/副本)
 		// 5点取自 MuMu-20261124-121006-207.png(孔雀国界面), 原始PNG偏差全0;
 		// 跨43张1280x720截图唯一: 本图5/5, 其余最高2/5(容差±8)。
 		// 原 [30]"进入月之海"那5点在孔雀国背景上不命中(背景不同), 故单独新增一条, 两个世界都能进。
@@ -773,9 +652,9 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_意外确认弹窗_关闭',
-			operator: [{ desc: thisOperator[42].desc }] // 只取desc识别：传完整operator会被oper()自动点击，再手动点就成了双击
+			operator: [{ desc: thisOperator[34].desc }] // 只取desc识别：传完整operator会被oper()自动点击，再手动点就成了双击
 		})) {
-			thisScript.regionClick([thisOperator[42].oper[0]]);
+			thisScript.regionClick([thisOperator[34].oper[0]]);
 			log('意外弹窗：点弹窗外空白处关闭');
 			return true;
 		}
@@ -787,10 +666,10 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_混沌之屿_宝箱页_离开',
 			// 只取desc：传完整operator会被oper()自动点击一次，再regionClick就成了双击，
 			// 第二击落到已切回地图的同一位置=误点"唤息"(用户实机反馈)。
-			operator: [{ desc: thisOperator[41].desc }]
+			operator: [{ desc: thisOperator[33].desc }]
 		})) {
 			if (leaveCooling) return true; // 刚点过离开，画面切换中，别再点右下角(否则误点唤息)
-			thisScript.regionClick([thisOperator[41].oper[0]]);
+			thisScript.regionClick([thisOperator[33].oper[0]]);
 			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			log('混沌之屿宝箱页：点右下角离开');
 			sleep(1200); // 等画面切回地图，避免下一帧还在过渡又点一次
@@ -804,10 +683,10 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_绽放之屿_离开',
 			// 只取desc：传完整operator会被oper()自动点击一次，再regionClick就成了双击，
 			// 第二击落到已切回地图的同一位置=误点"唤息"。
-			operator: [{ desc: thisOperator[40].desc }]
+			operator: [{ desc: thisOperator[32].desc }]
 		})) {
 			if (leaveCooling) return true; // 刚点过离开，画面切换中，别再点右下角(否则回到地图会误点唤息)
-			thisScript.regionClick([thisOperator[40].oper[0]]);
+			thisScript.regionClick([thisOperator[32].oper[0]]);
 			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			log('绽放之屿内部页：点右下角离开');
 			sleep(1200); // 等画面切回地图，避免下一帧还在过渡又点一次
@@ -829,7 +708,7 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_选事件',
-			operator: [{ desc: thisOperator[0].desc }, { desc: thisOperator[2].desc }]
+			operator: [{ desc: thisOperator[0].desc }, { desc: thisOperator[1].desc }]
 		}, 200)) {
 			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 神秘>混沌>鏖战>宁息/商店）
 			// 宁息之屿就是商店(点进去后"商店_直接离开"分支会立刻退出)，所以它排在最后=优先级最低。
@@ -853,7 +732,7 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_事件购买buff',
-			operator: [{ desc: thisOperator[4].desc }]
+			operator: [{ desc: thisOperator[3].desc }]
 		})) {
 			// 四选一 buff 页：前3张随机 buff，第4张固定舞技强化。
 			// 本页点"选择"必定获得该 buff(与商店不同，没有二次确认/扣费失败的可能)，
@@ -872,7 +751,7 @@ export class Func314 implements IFuncOrigin {
 			// ① 本局已经获得过轰雷：不识别、不刷新，直接选第4个
 			if (thisScript.global.d6HongLeiGot) {
 				thisScript.global.d6BuffRefreshCnt = 0;
-				thisScript.regionClick([thisOperator[4].oper[0]]);
+				thisScript.regionClick([thisOperator[3].oper[0]]);
 				log('四选一buff：本局已获得轰雷，直接选第4个舞技强化');
 				return true;
 			}
@@ -897,10 +776,10 @@ export class Func314 implements IFuncOrigin {
 			if (thisScript.oper({
 				id: 314,
 				name: '六道觉_四选一_万相铃不足',
-				operator: [{ desc: thisOperator[45].desc }]
+				operator: [{ desc: thisOperator[36].desc }]
 			})) {
 				thisScript.global.d6BuffRefreshCnt = 0;
-				thisScript.regionClick([thisOperator[4].oper[0]]);
+				thisScript.regionClick([thisOperator[3].oper[0]]);
 				log('四选一buff：万相铃不足(刷新无效)，直接选第4个舞技强化');
 				return true;
 			}
@@ -909,7 +788,7 @@ export class Func314 implements IFuncOrigin {
 			//    说明刷新没生效(异常/提示未识别)，不再刷，直接选第4个，杜绝死循环。
 			if (thisScript.global.d6BuffRefreshCnt >= 3) {
 				thisScript.global.d6BuffRefreshCnt = 0;
-				thisScript.regionClick([thisOperator[4].oper[0]]);
+				thisScript.regionClick([thisOperator[3].oper[0]]);
 				log('四选一buff：本页刷新3次仍未生效，停止刷新，选第4个舞技强化');
 				return true;
 			}
@@ -918,10 +797,10 @@ export class Func314 implements IFuncOrigin {
 			const refreshBright = thisScript.oper({
 				id: 314,
 				name: '六道觉_四选一_刷新亮',
-				operator: [{ desc: thisOperator[43].desc }]
+				operator: [{ desc: thisOperator[35].desc }]
 			});
 			if (refreshBright) {
-				thisScript.regionClick([thisOperator[43].oper[0]]);
+				thisScript.regionClick([thisOperator[35].oper[0]]);
 				thisScript.global.d6BuffRefreshCnt++; // 本页刷新计数+1(上限兜底用)
 				log('四选一buff：无轰雷，点刷新继续找(本页第' + thisScript.global.d6BuffRefreshCnt + '次)');
 				sleep(800); // 等刷新动画完成
@@ -930,7 +809,7 @@ export class Func314 implements IFuncOrigin {
 
 			// ⑥ 刷新"暗"或不可点(剩0次)且无轰雷→固定选第4个舞技强化兜底
 			thisScript.global.d6BuffRefreshCnt = 0;
-			thisScript.regionClick([thisOperator[4].oper[0]]);
+			thisScript.regionClick([thisOperator[3].oper[0]]);
 			log('四选一buff：刷新不可用且无轰雷，选第4个舞技强化');
 			return true;
 		}
@@ -939,10 +818,10 @@ export class Func314 implements IFuncOrigin {
 			id: 314,
 			name: '六道觉_强化选择_三卡页',
 			// 只取desc：传完整operator会被oper()自动点一次，这里再regionClick会双击到新页面同位置。
-			operator: [{ desc: thisOperator[37].desc }]
+			operator: [{ desc: thisOperator[30].desc }]
 		})) {
 			// 强化三选一页：固定选第1个(力量强化)
-			thisScript.regionClick([thisOperator[37].oper[0]]);
+			thisScript.regionClick([thisOperator[30].oper[0]]);
 			log('强化三选一：固定选第1个(力量强化)');
 			return true;
 		}
@@ -950,10 +829,10 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_强化选择_两卡页',
-			operator: [{ desc: thisOperator[38].desc }]
+			operator: [{ desc: thisOperator[31].desc }]
 		})) {
 			// 强化二选一页(力量满10级消失)：固定选第1个(技巧强化)
-			thisScript.regionClick([thisOperator[38].oper[0]]);
+			thisScript.regionClick([thisOperator[31].oper[0]]);
 			log('强化二选一：固定选第1个(技巧强化)');
 			return true;
 		}
@@ -963,10 +842,10 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_商店_直接离开',
-			operator: [{ desc: thisOperator[7].desc }]
+			operator: [{ desc: thisOperator[6].desc }]
 		})) {
 			if (leaveCooling) return true; // 刚点过右下角离开/退出，画面切换中，别重复点(否则回到地图会误点唤息)
-			thisScript.regionClick([thisOperator[7].oper[1]]); // 退出商店
+			thisScript.regionClick([thisOperator[6].oper[1]]); // 退出商店
 			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			log('商店：直接点退出离开');
 			sleep(1200);
@@ -978,14 +857,14 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_神秘之屿_退出',
 			// 只取desc(不传oper)：传完整operator会被oper()自动点一次，这里再regionClick就变双击。
 			operator: [
-				{ desc: thisOperator[15].desc }
+				{ desc: thisOperator[14].desc }
 			]
 		})) {
 			// 神秘之屿(背包仿造页)：不做仿造，直接点左上角返回退出。
 			// 与右下角"离开"共用2秒冷却：点下去后画面要切换，指纹在过渡帧仍可能命中，
 			// 再点一次会落到地图页左上角的其他按钮上，故冷却期内直接跳过。
 			if (leaveCooling) return true;
-			thisScript.regionClick([thisOperator[15].oper[0]]);
+			thisScript.regionClick([thisOperator[14].oper[0]]);
 			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			log('神秘之屿：点左上角返回退出');
 			sleep(1200); // 等画面切回地图
@@ -997,12 +876,12 @@ export class Func314 implements IFuncOrigin {
 			if (thisScript.oper({
 				id: 314,
 				name: '六道觉_开始战斗检测',
-				operator: [{ desc: thisOperator[9].desc }]
+				operator: [{ desc: thisOperator[8].desc }]
 			})) {
 				if (thisScript.oper({
 					id: 314,
 					name: '六道觉_双倍次数检测',
-					operator: [thisOperator[33]]
+					operator: [thisOperator[27]]
 				})) {
 					thisScript.myToast('双倍次数已用完，停止运行');
 					console.log('双倍次数已用完，停止运行');
@@ -1012,23 +891,10 @@ export class Func314 implements IFuncOrigin {
 			}
 		}
 
-		// 新增：柔风满层检测，便于接手打到一半的局
-		if (thisScript.global.d6RouFeng < 5) {
-			if (thisScript.oper({
-				id: 314,
-				name: '六道觉_柔风满层检测',
-				operator: [{ desc: thisOperator[34].desc }]
-			})) {
-				thisScript.global.d6RouFeng = 5;
-				thisScript.myToast('柔风已满，进入速通模式');
-				console.log('检测到柔风满层，进入速通模式');
-			}
-		}
-
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_精进舞技_祈愿之舞',
-			operator: [thisOperator[35]]
+			operator: [thisOperator[28]]
 		})) {
 			return true;
 		}
@@ -1037,7 +903,7 @@ export class Func314 implements IFuncOrigin {
 		if (!thisScript.global.d6FirstBuffDone && thisScript.oper({
 			id: 314,
 			name: '六道觉_首次buff_选第一个',
-			operator: [thisOperator[36]]
+			operator: [thisOperator[29]]
 		})) {
 			thisScript.global.d6FirstBuffDone = true;
 			console.log('首次buff已选（极道轰炸），本局不再重复');
@@ -1051,12 +917,12 @@ export class Func314 implements IFuncOrigin {
 			id: 314,
 			name: '六道觉_执行个别事件',
 			operator: [
-				thisOperator[3], thisOperator[5], thisOperator[6], thisOperator[8],
-				thisOperator[9], thisOperator[10], thisOperator[12], thisOperator[13],
-				thisOperator[14], thisOperator[19], thisOperator[20], thisOperator[21],
-				thisOperator[22], thisOperator[26], thisOperator[27], thisOperator[28],
-				thisOperator[29], thisOperator[30], thisOperator[31], thisOperator[32],
-				thisOperator[46], // 六道之门·孔雀国横幅
+				thisOperator[2], thisOperator[4], thisOperator[5], thisOperator[7],
+				thisOperator[8], thisOperator[9], thisOperator[11], thisOperator[12],
+				thisOperator[13], thisOperator[16], thisOperator[17], thisOperator[18],
+				thisOperator[19], thisOperator[20], thisOperator[21], thisOperator[22],
+				thisOperator[23], thisOperator[24], thisOperator[25], thisOperator[26],
+				thisOperator[37], // 六道之门·孔雀国横幅
 			]
 		})) {
 			return true;
@@ -1065,11 +931,10 @@ export class Func314 implements IFuncOrigin {
 			id: 314,
 			name: '六道觉_开始_重置参数',
 			operator: [
-				thisOperator[11]
+				thisOperator[10]
 			]
 		})) {
 			thisScript.global.d6Loop = 0;
-			thisScript.global.d6RouFeng = 1;
 			thisScript.global.d6FirstBuffDone = false;
 			thisScript.global.d6HongLeiGot = false; // 新一局：重新允许寻找轰雷
 			thisScript.global.d6BuffRefreshCnt = 0;
@@ -1088,7 +953,7 @@ export class Func314 implements IFuncOrigin {
 		if (thisScript.oper({
 			id: 314,
 			name: '六道觉_结束',
-			operator: [thisOperator[16]]
+			operator: [thisOperator[15]]
 		})) {
 			const thisconf = thisScript.scheme.config['314'];
 			thisconf.overTimes = Math.floor(Number(thisconf.overTimes) || 0);
@@ -1097,8 +962,7 @@ export class Func314 implements IFuncOrigin {
 			const cost = ((now - thisScript.global.d6dBegin) / 1000 / 60).toFixed(2); // 分
 			const costAvg = Math.floor((now - thisScript.global.d6dBegin) / 1000 / (thisScript.global.times || 0)) // 秒
 			// 中途进入的不计次
-			const bufLog = `本局柔风buff：${thisScript.global.d6RouFeng}`;
-			let toLog = `${bufLog}。通关次数: ${thisScript.global.times || 0}次, 本次通关时间: ${currentCost}秒, 平均通关时间: ${costAvg}秒, 总通关时间: ${cost}分`;
+			let toLog = `通关次数: ${thisScript.global.times || 0}次, 本次通关时间: ${currentCost}秒, 平均通关时间: ${costAvg}秒, 总通关时间: ${cost}分`;
 			if (thisconf.overTimes && thisScript.global.times >= thisconf.overTimes) {
 				toLog = `[${thisScript.schemeHistory.map(item => item.schemeName).join('、')}]已够次数，请查看。` + toLog;
 			}
