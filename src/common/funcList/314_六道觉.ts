@@ -323,17 +323,19 @@ export class Func314 implements IFuncOrigin {
 			[center, 1280, 720, 1130, 19, 1232, 43, 500],
 		]
 	}, { // 18 使用极的双倍
+		// 2026-11-24 重取8点(截图 MuMu-20261124-130236-931)：偏差全0，跨45张截图仅2张同款弹窗命中。
+		// 前5点=弹窗特征(op19共用)，后3点(左侧大字区域)=用来判断"使用"。
 		desc: [
 			1280, 720,
 			[
-				[center, 516, 443, 0xdf6851],
-				[center, 686, 446, 0xf3b25e],
-				[center, 667, 367, 0xf7e51d],
-				[center, 879, 288, 0x282d38],
-				[center, 434, 306, 0x272b33],
-				[center, 152, 169, 0x594a25],
-				[center, 120, 237, 0x575235],
-				[center, 256, 223, 0x31211a],
+				[center, 489, 446, 0xdf6851],
+				[right, 682, 447, 0xf3b25e],
+				[right, 662, 376, 0xf7e628],
+				[center, 420, 298, 0x18253d],
+				[right, 844, 299, 0x3f5e85],
+				[left, 250, 230, 0x575435],
+				[left, 146, 126, 0x5d4f2e],
+				[left, 131, 239, 0x565233],
 			]
 		],
 		oper: [
@@ -343,11 +345,11 @@ export class Func314 implements IFuncOrigin {
 		desc: [
 			1280, 720,
 			[
-				[center, 516, 443, 0xdf6851],
-				[center, 686, 446, 0xf3b25e],
-				[center, 667, 367, 0xf7e51d],
-				[center, 879, 288, 0x282d38],
-				[center, 434, 306, 0x272b33],
+				[center, 489, 446, 0xdf6851],
+				[right, 682, 447, 0xf3b25e],
+				[right, 662, 376, 0xf7e628],
+				[center, 420, 298, 0x18253d],
+				[right, 844, 299, 0x3f5e85],
 			]
 		],
 		oper: [
