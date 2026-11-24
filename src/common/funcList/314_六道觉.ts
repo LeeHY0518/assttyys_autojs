@@ -736,6 +736,24 @@ export class Func314 implements IFuncOrigin {
 				[right, 702, 249, 0xffffff],
 			]
 		],
+	}, { // 46 六道之门·孔雀国世界横幅(识别到直接点横幅进入该世界/副本)
+		// 5点取自 MuMu-20261124-121006-207.png(孔雀国界面), 原始PNG偏差全0;
+		// 跨43张1280x720截图唯一: 本图5/5, 其余最高2/5(容差±8)。
+		// 原 [30]"进入月之海"那5点在孔雀国背景上不命中(背景不同), 故单独新增一条, 两个世界都能进。
+		// 点击框即"孔雀国"竖排文字区域(342,155)-(383,281)。
+		desc: [
+			1280, 720,
+			[
+				[left, 22, 42, 0xf0f2f7],
+				[center, 388, 609, 0x586473],
+				[right, 1140, 106, 0x121f27],
+				[right, 1151, 147, 0x121f27],
+				[right, 986, 653, 0x38465c],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 342, 155, 383, 281, 1000], // 孔雀国竖排横幅
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -1038,6 +1056,7 @@ export class Func314 implements IFuncOrigin {
 				thisOperator[14], thisOperator[19], thisOperator[20], thisOperator[21],
 				thisOperator[22], thisOperator[26], thisOperator[27], thisOperator[28],
 				thisOperator[29], thisOperator[30], thisOperator[31], thisOperator[32],
+				thisOperator[46], // 六道之门·孔雀国横幅
 			]
 		})) {
 			return true;
