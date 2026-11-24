@@ -395,7 +395,7 @@ export class Script {
 						});
 						toDraw[0].color = 'orange';
 						toDraw[0].region = [point.x - 5, point.y - 5, point.x + 5, point.y + 5];
-						drawFloaty.draw(toDraw, 200);
+						drawFloaty.draw(toDraw, 3000);
 					}
 					return point;
 				}
@@ -421,7 +421,7 @@ export class Script {
 							});
 							toDraw[0].color = 'orange';
 							toDraw[0].region = [point.x - 5, point.y - 5, point.x + 5, point.y + 5];
-							drawFloaty.draw(toDraw, 200);
+							drawFloaty.draw(toDraw, 3000);
 						}
 						return point;
 					}
@@ -458,7 +458,7 @@ export class Script {
 					});
 					toDraw[0].color = 'orange';
 					toDraw[0].region = [point.x - 5, point.y - 5, point.x + 5, point.y + 5];
-					drawFloaty.draw(toDraw, 400);
+					drawFloaty.draw(toDraw, 3000);
 				}
 			}
 			if (pointAll.size() > 0) {
@@ -816,7 +816,7 @@ export class Script {
 							}
 						})];
 
-						drawFloaty.draw(toDraw, 200);
+						drawFloaty.draw(toDraw, 3000);
 					}
 					retest = retest || item.retest || undefined;
 					if (retest && retest !== -1) {

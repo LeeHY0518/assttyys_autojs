@@ -121,7 +121,7 @@ export class helperBridge implements IhelperBridge {
 						color: 'red',
 						region: [x - 5, y - 5, x + 5, y + 5]
 					}];
-					drawFloaty.draw(toDraw, 300);
+					drawFloaty.draw(toDraw, 3000);
 					// sleep(500);
 				}
 				self.automator.press(x, y, pressTimeout);
@@ -228,7 +228,7 @@ export class helperBridge implements IhelperBridge {
 				color: 'orange',
 				region: [item[0], item[1], item[2], item[3]]
 			}))];
-			drawFloaty.draw(toDraw, Math.max(duration - 20, 300));
+			drawFloaty.draw(toDraw, Math.max(duration - 20, 3000));
 			sleep(200);
 		}
 		this.automator.gesture(duration, ...points);

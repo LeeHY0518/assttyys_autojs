@@ -914,6 +914,18 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
+		// 双倍结算弹窗：优先级最高，单独提前处理。
+		// 它的识别点落在右下角统计文字区(深灰小字)，与 op8"开始_开启"的深灰点位高度重合；
+		// 实测在弹窗页 op8 先命中并点了右下角(绿点+橙框正是 op8 的点位与点击框)，
+		// 导致排在它后面的 op18/op19 永远没机会。故单独提前，且不受离开冷却影响。
+		if (thisScript.oper({
+			id: 314,
+			name: '六道觉_双倍结算弹窗',
+			operator: [thisOperator[18], thisOperator[19]]
+		})) {
+			return true;
+		}
+
 		// 离开页面后的冷却期内不做这类"个别事件"点击：这个分支命中会自动点击(挑战/开始等)，
 		// 而地图右下角"唤息"与挑战/开始是同一位置的同款圆形按钮，画面刚切回地图时若误判，
 		// 点了就会误触"唤息"。
@@ -923,8 +935,8 @@ export class Func314 implements IFuncOrigin {
 			operator: [
 				thisOperator[2], thisOperator[4], thisOperator[5], thisOperator[7],
 				thisOperator[8], thisOperator[9], thisOperator[11], thisOperator[12],
-				thisOperator[13], thisOperator[16], thisOperator[17], thisOperator[18],
-				thisOperator[19], thisOperator[20], thisOperator[21], thisOperator[22],
+				thisOperator[13], thisOperator[16], thisOperator[17],
+				thisOperator[20], thisOperator[21], thisOperator[22],
 				thisOperator[23], thisOperator[24], thisOperator[25], thisOperator[26],
 				thisOperator[37], // 六道之门·孔雀国横幅
 			]
