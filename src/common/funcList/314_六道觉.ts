@@ -112,26 +112,22 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1160, 609, 1227, 659, 500],
 		]
-	}, { // 5 混沌之屿_地图页(带幸运宝匣)：点右下角离开(不要点宝箱)
-		// 2026-11-25 重取8点：前5点=左上"混沌之屿"标题笔画,中2点=场景蓝,末1点=右下"离开"按钮米色(区分精英怪页)。
-		// 原始PNG偏差全0；跨48张截图命中>=6仅4张,其中3张8/8都是本页(混沌之屿地图页)。
-		// 旧7点(混沌_怪物)点太松,在本页命中后点击框[680,292,801,379]框在宝箱上→误点宝箱。
-		// 现改点右下"离开"回地图；branch走"混沌之屿_离开"专门分支(带冷却,防误点唤息)。
+	}, { // 5 混沌_怪物（精英怪页）
 		desc: [
 			1280, 720,
 			[
-				[left, 21, 42, 0xf1f3f8],
-				[left, 121, 43, 0xf8f3e0],
-				[left, 128, 52, 0xf8f3e0],
-				[left, 148, 28, 0xf8f3e0],
-				[left, 145, 44, 0xf8f3e0],
-				[left, 207, 572, 0x507597],
-				[left, 295, 639, 0x4c7693],
-				[right, 1200, 658, 0xe9d5b3],
+				[left, 105, 28, 0xf1ecda],
+				[left, 120, 43, 0xf8f3e0],
+				[left, 148, 29, 0xf8f3e0],
+				[left, 153, 41, 0xf8f3e0],
+				[left, 154, 52, 0xf8f3e0],
+				[left, 146, 579, 0x48768f],
+				[left, 209, 628, 0x4d7497],
 			]
 		],
 		oper: [
-			[center, 1280, 720, 1155, 635, 1211, 687, 1000], // 右下角"离开"
+			[center, 1280, 720, 680, 292, 801, 379, 0],
+			// [center, 1280, 720, 1120, 597, 1231, 682, 500], // 挑战
 		]
 	}, { // 6 商店(宁息之屿)：右侧商店tab亮笔画+底部备战,两图100%一致/地图页0命中
 		desc: [
@@ -673,22 +669,19 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		// 混沌之屿相关页统一在此处理，直接点右下角"离开"回地图：
-		//  - op33 宝箱详情页(幸运宝匣)
-		//  - op5  地图页带幸运宝匣(2026-11-25重取8点)：此页左上"混沌之屿"标题与式神页相似，
-		//          旧逻辑(op5在catch-all里传完整operator)命中后点的是 oper[0] 宝箱框
-		//          [680,292,801,379]→误点宝箱；现改为点右下离开。
+		// 混沌之屿宝箱页(幸运宝匣)：必须放在最前面。此页左上标题与式神页相似,
+		// 容易被当成式神页误点宝箱；识别到直接点右下角"离开"回地图。
 		if (thisScript.oper({
 			id: 314,
-			name: '六道觉_混沌之屿_离开',
+			name: '六道觉_混沌之屿_宝箱页_离开',
 			// 只取desc：传完整operator会被oper()自动点击一次，再regionClick就成了双击，
 			// 第二击落到已切回地图的同一位置=误点"唤息"(用户实机反馈)。
-			operator: [{ desc: thisOperator[33].desc }, { desc: thisOperator[5].desc }]
+			operator: [{ desc: thisOperator[33].desc }]
 		})) {
 			if (leaveCooling) return true; // 刚点过离开，画面切换中，别再点右下角(否则误点唤息)
 			thisScript.regionClick([thisOperator[33].oper[0]]);
 			thisScript.global.d6LeaveClickAt = new Date().getTime();
-			log('混沌之屿：点右下角离开');
+			log('混沌之屿宝箱页：点右下角离开');
 			sleep(1200); // 等画面切回地图，避免下一帧还在过渡又点一次
 			return true;
 		}
@@ -948,10 +941,8 @@ export class Func314 implements IFuncOrigin {
 		if (!leaveCooling && thisScript.oper({
 			id: 314,
 			name: '六道觉_执行个别事件',
-			// op5(混沌之屿地图页)已改走专门的"混沌之屿_离开"分支点右下离开,
-			// 不再放这里自动点击(否则点它的oper[0]宝箱框=误点宝箱)。
 			operator: [
-				thisOperator[2], thisOperator[4], thisOperator[7],
+				thisOperator[2], thisOperator[4], thisOperator[5], thisOperator[7],
 				thisOperator[8], thisOperator[9], thisOperator[11], thisOperator[12],
 				thisOperator[13], thisOperator[16], thisOperator[17],
 				thisOperator[20], thisOperator[21], thisOperator[22],
