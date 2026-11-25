@@ -22,6 +22,12 @@ export class Func314 implements IFuncOrigin {
 			type: 'switch',
 			default: true,
 		}, {
+			name: 'hongLeiLimit',
+			desc: '本局最多获得几个六道·轰雷(1-5)',
+			type: 'list',
+			data: ['1', '2', '3', '4', '5'],
+			default: '2',
+		}, {
 			name: 'overTimes',
 			desc: '挂机局数，完成后自动切换方案，0表示一直刷',
 			type: 'integer',
@@ -646,9 +652,9 @@ export class Func314 implements IFuncOrigin {
 		// 因此点过一次后在冷却期内不再点，冷却期内命中也直接跳过。
 		const leaveCooling = new Date().getTime() - (thisScript.global.d6LeaveClickAt || 0) < 2000;
 
-		// 轰雷"选择"点击冷却(2秒)：点了轰雷卡的"选择"后置 d6HongLeiGot=true，
+		// 轰雷"选择"点击冷却(2秒)：点了轰雷卡的"选择"后 d6HongLeiCnt+1，
 		// 但画面切换有几帧延迟，若下一帧仍识别到四选一页(有时会连续出现两个buff页)，
-		// 会立刻走"已获得→点第4个"，在过渡帧上误点。冷却期内四选一页不做任何操作。
+		// 会立刻走后续判断，在过渡帧上误点。冷却期内四选一页不做任何操作。
 		const buffCooling = new Date().getTime() - (thisScript.global.d6BuffClickAt || 0) < 2000;
 
 		// 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：
@@ -740,9 +746,9 @@ export class Func314 implements IFuncOrigin {
 		})) {
 			// 四选一 buff 页：前3张随机 buff，第4张固定舞技强化。
 			// 本页点"选择"必定获得该 buff(与商店不同，没有二次确认/扣费失败的可能)，
-			// 所以只要识别到轰雷并点了它下方"选择"，就是真拿到了，直接置 d6HongLeiGot。
-			// 本局流程：① 已获得轰雷 → 不再找、不刷新，直接选第4个舞技强化；
-			//           ② 还没获得 → 前3格找轰雷，找到点它正下方"选择"，即视为获得；
+			// 所以只要识别到轰雷并点了它下方"选择"，就是真拿到了，d6HongLeiCnt+1。
+			// 本局流程：① 已拿够配置的个数(默认2，前端1-5可调) → 不再找、不刷新，直接选第4个舞技强化；
+			//           ② 没拿够 → 前3格找轰雷，找到点它正下方"选择"，计数+1；
 			//           ③ 出现"万相铃不足"(没钱) → 刷新无效，不再刷新，直接选第4个；
 			//           ④ 本页已刷3次还亮着(刷新没生效) → 停止刷新，直接选第4个(防死循环)；
 			//           ⑤ 没轰雷且刷新"亮" → 点刷新继续找；
@@ -752,11 +758,14 @@ export class Func314 implements IFuncOrigin {
 			// 过渡期间不做任何点击，否则会在淡出帧上误点第4个。
 			if (buffCooling) return true;
 
-			// ① 本局已经获得过轰雷：不识别、不刷新，直接选第4个
-			if (thisScript.global.d6HongLeiGot) {
+			// ① 本局已拿够配置的个数：不识别、不刷新，直接选第4个
+			// 上限来自前端配置 hongLeiLimit(1-5，默认2)，容错：读不到/非法值一律按2处理并夹在1-5内。
+			const rawLimit = Number((thisScript.scheme.config['314'] || {}).hongLeiLimit);
+			const hongLeiLimit = Math.min(5, Math.max(1, isNaN(rawLimit) || rawLimit <= 0 ? 2 : Math.floor(rawLimit)));
+			if (thisScript.global.d6HongLeiCnt >= hongLeiLimit) {
 				thisScript.global.d6BuffRefreshCnt = 0;
 				thisScript.regionClick([thisOperator[3].oper[0]]);
-				log('四选一buff：本局已获得轰雷，直接选第4个舞技强化');
+				log('四选一buff：本局已获得轰雷 ' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + ' 个(已达上限)，直接选第4个舞技强化');
 				return true;
 			}
 
@@ -767,10 +776,10 @@ export class Func314 implements IFuncOrigin {
 				// 实测三个"选择"按钮中心(219/492/765, y572)正好对齐各自图标中心，故以图标中心±38点击。
 				const cardCx = hongLei.x - 7;
 				thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
-				thisScript.global.d6HongLeiGot = true; // 本页点了就必得，无需二次确认
+				thisScript.global.d6HongLeiCnt++; // 本页点了就必得，计数+1
 				thisScript.global.d6BuffClickAt = new Date().getTime(); // 2秒冷却，等画面切走
 				thisScript.global.d6BuffRefreshCnt = 0;
-				log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + '→按钮中心x' + cardCx + ')，已获得轰雷，本局后续直接选第4个');
+				log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + '→按钮中心x' + cardCx + ')，已获得第' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '个轰雷');
 				sleep(1200); // 等选择动画/页面跳转
 				return true;
 			}
@@ -952,7 +961,7 @@ export class Func314 implements IFuncOrigin {
 		})) {
 			thisScript.global.d6Loop = 0;
 			thisScript.global.d6FirstBuffDone = false;
-			thisScript.global.d6HongLeiGot = false; // 新一局：重新允许寻找轰雷
+			thisScript.global.d6HongLeiCnt = 0; // 新一局：轰雷获得数清零，重新按上限寻找
 			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.global.d6BuffClickAt = 0;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
