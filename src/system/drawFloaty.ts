@@ -4,6 +4,19 @@
  * 3. 绘制多点找色命中区域(script.js)
  * 2. 绘制点击区域与实际点击点(helperBridge.js)
  */
+// ==================== 调试绘制自定义配置（改这里即可，改完重新打包） ====================
+// ① drawTime：框框在屏幕上停留的毫秒数，手动填数字（如 500 / 1000 / 2000 / 3000）
+// ② showBox：是否显示框框。true=显示；false=不显示（脚本照常点击，不受③影响）
+// ③ clickWhenDrawing：显示框时脚本是否执行点击。
+//      true  = 显示框 + 脚本正常点击（边看边跑）
+//      false = 显示框 + 脚本不点击（只显示模式，界面停住方便校准取点）
+export const debugDrawConfig = {
+	drawTime: 1000,
+	showBox: true,
+	clickWhenDrawing: false
+};
+// ======================================================================================
+
 const drawFloaty = {
 	// 悬浮实例
 	instacne: null,
@@ -132,6 +145,7 @@ const drawFloaty = {
 	 * @param {*} time
 	 */
 	draw: function (arr, time) {
+		if (!debugDrawConfig.showBox) return;
 		arr.forEach(i => {
 			i.region[1] = i.region[1] - this.option.statusBarHeight;
 			i.region[3] = i.region[3] - this.option.statusBarHeight;

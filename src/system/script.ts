@@ -12,7 +12,7 @@ import { yunxiOcr } from '@/system/Ocr/YunxiOcr';
 import { setCurrentScheme } from '@/common/tool';
 import { getWidthPixels, getHeightPixels } from '@auto.pro/core';
 import schemeDialog from './schemeDialog';
-import drawFloaty from '@/system/drawFloaty';
+import drawFloaty, { debugDrawConfig } from '@/system/drawFloaty';
 import { myToast, doPush, questionSearch, search, formatTime, formatRunTime } from '@/common/toolAuto';
 import { IFunc, IFuncOrigin } from '@/interface/IFunc';
 import { IScheme } from '@/interface/IScheme';
@@ -395,7 +395,7 @@ export class Script {
 						});
 						toDraw[0].color = 'orange';
 						toDraw[0].region = [point.x - 5, point.y - 5, point.x + 5, point.y + 5];
-						drawFloaty.draw(toDraw, 1000);
+						drawFloaty.draw(toDraw, debugDrawConfig.drawTime);
 					}
 					return point;
 				}
@@ -421,7 +421,7 @@ export class Script {
 							});
 							toDraw[0].color = 'orange';
 							toDraw[0].region = [point.x - 5, point.y - 5, point.x + 5, point.y + 5];
-							drawFloaty.draw(toDraw, 1000);
+							drawFloaty.draw(toDraw, debugDrawConfig.drawTime);
 						}
 						return point;
 					}
@@ -458,7 +458,7 @@ export class Script {
 					});
 					toDraw[0].color = 'orange';
 					toDraw[0].region = [point.x - 5, point.y - 5, point.x + 5, point.y + 5];
-					drawFloaty.draw(toDraw, 1000);
+					drawFloaty.draw(toDraw, debugDrawConfig.drawTime);
 				}
 			}
 			if (pointAll.size() > 0) {
@@ -816,7 +816,7 @@ export class Script {
 							}
 						})];
 
-						drawFloaty.draw(toDraw, 1000);
+						drawFloaty.draw(toDraw, debugDrawConfig.drawTime);
 					}
 					retest = retest || item.retest || undefined;
 					if (retest && retest !== -1) {

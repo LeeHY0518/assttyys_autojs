@@ -86,7 +86,7 @@ async function api(url, options = {}, retries = 8) {
 
   // 日志文件只留在本地，不参与推送对比
   const SKIP = new Set(['push_log.txt', '推送记录.txt']);
-  const allLocal = [...new Set([...tracked, ...untracked])].filter(p => !SKIP.has(path.basename(p)));
+  const allLocal = [...new Set([...tracked, ...untracked])].filter(p => !SKIP.has(path.basename(p)) && fs.existsSync(path.join(REPO_DIR, p)));
   console.log(`本地文件: ${allLocal.length}（跟踪 ${tracked.length}，新文件 ${untracked.length}）`);
 
   // 远程 master 树

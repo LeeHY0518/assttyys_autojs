@@ -1,5 +1,5 @@
 import { getWidthPixels, getHeightPixels } from '@auto.pro/core';
-import drawFloaty from '@/system/drawFloaty';
+import drawFloaty, { debugDrawConfig } from '@/system/drawFloaty';
 import { getNormalRandom, getRegionBiasRnd2, hash, strHashToNum } from '@/common/toolAuto';
 import { IMyAutomator } from '@/system/MyAutomator';
 
@@ -121,7 +121,7 @@ export class helperBridge implements IhelperBridge {
 						color: 'red',
 						region: [x - 5, y - 5, x + 5, y + 5]
 					}];
-					drawFloaty.draw(toDraw, 1000);
+					drawFloaty.draw(toDraw, debugDrawConfig.drawTime);
 					// sleep(500);
 				}
 				self.automator.press(x, y, pressTimeout);
@@ -228,7 +228,7 @@ export class helperBridge implements IhelperBridge {
 				color: 'orange',
 				region: [item[0], item[1], item[2], item[3]]
 			}))];
-			drawFloaty.draw(toDraw, Math.max(duration - 20, 1000));
+			drawFloaty.draw(toDraw, Math.max(duration - 20, debugDrawConfig.drawTime));
 			sleep(200);
 		}
 		this.automator.gesture(duration, ...points);
