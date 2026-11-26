@@ -864,6 +864,7 @@ export class Func314 implements IFuncOrigin {
 			}
 			thisScript.global.d6ShopBuying = '';
 			thisScript.global.d6ShopRefreshCnt = 0;
+			thisScript.global.d6ShopEnterAt = 0; // 退出后清空，下次进店重新等渲染
 			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			sleep(1200); // 等退出商店动画，避免过渡帧误点地图右下角唤息
 			return true;
@@ -877,6 +878,18 @@ export class Func314 implements IFuncOrigin {
 			name: '六道觉_商店_购买buff',
 			operator: [{ desc: thisOperator[6].desc }]
 		})) {
+			// 2026-11-26 修复"进店秒退"：从"宁息事件"直接进店时没有冷却/等待，
+			// 下一帧九宫格还没渲染完，buff与刷新指纹都找不到 → 直接走"刷新按钮未找到"秒退，
+			// 全程未做任何判断。而"绽放之屿→唤息"路径因点了右下角有2秒冷却，反而能等渲染完再判断。
+			// 统一处理：首次识别到商店页时先等1秒让页面渲染，这一帧不判断、不退出；
+			// 退出商店/确认购买后清空标记，下次进店会重新等待。
+			if (!thisScript.global.d6ShopEnterAt) {
+				thisScript.global.d6ShopEnterAt = new Date().getTime();
+				log('商店：首次识别到商店页，等待渲染(1秒)后再判断');
+				sleep(1000);
+				return true;
+			}
+
 			if (leaveCooling) return true; // 刚点过右下角，画面切换中，别重复点
 
 			const exitShop = () => {
@@ -884,6 +897,7 @@ export class Func314 implements IFuncOrigin {
 				thisScript.global.d6LeaveClickAt = new Date().getTime();
 				thisScript.global.d6ShopBuying = '';
 				thisScript.global.d6ShopRefreshCnt = 0;
+				thisScript.global.d6ShopEnterAt = 0; // 离开后清空，下次进店重新等渲染
 				sleep(1200); // 等画面切回地图，避免过渡帧误点唤息
 			};
 
@@ -903,49 +917,53 @@ export class Func314 implements IFuncOrigin {
 			// 现删除该前置判断，改为正常流程：找目标buff→找不到点刷新→刷新3次/按钮不可用才退出。
 			// 真没钱时刷新按钮会变不可用，下面的"刷新按钮不可用"分支会退出，不会死循环。
 
-			// 找还没满的目标，轰雷优先；指纹命中即点它下方购买按钮(照椒图 y+50~+140，夹在屏幕内)
-			let point = null;
-			let buying = '';
-			if (!hongLeiFull) {
-				point = thisScript.findMultiColor('六道觉_商店_轰雷', undefined, undefined, true);
-				buying = 'hongLei';
+			// 找目标buff + 刷新，带多轮重试。
+			// 2026-11-26 修复"进店秒退"：刚进店九宫格还没渲染完，buff和刷新指纹都找不到，
+			// 原逻辑直接走"刷新按钮未找到"秒退，全程未做任何判断。现改为多轮重试等渲染，
+			// 每轮：先找目标buff(轰雷优先)→点购买；再找刷新按钮→点刷新；都找不到→等400ms重找。
+			// 累计6轮(约2.4秒)仍识别不到才退出，既杜绝秒退也杜绝死循环。
+			for (let attempt = 0; attempt < 6; attempt++) {
+				// 找还没满的目标，轰雷优先；指纹命中即点它下方购买按钮(照椒图 y+50~+140，夹在屏幕内)
+				let point = null;
+				let buying = '';
+				if (!hongLeiFull) {
+					point = thisScript.findMultiColor('六道觉_商店_轰雷', undefined, undefined, true);
+					buying = 'hongLei';
+				}
+				if (!point && !jiDaoFull) {
+					point = thisScript.findMultiColor('六道觉_商店_极道轰炸', undefined, undefined, true);
+					buying = 'jiDao';
+				}
+				if (point) {
+					const y2 = Math.min(point.y + 140, 718);
+					thisScript.regionClick([[point.x - 10, point.y + 50, point.x + 10, y2, 500]]);
+					thisScript.global.d6ShopBuying = buying;
+					log('商店：点购买' + (buying === 'hongLei' ? '轰雷' : '极道轰炸') + ' (锚点' + point.x + ',' + point.y + ')，等待确认弹窗');
+					sleep(600); // 等确认弹窗出现
+					return true;
+				}
+				// 没找到目标buff → 找刷新按钮继续找；刷新3次还没找到 → 退出，杜绝死循环
+				const refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
+				if (refresh) {
+					if (thisScript.global.d6ShopRefreshCnt >= 3) {
+						exitShop();
+						const msg = '商店退出：刷新3次仍未找到目标buff(轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + ')';
+						log(msg);
+						thisScript.myToast(msg);
+						return true;
+					}
+					thisScript.regionClick([[refresh.x - 25, refresh.y - 25, refresh.x + 25, refresh.y + 25, 500]]);
+					thisScript.global.d6ShopRefreshCnt++;
+					log('商店：未找到目标buff，点刷新(第' + thisScript.global.d6ShopRefreshCnt + '次)');
+					sleep(800); // 等刷新动画
+					return true;
+				}
+				// buff和刷新按钮都没识别到：可能页面还没渲染完，等一下重找
+				sleep(400);
 			}
-			if (!point && !jiDaoFull) {
-				point = thisScript.findMultiColor('六道觉_商店_极道轰炸', undefined, undefined, true);
-				buying = 'jiDao';
-			}
-			if (point) {
-				const y2 = Math.min(point.y + 140, 718);
-				thisScript.regionClick([[point.x - 10, point.y + 50, point.x + 10, y2, 500]]);
-				thisScript.global.d6ShopBuying = buying;
-				log('商店：点购买' + (buying === 'hongLei' ? '轰雷' : '极道轰炸') + ' (锚点' + point.x + ',' + point.y + ')，等待确认弹窗');
-				sleep(600); // 等确认弹窗出现
-				return true;
-			}
-
-			// 没找到目标 → 点刷新继续找；刷新3次还没找到 → 退出，杜绝死循环
-			if (thisScript.global.d6ShopRefreshCnt >= 3) {
-				exitShop();
-				const msg = '商店退出：刷新3次仍未找到目标buff(轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + ')';
-				log(msg);
-				thisScript.myToast(msg);
-				return true;
-			}
-			// 刚进店的过渡帧可能还渲染不全，刷新按钮指纹第一次找不到时等一下重找一次，避免秒退
-			let refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
-			if (!refresh) {
-				sleep(500);
-				refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
-			}
-			if (refresh) {
-				thisScript.regionClick([[refresh.x - 25, refresh.y - 25, refresh.x + 25, refresh.y + 25, 500]]);
-				thisScript.global.d6ShopRefreshCnt++;
-				log('商店：未找到目标buff，点刷新(第' + thisScript.global.d6ShopRefreshCnt + '次)');
-				sleep(800); // 等刷新动画
-				return true;
-			}
+			// 多轮重试后仍识别不到任何元素 → 页面异常/真的没渲染，退出
 			exitShop();
-			const msg = '商店退出：刷新按钮指纹未找到(过渡帧/未渲染),轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit;
+			const msg = '商店退出：重试多轮仍未识别到buff/刷新按钮(页面未渲染?),轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit;
 			log(msg);
 			thisScript.myToast(msg);
 			return true;
@@ -1056,6 +1074,7 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6ShopBuffDone = false; // 完成标记每局重置(用户2026-11-26决定)
 			thisScript.global.d6ShopBuying = '';
 			thisScript.global.d6ShopRefreshCnt = 0;
+			thisScript.global.d6ShopEnterAt = 0;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();

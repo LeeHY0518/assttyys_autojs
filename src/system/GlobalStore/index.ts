@@ -96,6 +96,7 @@ export type globalRootType = {
 	d6ShopBuffDone: boolean;// 六道觉本局两种目标buff都已买满:不再点唤息召唤商店/不再进宁息商店(每局重置)
 	d6ShopBuying: string;// 六道觉本局商店当前点击购买的目标('hongLei'|'jiDao'),确认弹窗据此给对应计数+1
 	d6ShopRefreshCnt: number;// 六道觉当前商店页已点刷新次数(防刷新无效死循环)
+	d6ShopEnterAt: number;// 六道觉首次识别到商店页的时间戳:进店先等渲染再判断,防页面未渲染完就误判"刷新按钮找不到"秒退
 	upYuHun: boolean;//      强化御魂记录界面次数
 	upYuHunIni: boolean;//      强化御魂初设置
 	bgyxLastCapture: number; // 上次截图的时间戳
@@ -256,6 +257,7 @@ export const globalRoot: globalRootType = {
 	d6ShopBuffDone: false,
 	d6ShopBuying: '',
 	d6ShopRefreshCnt: 0,
+	d6ShopEnterAt: 0,
 	upYuHun: false,
 	upYuHunIni: true,
 	bgyxLastCapture: undefined,
