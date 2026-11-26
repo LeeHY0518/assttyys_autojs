@@ -28,6 +28,12 @@ export class Func314 implements IFuncOrigin {
 			data: ['1', '2', '3', '4', '5'],
 			default: '2',
 		}, {
+			name: 'jiDaoLimit',
+			desc: '本局最多获得几个极道轰炸(1-5)',
+			type: 'list',
+			data: ['1', '2', '3', '4', '5'],
+			default: '2',
+		}, {
 			name: 'overTimes',
 			desc: '挂机局数，完成后自动切换方案，0表示一直刷',
 			type: 'integer',
@@ -746,43 +752,66 @@ export class Func314 implements IFuncOrigin {
 			operator: [{ desc: thisOperator[3].desc }]
 		})) {
 			// 四选一 buff 页：前3张随机 buff，第4张固定舞技强化。
-			// 本页点"选择"必定获得该 buff(与商店不同，没有二次确认/扣费失败的可能)，
-			// 所以只要识别到轰雷并点了它下方"选择"，就是真拿到了，d6HongLeiCnt+1。
-			// 本局流程：① 已拿够配置的个数(默认2，前端1-5可调) → 不再找、不刷新，直接选第4个舞技强化；
-			//           ② 没拿够 → 前3格找轰雷，找到点它正下方"选择"，计数+1；
+			// 本页点"选择"必定获得该 buff(与商店不同，没有二次确认/扣费失败的可能)。
+			// 两种目标 buff：六道·轰雷、极道轰炸，各自独立计数 + 前端可配上限(1-5)。
+			// 本局流程：① 两个目标都拿够上限 → 直接选第4个舞技强化；
+			//           ② 否则前3格找"还没满"的目标(轰雷优先)，找到点它正下方"选择"，对应计数+1；
 			//           ③ 出现"万相铃不足"(没钱) → 刷新无效，不再刷新，直接选第4个；
 			//           ④ 本页已刷3次还亮着(刷新没生效) → 停止刷新，直接选第4个(防死循环)；
-			//           ⑤ 没轰雷且刷新"亮" → 点刷新继续找；
-			//           ⑥ 刷新"暗"(剩0次)仍没轰雷 → 选第4个舞技强化兜底。
+			//           ⑤ 没找到目标且刷新"亮" → 点刷新继续找；
+			//           ⑥ 刷新"暗"(剩0次)仍没找到 → 选第4个舞技强化兜底。
 
-			// 刚点过轰雷"选择"（2秒内）：画面切换有几帧延迟，有时还会连着来第二个buff页，
+			// 刚点过目标 buff"选择"（2秒内）：画面切换有几帧延迟，有时还会连着来第二个buff页，
 			// 过渡期间不做任何点击，否则会在淡出帧上误点第4个。
 			if (buffCooling) return true;
 
-			// ① 本局已拿够配置的个数：不识别、不刷新，直接选第4个
-			// 上限来自前端配置 hongLeiLimit(1-5，默认2)，容错：读不到/非法值一律按2处理并夹在1-5内。
-			const rawLimit = Number((thisScript.scheme.config['314'] || {}).hongLeiLimit);
-			const hongLeiLimit = Math.min(5, Math.max(1, isNaN(rawLimit) || rawLimit <= 0 ? 2 : Math.floor(rawLimit)));
-			if (thisScript.global.d6HongLeiCnt >= hongLeiLimit) {
+			// 两个上限来自前端配置(1-5，默认2)，容错：读不到/非法值一律按2处理并夹在1-5内。
+			const buffConf = thisScript.scheme.config['314'] || {};
+			const clampLimit = (v: any) => {
+				const raw = Number(v);
+				return Math.min(5, Math.max(1, isNaN(raw) || raw <= 0 ? 2 : Math.floor(raw)));
+			};
+			const hongLeiLimit = clampLimit(buffConf.hongLeiLimit);
+			const jiDaoLimit = clampLimit(buffConf.jiDaoLimit);
+			const hongLeiFull = thisScript.global.d6HongLeiCnt >= hongLeiLimit;
+			const jiDaoFull = thisScript.global.d6JiDaoCnt >= jiDaoLimit;
+
+			// ① 两个目标都拿够：不识别、不刷新，直接选第4个
+			if (hongLeiFull && jiDaoFull) {
 				thisScript.global.d6BuffRefreshCnt = 0;
 				thisScript.regionClick([thisOperator[3].oper[0]]);
-				log('四选一buff：本局已获得轰雷 ' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + ' 个(已达上限)，直接选第4个舞技强化');
+				log('四选一buff：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道轰炸' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + ' 均已达上限，直接选第4个舞技强化');
 				return true;
 			}
 
-			// ② 前3格找轰雷 → 点它正下方"选择"，点下即获得
-			const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
-			if (hongLei) {
-				// 点击"选择"：轰雷指纹锚点是第1点(226,184)，卡片图标中心在锚点左侧约7px；
-				// 实测三个"选择"按钮中心(219/492/765, y572)正好对齐各自图标中心，故以图标中心±38点击。
-				const cardCx = hongLei.x - 7;
-				thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
-				thisScript.global.d6HongLeiCnt++; // 本页点了就必得，计数+1
-				thisScript.global.d6BuffClickAt = new Date().getTime(); // 2秒冷却，等画面切走
-				thisScript.global.d6BuffRefreshCnt = 0;
-				log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + '→按钮中心x' + cardCx + ')，已获得第' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '个轰雷');
-				sleep(1200); // 等选择动画/页面跳转
-				return true;
+			// ② 前3格找"还没满"的目标 → 点它正下方"选择"，点下即获得(轰雷优先)。
+			//    图标指纹锚点是第1点，卡片图标中心在锚点左侧约7px；
+			//    实测三个"选择"按钮中心(219/492/765, y572)正好对齐各自图标中心，故以图标中心±38点击。
+			if (!hongLeiFull) {
+				const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
+				if (hongLei) {
+					const cardCx = hongLei.x - 7;
+					thisScript.global.d6HongLeiCnt++; // 本页点了就必得，计数+1
+					thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
+					thisScript.global.d6BuffClickAt = new Date().getTime(); // 2秒冷却，等画面切走
+					thisScript.global.d6BuffRefreshCnt = 0;
+					log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + '→按钮中心x' + cardCx + ')，已获得第' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '个轰雷');
+					sleep(1200); // 等选择动画/页面跳转
+					return true;
+				}
+			}
+			if (!jiDaoFull) {
+				const jiDao = thisScript.findMultiColor('六道觉_极道轰炸');
+				if (jiDao) {
+					const cardCx = jiDao.x - 7;
+					thisScript.global.d6JiDaoCnt++; // 本页点了就必得，计数+1
+					thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
+					thisScript.global.d6BuffClickAt = new Date().getTime(); // 2秒冷却，等画面切走
+					thisScript.global.d6BuffRefreshCnt = 0;
+					log('四选一buff：点极道轰炸对应选择 (锚点' + jiDao.x + ',' + jiDao.y + '→按钮中心x' + cardCx + ')，已获得第' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + '个极道轰炸');
+					sleep(1200); // 等选择动画/页面跳转
+					return true;
+				}
 			}
 
 			// ③ 没钱时的"万相铃不足"提示：此时刷新按钮虽亮，但点了不会刷新、也不会变暗，
@@ -807,7 +836,7 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 
-			// ⑤ 刷新"亮"=可点击：点刷新后等待动画，下一帧重新找轰雷
+			// ⑤ 刷新"亮"=可点击：点刷新后等待动画，下一帧重新找目标buff
 			const refreshBright = thisScript.oper({
 				id: 314,
 				name: '六道觉_四选一_刷新亮',
@@ -816,15 +845,15 @@ export class Func314 implements IFuncOrigin {
 			if (refreshBright) {
 				thisScript.regionClick([thisOperator[35].oper[0]]);
 				thisScript.global.d6BuffRefreshCnt++; // 本页刷新计数+1(上限兜底用)
-				log('四选一buff：无轰雷，点刷新继续找(本页第' + thisScript.global.d6BuffRefreshCnt + '次)');
+				log('四选一buff：未找到未满目标，点刷新继续找(本页第' + thisScript.global.d6BuffRefreshCnt + '次)');
 				sleep(800); // 等刷新动画完成
 				return true;
 			}
 
-			// ⑥ 刷新"暗"或不可点(剩0次)且无轰雷→固定选第4个舞技强化兜底
+			// ⑥ 刷新"暗"或不可点(剩0次)且未找到目标→固定选第4个舞技强化兜底
 			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.regionClick([thisOperator[3].oper[0]]);
-			log('四选一buff：刷新不可用且无轰雷，选第4个舞技强化');
+			log('四选一buff：刷新不可用且未找到目标，选第4个舞技强化');
 			return true;
 		}
 
@@ -962,7 +991,8 @@ export class Func314 implements IFuncOrigin {
 		})) {
 			thisScript.global.d6Loop = 0;
 			thisScript.global.d6FirstBuffDone = false;
-			thisScript.global.d6HongLeiCnt = 0; // 新一局：轰雷获得数清零，重新按上限寻找
+			thisScript.global.d6HongLeiCnt = 0; // 新一局：轰雷/极道轰炸获得数清零，重新按上限寻找
+			thisScript.global.d6JiDaoCnt = 0;
 			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.global.d6BuffClickAt = 0;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();

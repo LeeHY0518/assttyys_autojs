@@ -89,6 +89,7 @@ export type globalRootType = {
 	d6RouFeng: number;//     椒图柔风实时buff数
 	d6FirstBuffDone: boolean;// 六道觉本局首次三选一buff是否已选
 	d6HongLeiCnt: number;// 六道觉本局已获得六道·轰雷的个数(四选一页点一次轰雷卡"选择"即+1;达到前端配置的hongLeiLimit后不再找/不刷新,直接选第4个)
+	d6JiDaoCnt: number;// 六道觉本局已获得极道轰炸的个数(四选一页点一次极道轰炸卡"选择"即+1;达到前端配置的jiDaoLimit后不再找)
 	d6BuffRefreshCnt: number;// 六道觉当前四选一页已点刷新次数(上限3次,防止刷新无效时死循环)
 	d6BuffClickAt: number;// 六道觉上次点轰雷卡"选择"的时间戳(2秒冷却:连续两个四选一页时,避免在过渡帧误点第4个)
 	d6LeaveClickAt: number;// 六道觉上次点右下角"离开"的时间戳(冷却期内不再点,防画面切换中重复点误触地图唤息)
@@ -245,6 +246,7 @@ export const globalRoot: globalRootType = {
 	d6RouFeng: 1,
 	d6FirstBuffDone: false,
 	d6HongLeiCnt: 0,
+	d6JiDaoCnt: 0,
 	d6BuffRefreshCnt: 0,
 	d6BuffClickAt: 0,
 	d6LeaveClickAt: 0,
