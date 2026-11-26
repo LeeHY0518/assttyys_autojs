@@ -794,7 +794,7 @@ export class Func314 implements IFuncOrigin {
 					thisScript.global.d6BuffClickAt = new Date().getTime();
 					thisScript.global.d6BuffRefreshCnt = 0;
 					log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + ')，已获得第' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '个轰雷');
-					sleep(1200); // 等选择动画/页面跳转
+					sleep(500); // 等选择动画起步即可；后续2秒冷却(d6BuffClickAt)兜底防过渡帧误点，不必久等
 					return true;
 				}
 			}
@@ -808,7 +808,7 @@ export class Func314 implements IFuncOrigin {
 					thisScript.global.d6BuffClickAt = new Date().getTime();
 					thisScript.global.d6BuffRefreshCnt = 0;
 					log('四选一buff：点极道轰炸对应选择 (锚点' + jiDao.x + ',' + jiDao.y + ')，已获得第' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + '个极道轰炸');
-					sleep(1200); // 等选择动画/页面跳转
+					sleep(500); // 等选择动画起步即可；后续2秒冷却(d6BuffClickAt)兜底防过渡帧误点，不必久等
 					return true;
 				}
 			}
@@ -895,12 +895,11 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 
-			// 没钱判断(照椒图)：找不到"可购买buff"标记就退出，避免空转
-			if (!thisScript.findMultiColor('六道觉_购买buff', undefined, undefined, true)) {
-				exitShop();
-				log('商店：无可购买buff标记(万相铃不足?)，退出');
-				return true;
-			}
+			// 2026-11-26 修复：原这里用 '六道觉_购买buff' 指纹做"没钱就退出"判断，
+			// 但该指纹取点([right,1071,153]等)是从椒图商店页照搬的，觉的宁息商店页并没有这些点，
+			// 导致每次进店 findMultiColor 都返回 null → 立刻 exitShop() 秒退，刷新逻辑根本走不到。
+			// 现删除该前置判断，改为正常流程：找目标buff→找不到点刷新→刷新3次/按钮不可用才退出。
+			// 真没钱时刷新按钮会变不可用，下面的"刷新按钮不可用"分支会退出，不会死循环。
 
 			// 找还没满的目标，轰雷优先；指纹命中即点它下方购买按钮(照椒图 y+50~+140，夹在屏幕内)
 			let point = null;
