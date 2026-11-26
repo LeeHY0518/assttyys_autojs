@@ -843,7 +843,9 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		// 商店确认购买弹窗：弹窗会遮挡商店页，必须放在商店页判断之前。
+		// 商店确认购买弹窗：这是【唯一的计数点】。
+		// 只有"点了商品(ShopBuying非空) → 弹出确认框 → 点了确认购买"这条完整流程走完，才给buff计数+1。
+		// 仅点了一下商品图标但没弹确认框(如万相铃不足买不起)，不会走这里，计数绝不增加。
 		// 用户2026-11-26要求直接复用椒图op23(desc+确认购买/退出商店按钮框)：
 		// 点"确认购买"→"退出商店"，并按 d6ShopBuying 给对应buff计数+1。
 		// desc 同时兼容觉自己的 op20(万象赐福购买确认)与椒图 op38(商店确认购买)，
@@ -910,14 +912,28 @@ export class Func314 implements IFuncOrigin {
 				sleep(1200); // 等画面切回地图，避免过渡帧误点唤息
 			};
 
-			// 轰雷/极道各自的"是否需要"：已达上限 或 本局已点过一次购买(不管成功与否) → 不再找、不再点
+			// 每种buff是否需要再点：已达上限 或 本局已点过一次购买 → 不再点。
+			// 注意：d6ShopTriedXxx 只是"点过一次"的防死循环标记，【不代表已购买】；
+			// 是否买到只由计数 d6HongLeiCnt/d6JiDaoCnt 决定(确认弹窗分支才+1)。
 			const needHongLei = !hongLeiFull && !thisScript.global.d6ShopTriedHongLei;
 			const needJiDao = !jiDaoFull && !thisScript.global.d6ShopTriedJiDao;
-			if (!needHongLei && !needJiDao) {
-				// 两个都不再需要(买满/已点过)：置完成标记并退出，之后不再召唤/进店
+
+			// 只有【计数真正达到上限】才算完成、才不再召唤/进店。
+			// 绝不能因"点过一次(Tried)"就置完成标记——点了没买成功(没弹确认框)不算买到。
+			if (hongLeiFull && jiDaoFull) {
 				thisScript.global.d6ShopBuffDone = true;
 				exitShop();
-				const msg = '商店退出：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + (thisScript.global.d6ShopTriedHongLei ? '(已点过)' : '') + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + (thisScript.global.d6ShopTriedJiDao ? '(已点过)' : '') + '，均不再需要';
+				const msg = '商店退出：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + '均已买够，本局不再进店';
+				log(msg);
+				thisScript.myToast(msg);
+				return true;
+			}
+
+			// 两个buff都"不再点"(满或本局点过)，但计数还没达标(点了没买成功)：
+			// 退出商店，但不置完成标记——下次仍可进店(本局点过的buff仍不会再点)。
+			if (!needHongLei && !needJiDao) {
+				exitShop();
+				const msg = '商店退出：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + (thisScript.global.d6ShopTriedHongLei ? '(已点过未买到)' : '') + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + (thisScript.global.d6ShopTriedJiDao ? '(已点过未买到)' : '') + '，未买够暂不退店标记';
 				log(msg);
 				thisScript.myToast(msg);
 				return true;
