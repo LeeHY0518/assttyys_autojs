@@ -863,7 +863,9 @@ export class Func314 implements IFuncOrigin {
 				log('商店：确认购买极道轰炸，已获得 ' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit);
 			}
 			thisScript.global.d6ShopBuying = '';
+			thisScript.global.d6ShopBuyAt = 0;
 			thisScript.global.d6ShopRefreshCnt = 0;
+			thisScript.global.d6ShopScanCnt = 0;
 			thisScript.global.d6ShopEnterAt = 0; // 退出后清空，下次进店重新等渲染
 			thisScript.global.d6LeaveClickAt = new Date().getTime();
 			sleep(1200); // 等退出商店动画，避免过渡帧误点地图右下角唤息
@@ -885,6 +887,7 @@ export class Func314 implements IFuncOrigin {
 			// 退出商店/确认购买后清空标记，下次进店会重新等待。
 			if (!thisScript.global.d6ShopEnterAt) {
 				thisScript.global.d6ShopEnterAt = new Date().getTime();
+				thisScript.global.d6ShopScanCnt = 0;
 				log('商店：首次识别到商店页，等待渲染(1秒)后再判断');
 				sleep(1000);
 				return true;
@@ -892,20 +895,43 @@ export class Func314 implements IFuncOrigin {
 
 			if (leaveCooling) return true; // 刚点过右下角，画面切换中，别重复点
 
+			// 买不起检测：点了"购买"但超过3秒还没弹出确认弹窗(确认分支会清空d6ShopBuying)，
+			// 说明材料不足(万相铃不够)，游戏不会弹确认框。若不停重试就会一直点同一个buff死循环。
+			// 判定买不起→本局标记跳过该buff，清掉购买状态，继续找别的buff/刷新。
+			if (!!thisScript.global.d6ShopBuying && new Date().getTime() - (thisScript.global.d6ShopBuyAt || 0) > 3000) {
+				const failed = thisScript.global.d6ShopBuying;
+				if (failed === 'hongLei') {
+					thisScript.global.d6ShopNoMoneyHongLei = true;
+					log('商店：轰雷点购买后3秒无确认弹窗，判定材料不足，本局不再购买轰雷');
+				} else if (failed === 'jiDao') {
+					thisScript.global.d6ShopNoMoneyJiDao = true;
+					log('商店：极道轰炸点购买后3秒无确认弹窗，判定材料不足，本局不再购买极道轰炸');
+				}
+				thisScript.global.d6ShopBuying = '';
+				thisScript.global.d6ShopBuyAt = 0;
+				thisScript.global.d6ShopScanCnt = 0;
+				return true; // 下一轮重新扫描(会跳过已判定买不起的buff)
+			}
+
 			const exitShop = () => {
 				thisScript.regionClick([thisOperator[6].oper[1]]); // 退出商店
 				thisScript.global.d6LeaveClickAt = new Date().getTime();
 				thisScript.global.d6ShopBuying = '';
+				thisScript.global.d6ShopBuyAt = 0;
 				thisScript.global.d6ShopRefreshCnt = 0;
+				thisScript.global.d6ShopScanCnt = 0;
 				thisScript.global.d6ShopEnterAt = 0; // 离开后清空，下次进店重新等渲染
 				sleep(1200); // 等画面切回地图，避免过渡帧误点唤息
 			};
 
-			// 两种buff都满：置完成标记(每局重置)并退出，之后绽放之屿不召唤、宁息商店直接退出
-			if (hongLeiFull && jiDaoFull) {
+			// 轰雷/极道各自的"是否需要"：已达上限 或 本局判定买不起 → 不再找、不再点
+			const needHongLei = !hongLeiFull && !thisScript.global.d6ShopNoMoneyHongLei;
+			const needJiDao = !jiDaoFull && !thisScript.global.d6ShopNoMoneyJiDao;
+			if (!needHongLei && !needJiDao) {
+				// 两个都不再需要(买满/买不起)：置完成标记并退出，之后不再召唤/进店
 				thisScript.global.d6ShopBuffDone = true;
 				exitShop();
-				const msg = '商店退出：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + '均已达上限';
+				const msg = '商店退出：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + (thisScript.global.d6ShopNoMoneyHongLei ? '(买不起)' : '') + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + (thisScript.global.d6ShopNoMoneyJiDao ? '(买不起)' : '') + '，均不再需要';
 				log(msg);
 				thisScript.myToast(msg);
 				return true;
@@ -917,53 +943,64 @@ export class Func314 implements IFuncOrigin {
 			// 现删除该前置判断，改为正常流程：找目标buff→找不到点刷新→刷新3次/按钮不可用才退出。
 			// 真没钱时刷新按钮会变不可用，下面的"刷新按钮不可用"分支会退出，不会死循环。
 
-			// 找目标buff + 刷新，带多轮重试。
-			// 2026-11-26 修复"进店秒退"：刚进店九宫格还没渲染完，buff和刷新指纹都找不到，
-			// 原逻辑直接走"刷新按钮未找到"秒退，全程未做任何判断。现改为多轮重试等渲染，
-			// 每轮：先找目标buff(轰雷优先)→点购买；再找刷新按钮→点刷新；都找不到→等400ms重找。
-			// 累计6轮(约2.4秒)仍识别不到才退出，既杜绝秒退也杜绝死循环。
-			for (let attempt = 0; attempt < 6; attempt++) {
-				// 找还没满的目标，轰雷优先；指纹命中即点它下方购买按钮(照椒图 y+50~+140，夹在屏幕内)
-				let point = null;
-				let buying = '';
-				if (!hongLeiFull) {
-					point = thisScript.findMultiColor('六道觉_商店_轰雷', undefined, undefined, true);
-					buying = 'hongLei';
-				}
-				if (!point && !jiDaoFull) {
-					point = thisScript.findMultiColor('六道觉_商店_极道轰炸', undefined, undefined, true);
-					buying = 'jiDao';
-				}
-				if (point) {
-					const y2 = Math.min(point.y + 140, 718);
-					thisScript.regionClick([[point.x - 10, point.y + 50, point.x + 10, y2, 500]]);
-					thisScript.global.d6ShopBuying = buying;
-					log('商店：点购买' + (buying === 'hongLei' ? '轰雷' : '极道轰炸') + ' (锚点' + point.x + ',' + point.y + ')，等待确认弹窗');
-					sleep(600); // 等确认弹窗出现
-					return true;
-				}
-				// 没找到目标buff → 找刷新按钮继续找；刷新3次还没找到 → 退出，杜绝死循环
-				const refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
-				if (refresh) {
-					if (thisScript.global.d6ShopRefreshCnt >= 3) {
-						exitShop();
-						const msg = '商店退出：刷新3次仍未找到目标buff(轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + ')';
-						log(msg);
-						thisScript.myToast(msg);
-						return true;
-					}
-					thisScript.regionClick([[refresh.x - 25, refresh.y - 25, refresh.x + 25, refresh.y + 25, 500]]);
-					thisScript.global.d6ShopRefreshCnt++;
-					log('商店：未找到目标buff，点刷新(第' + thisScript.global.d6ShopRefreshCnt + '次)');
-					sleep(800); // 等刷新动画
-					return true;
-				}
-				// buff和刷新按钮都没识别到：可能页面还没渲染完，等一下重找
-				sleep(400);
+			// 核心流程：先扫描找目标buff，连续3轮都没找到才点刷新(杜绝"有buff却先刷新")。
+			// 买不起的buff(need=false)直接跳过，不再点它，避免死循环。
+
+			// ① 找还没满且买得起的目标，轰雷优先；命中即点它下方购买按钮(照椒图 y+50~+140，夹在屏幕内)
+			let point = null;
+			let buying = '';
+			if (needHongLei) {
+				point = thisScript.findMultiColor('六道觉_商店_轰雷', undefined, undefined, true);
+				buying = 'hongLei';
 			}
-			// 多轮重试后仍识别不到任何元素 → 页面异常/真的没渲染，退出
+			if (!point && needJiDao) {
+				point = thisScript.findMultiColor('六道觉_商店_极道轰炸', undefined, undefined, true);
+				buying = 'jiDao';
+			}
+			if (point) {
+				const y2 = Math.min(point.y + 140, 718);
+				thisScript.regionClick([[point.x - 10, point.y + 50, point.x + 10, y2, 500]]);
+				thisScript.global.d6ShopBuying = buying;
+				thisScript.global.d6ShopBuyAt = new Date().getTime(); // 记录点购买时间，超时未出确认=买不起
+				thisScript.global.d6ShopScanCnt = 0;
+				log('商店：点购买' + (buying === 'hongLei' ? '轰雷' : '极道轰炸') + ' (锚点' + point.x + ',' + point.y + ')，等待确认弹窗');
+				sleep(600); // 等确认弹窗出现
+				return true;
+			}
+
+			// ② 没找到目标buff：累计"未找到"轮数。连续3轮都没找到，才认为页面确实没有，点刷新。
+			//    这样即使某轮因渲染/滑动恰好没识别到，也不会立刻刷新掉页面上的buff。
+			thisScript.global.d6ShopScanCnt = (thisScript.global.d6ShopScanCnt || 0) + 1;
+			if (thisScript.global.d6ShopScanCnt < 3) {
+				sleep(400);
+				return true; // 继续在下一轮扫描当前页面，不刷新
+			}
+
+			// ③ 连续3轮没找到 → 刷新上限判断：已达3次则退出，杜绝死循环
+			if (thisScript.global.d6ShopRefreshCnt >= 3) {
+				exitShop();
+				const msg = '商店退出：刷新3次仍未找到目标buff(轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + ')';
+				log(msg);
+				thisScript.myToast(msg);
+				return true;
+			}
+			// 找刷新按钮，多轮重试防过渡帧渲染不全
+			let refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
+			if (!refresh) {
+				sleep(500);
+				refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
+			}
+			if (refresh) {
+				thisScript.regionClick([[refresh.x - 25, refresh.y - 25, refresh.x + 25, refresh.y + 25, 500]]);
+				thisScript.global.d6ShopRefreshCnt++;
+				thisScript.global.d6ShopScanCnt = 0; // 刷新后重置扫描轮数，对新页面重新"先判断"
+				log('商店：连续3轮未找到目标buff，点刷新(第' + thisScript.global.d6ShopRefreshCnt + '次)');
+				sleep(800); // 等刷新动画
+				return true;
+			}
+			// 刷新按钮也找不到 → 页面异常/未渲染，退出
 			exitShop();
-			const msg = '商店退出：重试多轮仍未识别到buff/刷新按钮(页面未渲染?),轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit;
+			const msg = '商店退出：刷新按钮指纹未找到(页面未渲染?),轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit;
 			log(msg);
 			thisScript.myToast(msg);
 			return true;
@@ -1073,8 +1110,12 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6BuffClickAt = 0;
 			thisScript.global.d6ShopBuffDone = false; // 完成标记每局重置(用户2026-11-26决定)
 			thisScript.global.d6ShopBuying = '';
+			thisScript.global.d6ShopBuyAt = 0;
 			thisScript.global.d6ShopRefreshCnt = 0;
+			thisScript.global.d6ShopScanCnt = 0;
 			thisScript.global.d6ShopEnterAt = 0;
+			thisScript.global.d6ShopNoMoneyHongLei = false; // 买不起标记每局重置，新一局可再尝试
+			thisScript.global.d6ShopNoMoneyJiDao = false;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();
