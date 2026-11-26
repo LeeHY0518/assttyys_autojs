@@ -891,7 +891,9 @@ export class Func314 implements IFuncOrigin {
 			if (hongLeiFull && jiDaoFull) {
 				thisScript.global.d6ShopBuffDone = true;
 				exitShop();
-				log('商店：轰雷/极道轰炸均已达上限，标记完成并退出');
+				const msg = '商店退出：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + '均已达上限';
+				log(msg);
+				thisScript.myToast(msg);
 				return true;
 			}
 
@@ -924,10 +926,17 @@ export class Func314 implements IFuncOrigin {
 			// 没找到目标 → 点刷新继续找；刷新3次还没找到 → 退出，杜绝死循环
 			if (thisScript.global.d6ShopRefreshCnt >= 3) {
 				exitShop();
-				log('商店：已刷新3次仍未找到目标buff，退出');
+				const msg = '商店退出：刷新3次仍未找到目标buff(轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + ')';
+				log(msg);
+				thisScript.myToast(msg);
 				return true;
 			}
-			const refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
+			// 刚进店的过渡帧可能还渲染不全，刷新按钮指纹第一次找不到时等一下重找一次，避免秒退
+			let refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
+			if (!refresh) {
+				sleep(500);
+				refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
+			}
 			if (refresh) {
 				thisScript.regionClick([[refresh.x - 25, refresh.y - 25, refresh.x + 25, refresh.y + 25, 500]]);
 				thisScript.global.d6ShopRefreshCnt++;
@@ -936,7 +945,9 @@ export class Func314 implements IFuncOrigin {
 				return true;
 			}
 			exitShop();
-			log('商店：刷新按钮不可用，退出');
+			const msg = '商店退出：刷新按钮指纹未找到(过渡帧/未渲染),轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit;
+			log(msg);
+			thisScript.myToast(msg);
 			return true;
 		}
 
