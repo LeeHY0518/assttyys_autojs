@@ -895,23 +895,9 @@ export class Func314 implements IFuncOrigin {
 
 			if (leaveCooling) return true; // 刚点过右下角，画面切换中，别重复点
 
-			// 买不起检测：点了"购买"但超过3秒还没弹出确认弹窗(确认分支会清空d6ShopBuying)，
-			// 说明材料不足(万相铃不够)，游戏不会弹确认框。若不停重试就会一直点同一个buff死循环。
-			// 判定买不起→本局标记跳过该buff，清掉购买状态，继续找别的buff/刷新。
-			if (!!thisScript.global.d6ShopBuying && new Date().getTime() - (thisScript.global.d6ShopBuyAt || 0) > 3000) {
-				const failed = thisScript.global.d6ShopBuying;
-				if (failed === 'hongLei') {
-					thisScript.global.d6ShopNoMoneyHongLei = true;
-					log('商店：轰雷点购买后3秒无确认弹窗，判定材料不足，本局不再购买轰雷');
-				} else if (failed === 'jiDao') {
-					thisScript.global.d6ShopNoMoneyJiDao = true;
-					log('商店：极道轰炸点购买后3秒无确认弹窗，判定材料不足，本局不再购买极道轰炸');
-				}
-				thisScript.global.d6ShopBuying = '';
-				thisScript.global.d6ShopBuyAt = 0;
-				thisScript.global.d6ShopScanCnt = 0;
-				return true; // 下一轮重新扫描(会跳过已判定买不起的buff)
-			}
+			// 2026-11-26 用户决定：每种buff整局只点一次购买，不管买没买成功都不再点。
+			// 点购买时即置 d6ShopTriedXxx=true，needXxx 随之变false，绝不会二次点击→杜绝死循环。
+			// 确认弹窗分支成功购买后计数+1；若买不起(万相铃不足)不弹确认框，也因已标记而不再点。
 
 			const exitShop = () => {
 				thisScript.regionClick([thisOperator[6].oper[1]]); // 退出商店
@@ -924,14 +910,14 @@ export class Func314 implements IFuncOrigin {
 				sleep(1200); // 等画面切回地图，避免过渡帧误点唤息
 			};
 
-			// 轰雷/极道各自的"是否需要"：已达上限 或 本局判定买不起 → 不再找、不再点
-			const needHongLei = !hongLeiFull && !thisScript.global.d6ShopNoMoneyHongLei;
-			const needJiDao = !jiDaoFull && !thisScript.global.d6ShopNoMoneyJiDao;
+			// 轰雷/极道各自的"是否需要"：已达上限 或 本局已点过一次购买(不管成功与否) → 不再找、不再点
+			const needHongLei = !hongLeiFull && !thisScript.global.d6ShopTriedHongLei;
+			const needJiDao = !jiDaoFull && !thisScript.global.d6ShopTriedJiDao;
 			if (!needHongLei && !needJiDao) {
-				// 两个都不再需要(买满/买不起)：置完成标记并退出，之后不再召唤/进店
+				// 两个都不再需要(买满/已点过)：置完成标记并退出，之后不再召唤/进店
 				thisScript.global.d6ShopBuffDone = true;
 				exitShop();
-				const msg = '商店退出：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + (thisScript.global.d6ShopNoMoneyHongLei ? '(买不起)' : '') + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + (thisScript.global.d6ShopNoMoneyJiDao ? '(买不起)' : '') + '，均不再需要';
+				const msg = '商店退出：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + (thisScript.global.d6ShopTriedHongLei ? '(已点过)' : '') + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + (thisScript.global.d6ShopTriedJiDao ? '(已点过)' : '') + '，均不再需要';
 				log(msg);
 				thisScript.myToast(msg);
 				return true;
@@ -961,9 +947,12 @@ export class Func314 implements IFuncOrigin {
 				const y2 = Math.min(point.y + 140, 718);
 				thisScript.regionClick([[point.x - 10, point.y + 50, point.x + 10, y2, 500]]);
 				thisScript.global.d6ShopBuying = buying;
-				thisScript.global.d6ShopBuyAt = new Date().getTime(); // 记录点购买时间，超时未出确认=买不起
+				thisScript.global.d6ShopBuyAt = new Date().getTime(); // 记录点购买时间(供确认计数兜底)
+				// 每种buff整局只点一次：点下即标记，之后need变false，绝不二次点击
+				if (buying === 'hongLei') thisScript.global.d6ShopTriedHongLei = true;
+				else if (buying === 'jiDao') thisScript.global.d6ShopTriedJiDao = true;
 				thisScript.global.d6ShopScanCnt = 0;
-				log('商店：点购买' + (buying === 'hongLei' ? '轰雷' : '极道轰炸') + ' (锚点' + point.x + ',' + point.y + ')，等待确认弹窗');
+				log('商店：点购买' + (buying === 'hongLei' ? '轰雷' : '极道轰炸') + ' (锚点' + point.x + ',' + point.y + ')，本局不再点此buff，等待确认弹窗');
 				sleep(600); // 等确认弹窗出现
 				return true;
 			}
@@ -1114,8 +1103,8 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6ShopRefreshCnt = 0;
 			thisScript.global.d6ShopScanCnt = 0;
 			thisScript.global.d6ShopEnterAt = 0;
-			thisScript.global.d6ShopNoMoneyHongLei = false; // 买不起标记每局重置，新一局可再尝试
-			thisScript.global.d6ShopNoMoneyJiDao = false;
+			thisScript.global.d6ShopTriedHongLei = false; // 每局重置：新一局每种buff可再点一次购买
+			thisScript.global.d6ShopTriedJiDao = false;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();

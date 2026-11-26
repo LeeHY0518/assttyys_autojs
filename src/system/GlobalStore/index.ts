@@ -98,9 +98,9 @@ export type globalRootType = {
 	d6ShopRefreshCnt: number;// 六道觉当前商店页已点刷新次数(防刷新无效死循环)
 	d6ShopEnterAt: number;// 六道觉首次识别到商店页的时间戳:进店先等渲染再判断,防页面未渲染完就误判"刷新按钮找不到"秒退
 	d6ShopScanCnt: number;// 六道觉当前商店页连续"未找到目标buff"的轮数:先判断够N轮再刷新,防有buff却先刷新
-	d6ShopBuyAt: number;// 六道觉上次点"购买"的时间戳:超时未出确认弹窗视为材料不足(买不起),本局跳过该buff防死循环
-	d6ShopNoMoneyHongLei: boolean;// 六道觉本局轰雷已判定买不起(材料不足):后续不再点它(每局重置)
-	d6ShopNoMoneyJiDao: boolean;// 六道觉本局极道轰炸已判定买不起:后续不再点它(每局重置)
+	d6ShopBuyAt: number;// 六道觉上次点"购买"的时间戳:超时未出确认弹窗则清掉购买状态,避免影响下一次确认计数
+	d6ShopTriedHongLei: boolean;// 六道觉本局轰雷已点过一次购买(不管成功与否):不再重复点(每局重置)
+	d6ShopTriedJiDao: boolean;// 六道觉本局极道轰炸已点过一次购买(不管成功与否):不再重复点(每局重置)
 	upYuHun: boolean;//      强化御魂记录界面次数
 	upYuHunIni: boolean;//      强化御魂初设置
 	bgyxLastCapture: number; // 上次截图的时间戳
@@ -264,8 +264,8 @@ export const globalRoot: globalRootType = {
 	d6ShopEnterAt: 0,
 	d6ShopScanCnt: 0,
 	d6ShopBuyAt: 0,
-	d6ShopNoMoneyHongLei: false,
-	d6ShopNoMoneyJiDao: false,
+	d6ShopTriedHongLei: false,
+	d6ShopTriedJiDao: false,
 	upYuHun: false,
 	upYuHunIni: true,
 	bgyxLastCapture: undefined,
