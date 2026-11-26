@@ -93,6 +93,9 @@ export type globalRootType = {
 	d6BuffRefreshCnt: number;// 六道觉当前四选一页已点刷新次数(上限3次,防止刷新无效时死循环)
 	d6BuffClickAt: number;// 六道觉上次点轰雷卡"选择"的时间戳(2秒冷却:连续两个四选一页时,避免在过渡帧误点第4个)
 	d6LeaveClickAt: number;// 六道觉上次点右下角"离开"的时间戳(冷却期内不再点,防画面切换中重复点误触地图唤息)
+	d6ShopBuffDone: boolean;// 六道觉本局两种目标buff都已买满:不再点唤息召唤商店/不再进宁息商店(每局重置)
+	d6ShopBuying: string;// 六道觉本局商店当前点击购买的目标('hongLei'|'jiDao'),确认弹窗据此给对应计数+1
+	d6ShopRefreshCnt: number;// 六道觉当前商店页已点刷新次数(防刷新无效死循环)
 	upYuHun: boolean;//      强化御魂记录界面次数
 	upYuHunIni: boolean;//      强化御魂初设置
 	bgyxLastCapture: number; // 上次截图的时间戳
@@ -250,6 +253,9 @@ export const globalRoot: globalRootType = {
 	d6BuffRefreshCnt: 0,
 	d6BuffClickAt: 0,
 	d6LeaveClickAt: 0,
+	d6ShopBuffDone: false,
+	d6ShopBuying: '',
+	d6ShopRefreshCnt: 0,
 	upYuHun: false,
 	upYuHunIni: true,
 	bgyxLastCapture: undefined,

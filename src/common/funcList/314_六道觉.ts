@@ -650,6 +650,21 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 342, 155, 383, 281, 1000], // 孔雀国竖排横幅
 		]
+	}, { // 38 商店确认购买：用户2026-11-26要求直接复用椒图op23(desc+确认购买/退出商店按钮框)
+		desc: [1280, 720,
+			[
+				[left, 115, 37, 0x66645c],
+				[left, 212, 30, 0x66645c],
+				[center, 463, 428, 0xdf6851],
+				[center, 700, 436, 0xf3b25e],
+				[right, 1200, 166, 0x56534f],
+				[right, 1202, 310, 0x11141c],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 678, 409, 837, 453, 500], // 确认购买
+			[center, 1280, 720, 1174, 588, 1241, 649, 500], // 退出商店
+		]
 	},];
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 
@@ -659,10 +674,17 @@ export class Func314 implements IFuncOrigin {
 		// 因此点过一次后在冷却期内不再点，冷却期内命中也直接跳过。
 		const leaveCooling = new Date().getTime() - (thisScript.global.d6LeaveClickAt || 0) < 2000;
 
-		// 轰雷"选择"点击冷却(2秒)：点了轰雷卡的"选择"后 d6HongLeiCnt+1，
-		// 但画面切换有几帧延迟，若下一帧仍识别到四选一页(有时会连续出现两个buff页)，
-		// 会立刻走后续判断，在过渡帧上误点。冷却期内四选一页不做任何操作。
-		const buffCooling = new Date().getTime() - (thisScript.global.d6BuffClickAt || 0) < 2000;
+		// 两种目标buff的上限来自前端配置(1-5，默认2)，容错：读不到/非法值一律按2处理并夹在1-5内。
+		// 计数来源：① 首次三选一固定选极道轰炸(d6JiDaoCnt=1)；② 商店购买确认后按种类+1。
+		const buffConf = thisScript.scheme.config['314'] || {};
+		const clampLimit = (v: any) => {
+			const raw = Number(v);
+			return Math.min(5, Math.max(1, isNaN(raw) || raw <= 0 ? 2 : Math.floor(raw)));
+		};
+		const hongLeiLimit = clampLimit(buffConf.hongLeiLimit);
+		const jiDaoLimit = clampLimit(buffConf.jiDaoLimit);
+		const hongLeiFull = thisScript.global.d6HongLeiCnt >= hongLeiLimit;
+		const jiDaoFull = thisScript.global.d6JiDaoCnt >= jiDaoLimit;
 
 		// 意外弹出的"暂时离开/放弃试炼"确认弹窗(点太快误点左上退出导致)：
 		// 这是模态框，会遮挡其它页面，必须放在最前面优先处理，点弹窗外空白处关闭，不点两个按钮。
@@ -710,14 +732,16 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		// 绽放之屿：不再判断唤息亮暗，识别到直接点岛进内部页(后续"绽放之屿_离开"分支会点右下角离开)。
-		// 不再走"唤息亮→进宁息商店"分支——后续不进商店。
-		// 离开内部页后的 2 秒内不点岛(冷却中)，避免"离开→地图→又点岛"来回打转。
-		if (!leaveCooling) {
+		// 绽放之屿：识别到后点右下角"唤息"召唤宁息商店(用户给的点击框)。
+		// 但两种buff已满(d6ShopBuffDone)后不再召唤/进店，直接跳过。
+		// 离开内页后的2秒内不点(冷却中)，避免"离开→地图→又点唤息"来回打转。
+		if (!leaveCooling && !thisScript.global.d6ShopBuffDone) {
 			const pBfzy = thisScript.findMultiColor('六道觉_绽放之屿', undefined, undefined, true);
 			if (pBfzy) {
-				thisScript.regionClick([[pBfzy.x - 40, pBfzy.y + 20, pBfzy.x + 40, pBfzy.y + 80, 1000]]);
-				log('绽放之屿：点岛 (' + pBfzy.x + ',' + pBfzy.y + ')');
+				thisScript.regionClick([[1103, 596, 1209, 693, 1000]]); // 右下角"唤息"
+				thisScript.global.d6LeaveClickAt = new Date().getTime(); // 点右下角同样进冷却，防过渡帧重复点
+				log('绽放之屿：点右下角唤息召唤宁息商店');
+				sleep(1200); // 等商店页出现，避免过渡帧误点
 				return true;
 			}
 		}
@@ -728,7 +752,7 @@ export class Func314 implements IFuncOrigin {
 			operator: [{ desc: thisOperator[0].desc }, { desc: thisOperator[1].desc }]
 		}, 200)) {
 			// 事件点击优先级：数组顺序即优先级，改顺序即可调整（当前 神秘>宁息/商店>混沌>鏖战）
-			// 宁息之屿就是商店(点进去后"商店_直接离开"分支会立刻退出)。
+			// 宁息之屿就是商店(点进去后"商店_购买buff"分支会买buff/已满则退出)。
 			const eventPriority = [
 				'六道觉_事件_神秘',
 				'六道觉_事件_宁息',
@@ -752,108 +776,11 @@ export class Func314 implements IFuncOrigin {
 			operator: [{ desc: thisOperator[3].desc }]
 		})) {
 			// 四选一 buff 页：前3张随机 buff，第4张固定舞技强化。
-			// 本页点"选择"必定获得该 buff(与商店不同，没有二次确认/扣费失败的可能)。
-			// 两种目标 buff：六道·轰雷、极道轰炸，各自独立计数 + 前端可配上限(1-5)。
-			// 本局流程：① 两个目标都拿够上限 → 直接选第4个舞技强化；
-			//           ② 否则前3格找"还没满"的目标(轰雷优先)，找到点它正下方"选择"，对应计数+1；
-			//           ③ 出现"万相铃不足"(没钱) → 刷新无效，不再刷新，直接选第4个；
-			//           ④ 本页已刷3次还亮着(刷新没生效) → 停止刷新，直接选第4个(防死循环)；
-			//           ⑤ 没找到目标且刷新"亮" → 点刷新继续找；
-			//           ⑥ 刷新"暗"(剩0次)仍没找到 → 选第4个舞技强化兜底。
-
-			// 刚点过目标 buff"选择"（2秒内）：画面切换有几帧延迟，有时还会连着来第二个buff页，
-			// 过渡期间不做任何点击，否则会在淡出帧上误点第4个。
-			if (buffCooling) return true;
-
-			// 两个上限来自前端配置(1-5，默认2)，容错：读不到/非法值一律按2处理并夹在1-5内。
-			const buffConf = thisScript.scheme.config['314'] || {};
-			const clampLimit = (v: any) => {
-				const raw = Number(v);
-				return Math.min(5, Math.max(1, isNaN(raw) || raw <= 0 ? 2 : Math.floor(raw)));
-			};
-			const hongLeiLimit = clampLimit(buffConf.hongLeiLimit);
-			const jiDaoLimit = clampLimit(buffConf.jiDaoLimit);
-			const hongLeiFull = thisScript.global.d6HongLeiCnt >= hongLeiLimit;
-			const jiDaoFull = thisScript.global.d6JiDaoCnt >= jiDaoLimit;
-
-			// ① 两个目标都拿够：不识别、不刷新，直接选第4个
-			if (hongLeiFull && jiDaoFull) {
-				thisScript.global.d6BuffRefreshCnt = 0;
-				thisScript.regionClick([thisOperator[3].oper[0]]);
-				log('四选一buff：轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道轰炸' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + ' 均已达上限，直接选第4个舞技强化');
-				return true;
-			}
-
-			// ② 前3格找"还没满"的目标 → 点它正下方"选择"，点下即获得(轰雷优先)。
-			//    图标指纹锚点是第1点，卡片图标中心在锚点左侧约7px；
-			//    实测三个"选择"按钮中心(219/492/765, y572)正好对齐各自图标中心，故以图标中心±38点击。
-			if (!hongLeiFull) {
-				const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
-				if (hongLei) {
-					const cardCx = hongLei.x - 7;
-					thisScript.global.d6HongLeiCnt++; // 本页点了就必得，计数+1
-					thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
-					thisScript.global.d6BuffClickAt = new Date().getTime(); // 2秒冷却，等画面切走
-					thisScript.global.d6BuffRefreshCnt = 0;
-					log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + '→按钮中心x' + cardCx + ')，已获得第' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '个轰雷');
-					sleep(1200); // 等选择动画/页面跳转
-					return true;
-				}
-			}
-			if (!jiDaoFull) {
-				const jiDao = thisScript.findMultiColor('六道觉_极道轰炸');
-				if (jiDao) {
-					const cardCx = jiDao.x - 7;
-					thisScript.global.d6JiDaoCnt++; // 本页点了就必得，计数+1
-					thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
-					thisScript.global.d6BuffClickAt = new Date().getTime(); // 2秒冷却，等画面切走
-					thisScript.global.d6BuffRefreshCnt = 0;
-					log('四选一buff：点极道轰炸对应选择 (锚点' + jiDao.x + ',' + jiDao.y + '→按钮中心x' + cardCx + ')，已获得第' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + '个极道轰炸');
-					sleep(1200); // 等选择动画/页面跳转
-					return true;
-				}
-			}
-
-			// ③ 没钱时的"万相铃不足"提示：此时刷新按钮虽亮，但点了不会刷新、也不会变暗，
-			//    继续点会死循环。识别到提示就放弃刷新，直接选第4个舞技强化。
-			if (thisScript.oper({
-				id: 314,
-				name: '六道觉_四选一_万相铃不足',
-				operator: [{ desc: thisOperator[36].desc }]
-			})) {
-				thisScript.global.d6BuffRefreshCnt = 0;
-				thisScript.regionClick([thisOperator[3].oper[0]]);
-				log('四选一buff：万相铃不足(刷新无效)，直接选第4个舞技强化');
-				return true;
-			}
-
-			// ④ 刷新上限兜底：本页已点3次刷新(刷新次数上限就是剩3次)却还亮着，
-			//    说明刷新没生效(异常/提示未识别)，不再刷，直接选第4个，杜绝死循环。
-			if (thisScript.global.d6BuffRefreshCnt >= 3) {
-				thisScript.global.d6BuffRefreshCnt = 0;
-				thisScript.regionClick([thisOperator[3].oper[0]]);
-				log('四选一buff：本页刷新3次仍未生效，停止刷新，选第4个舞技强化');
-				return true;
-			}
-
-			// ⑤ 刷新"亮"=可点击：点刷新后等待动画，下一帧重新找目标buff
-			const refreshBright = thisScript.oper({
-				id: 314,
-				name: '六道觉_四选一_刷新亮',
-				operator: [{ desc: thisOperator[35].desc }]
-			});
-			if (refreshBright) {
-				thisScript.regionClick([thisOperator[35].oper[0]]);
-				thisScript.global.d6BuffRefreshCnt++; // 本页刷新计数+1(上限兜底用)
-				log('四选一buff：未找到未满目标，点刷新继续找(本页第' + thisScript.global.d6BuffRefreshCnt + '次)');
-				sleep(800); // 等刷新动画完成
-				return true;
-			}
-
-			// ⑥ 刷新"暗"或不可点(剩0次)且未找到目标→固定选第4个舞技强化兜底
+			// 2026-11-26 新流程：两种目标buff(轰雷/极道轰炸)改由"宁息商店"购买，
+			// 本页不再找轰雷/极道、不再刷新、不再计数，直接点第4个舞技强化。
 			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.regionClick([thisOperator[3].oper[0]]);
-			log('四选一buff：刷新不可用且未找到目标，选第4个舞技强化');
+			log('四选一buff：直接选第4个舞技强化(目标buff已改由商店购买)');
 			return true;
 		}
 
@@ -880,18 +807,101 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 
-		// 商店(宁息之屿)：后续不进商店、不做任何购买/刷新/滑动，识别到直接点右下角退出。
-		// (原"商店确认购买"分支已删除：现在遇到商店一律只点右下角退出，不购买任何东西。)
+		// 商店确认购买弹窗：弹窗会遮挡商店页，必须放在商店页判断之前。
+		// 用户2026-11-26要求直接复用椒图op23(desc+确认购买/退出商店按钮框)：
+		// 点"确认购买"→"退出商店"，并按 d6ShopBuying 给对应buff计数+1。
+		// desc 同时兼容觉自己的 op20(万象赐福购买确认)与椒图 op38(商店确认购买)，
+		// 且仅在确实点了购买(d6ShopBuying非空)后才处理，避免无购买流程时误点确认。
+		if (!!thisScript.global.d6ShopBuying && thisScript.oper({
+			id: 314,
+			name: '六道觉_商店确认购买',
+			operator: [{ desc: thisOperator[38].desc }, { desc: thisOperator[20].desc }]
+		})) {
+			thisScript.regionClick([thisOperator[38].oper[0]]); // 确认购买
+			thisScript.regionClick([thisOperator[38].oper[1]]); // 退出商店
+			if (thisScript.global.d6ShopBuying === 'hongLei') {
+				thisScript.global.d6HongLeiCnt++;
+				log('商店：确认购买轰雷，已获得 ' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit);
+			} else if (thisScript.global.d6ShopBuying === 'jiDao') {
+				thisScript.global.d6JiDaoCnt++;
+				log('商店：确认购买极道轰炸，已获得 ' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit);
+			}
+			thisScript.global.d6ShopBuying = '';
+			thisScript.global.d6ShopRefreshCnt = 0;
+			thisScript.global.d6LeaveClickAt = new Date().getTime();
+			sleep(1200); // 等退出商店动画，避免过渡帧误点地图右下角唤息
+			return true;
+		}
+
+		// 商店(宁息之屿)：照椒图流程买轰雷/极道轰炸。
+		// 两种buff都满 → 退出商店并置 d6ShopBuffDone，之后不再召唤/进店；
+		// 未满 → 找目标(轰雷优先)点购买→等确认弹窗；没找到→刷新(上限3次防死循环)。
 		if (thisScript.oper({
 			id: 314,
-			name: '六道觉_商店_直接离开',
+			name: '六道觉_商店_购买buff',
 			operator: [{ desc: thisOperator[6].desc }]
 		})) {
-			if (leaveCooling) return true; // 刚点过右下角离开/退出，画面切换中，别重复点(否则回到地图会误点唤息)
-			thisScript.regionClick([thisOperator[6].oper[1]]); // 退出商店
-			thisScript.global.d6LeaveClickAt = new Date().getTime();
-			log('商店：直接点退出离开');
-			sleep(1200);
+			if (leaveCooling) return true; // 刚点过右下角，画面切换中，别重复点
+
+			const exitShop = () => {
+				thisScript.regionClick([thisOperator[6].oper[1]]); // 退出商店
+				thisScript.global.d6LeaveClickAt = new Date().getTime();
+				thisScript.global.d6ShopBuying = '';
+				thisScript.global.d6ShopRefreshCnt = 0;
+				sleep(1200); // 等画面切回地图，避免过渡帧误点唤息
+			};
+
+			// 两种buff都满：置完成标记(每局重置)并退出，之后绽放之屿不召唤、宁息商店直接退出
+			if (hongLeiFull && jiDaoFull) {
+				thisScript.global.d6ShopBuffDone = true;
+				exitShop();
+				log('商店：轰雷/极道轰炸均已达上限，标记完成并退出');
+				return true;
+			}
+
+			// 没钱判断(照椒图)：找不到"可购买buff"标记就退出，避免空转
+			if (!thisScript.findMultiColor('六道觉_购买buff', undefined, undefined, true)) {
+				exitShop();
+				log('商店：无可购买buff标记(万相铃不足?)，退出');
+				return true;
+			}
+
+			// 找还没满的目标，轰雷优先；指纹命中即点它下方购买按钮(照椒图 y+50~+140，夹在屏幕内)
+			let point = null;
+			let buying = '';
+			if (!hongLeiFull) {
+				point = thisScript.findMultiColor('六道觉_商店_轰雷', undefined, undefined, true);
+				buying = 'hongLei';
+			}
+			if (!point && !jiDaoFull) {
+				point = thisScript.findMultiColor('六道觉_商店_极道轰炸', undefined, undefined, true);
+				buying = 'jiDao';
+			}
+			if (point) {
+				const y2 = Math.min(point.y + 140, 718);
+				thisScript.regionClick([[point.x - 10, point.y + 50, point.x + 10, y2, 500]]);
+				thisScript.global.d6ShopBuying = buying;
+				log('商店：点购买' + (buying === 'hongLei' ? '轰雷' : '极道轰炸') + ' (锚点' + point.x + ',' + point.y + ')，等待确认弹窗');
+				sleep(600); // 等确认弹窗出现
+				return true;
+			}
+
+			// 没找到目标 → 点刷新继续找；刷新3次还没找到 → 退出，杜绝死循环
+			if (thisScript.global.d6ShopRefreshCnt >= 3) {
+				exitShop();
+				log('商店：已刷新3次仍未找到目标buff，退出');
+				return true;
+			}
+			const refresh = thisScript.findMultiColor('六道觉_商店_刷新', undefined, undefined, true);
+			if (refresh) {
+				thisScript.regionClick([[refresh.x - 25, refresh.y - 25, refresh.x + 25, refresh.y + 25, 500]]);
+				thisScript.global.d6ShopRefreshCnt++;
+				log('商店：未找到目标buff，点刷新(第' + thisScript.global.d6ShopRefreshCnt + '次)');
+				sleep(800); // 等刷新动画
+				return true;
+			}
+			exitShop();
+			log('商店：刷新按钮不可用，退出');
 			return true;
 		}
 
@@ -949,7 +959,8 @@ export class Func314 implements IFuncOrigin {
 			operator: [thisOperator[29]]
 		})) {
 			thisScript.global.d6FirstBuffDone = true;
-			console.log('首次buff已选（极道轰炸），本局不再重复');
+			thisScript.global.d6JiDaoCnt = 1; // 首次选的是极道轰炸，开局即计入极道计数(上限来自jiDaoLimit)
+			console.log('首次buff已选（极道轰炸），本局不再重复；极道计数=' + thisScript.global.d6JiDaoCnt);
 			return true;
 		}
 
@@ -975,7 +986,8 @@ export class Func314 implements IFuncOrigin {
 				thisOperator[2], thisOperator[4], thisOperator[5], thisOperator[7],
 				thisOperator[8], thisOperator[9], thisOperator[11], thisOperator[12],
 				thisOperator[13], thisOperator[16], thisOperator[17],
-				thisOperator[20], thisOperator[21], thisOperator[22],
+				// op20(万象赐福购买确认)已移到"商店确认购买"分支处理(点确认购买而非右上取消)，此处不再自动点击
+				thisOperator[21], thisOperator[22],
 				thisOperator[23], thisOperator[24], thisOperator[25], thisOperator[26],
 				thisOperator[37], // 六道之门·孔雀国横幅
 			]
@@ -995,6 +1007,9 @@ export class Func314 implements IFuncOrigin {
 			thisScript.global.d6JiDaoCnt = 0;
 			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.global.d6BuffClickAt = 0;
+			thisScript.global.d6ShopBuffDone = false; // 完成标记每局重置(用户2026-11-26决定)
+			thisScript.global.d6ShopBuying = '';
+			thisScript.global.d6ShopRefreshCnt = 0;
 			thisScript.global.d6dCurrentBegin = new Date().getTime();
 			if (!thisScript.global.d6dBegin) {
 				thisScript.global.d6dBegin = new Date().getTime();
