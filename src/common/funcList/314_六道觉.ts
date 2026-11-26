@@ -675,7 +675,7 @@ export class Func314 implements IFuncOrigin {
 		const leaveCooling = new Date().getTime() - (thisScript.global.d6LeaveClickAt || 0) < 2000;
 
 		// 两种目标buff的上限来自前端配置(1-5，默认2)，容错：读不到/非法值一律按2处理并夹在1-5内。
-		// 计数来源：① 首次三选一固定选极道轰炸(d6JiDaoCnt=1)；② 商店购买确认后按种类+1。
+		// 计数来源：① 首次三选一固定选极道轰炸(d6JiDaoCnt=1)；② 四选一页点目标buff"选择"+1(不刷新,仅限当前页)；③ 商店购买确认后按种类+1。
 		const buffConf = thisScript.scheme.config['314'] || {};
 		const clampLimit = (v: any) => {
 			const raw = Number(v);
@@ -776,11 +776,47 @@ export class Func314 implements IFuncOrigin {
 			operator: [{ desc: thisOperator[3].desc }]
 		})) {
 			// 四选一 buff 页：前3张随机 buff，第4张固定舞技强化。
-			// 2026-11-26 新流程：两种目标buff(轰雷/极道轰炸)改由"宁息商店"购买，
-			// 本页不再找轰雷/极道、不再刷新、不再计数，直接点第4个舞技强化。
+			// 2026-11-26 新流程：本页也做判断——当前页若出现"还没满上限"的目标buff(轰雷/极道轰炸)
+			// 就直接点它的"选择"顺手拿；但【仅限当前页、不点刷新】，没找到就点第4个舞技强化。
+			// 上限/计数与商店共享(d6HongLeiCnt/d6JiDaoCnt + hongLeiLimit/jiDaoLimit)：
+			//   本页选一次即计数+1，达到前端配置上限后本页也不再选该buff。
+			// 点目标后2秒冷却：画面切换有延迟，过渡帧不操作，避免连着两个buff页时误点第4个。
+			const buffCooling = new Date().getTime() - (thisScript.global.d6BuffClickAt || 0) < 2000;
+			if (buffCooling) return true;
+
+			// ① 轰雷优先：当前页若有未达上限的轰雷 → 点对应"选择"，计数+1
+			if (!hongLeiFull) {
+				const hongLei = thisScript.findMultiColor('六道觉_六道轰雷');
+				if (hongLei) {
+					const cardCx = hongLei.x - 7; // 图标锚点左侧约7px = "选择"按钮中心x
+					thisScript.global.d6HongLeiCnt++;
+					thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
+					thisScript.global.d6BuffClickAt = new Date().getTime();
+					thisScript.global.d6BuffRefreshCnt = 0;
+					log('四选一buff：点轰雷对应选择 (锚点' + hongLei.x + ',' + hongLei.y + ')，已获得第' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '个轰雷');
+					sleep(1200); // 等选择动画/页面跳转
+					return true;
+				}
+			}
+			// ② 极道轰炸：当前页若有未达上限的极道 → 点对应"选择"，计数+1
+			if (!jiDaoFull) {
+				const jiDao = thisScript.findMultiColor('六道觉_极道轰炸');
+				if (jiDao) {
+					const cardCx = jiDao.x - 7; // 与轰雷同规则
+					thisScript.global.d6JiDaoCnt++;
+					thisScript.regionClick([[cardCx - 38, 556, cardCx + 38, 588, 1000]]);
+					thisScript.global.d6BuffClickAt = new Date().getTime();
+					thisScript.global.d6BuffRefreshCnt = 0;
+					log('四选一buff：点极道轰炸对应选择 (锚点' + jiDao.x + ',' + jiDao.y + ')，已获得第' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + '个极道轰炸');
+					sleep(1200); // 等选择动画/页面跳转
+					return true;
+				}
+			}
+
+			// ③ 当前页没有可拿的目标buff → 不刷新，直接选第4个舞技强化
 			thisScript.global.d6BuffRefreshCnt = 0;
 			thisScript.regionClick([thisOperator[3].oper[0]]);
-			log('四选一buff：直接选第4个舞技强化(目标buff已改由商店购买)');
+			log('四选一buff：当前页无目标buff(轰雷' + thisScript.global.d6HongLeiCnt + '/' + hongLeiLimit + '、极道' + thisScript.global.d6JiDaoCnt + '/' + jiDaoLimit + ')，不刷新，直接选第4个舞技强化');
 			return true;
 		}
 
