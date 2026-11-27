@@ -123,7 +123,6 @@ export class Script {
 		};
 		this.myToast = myToast;
 		this.schedule = schedule;
-		syncDebugDrawConfig(storeCommon.get('settings', {})); // 脚本启动时同步调试绘制配置
 	}
 
 	initOcrIfNeeded() {
@@ -549,6 +548,7 @@ export class Script {
 	 */
 	_run(job?: Job): void {
 		if (this.runThread) return;
+		syncDebugDrawConfig(storeCommon.get('settings', {})); // 脚本运行时同步调试绘制配置（此时store已初始化）
 		const self = this;
 		try {
 			this.initFuncList();
