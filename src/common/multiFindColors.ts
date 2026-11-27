@@ -1385,15 +1385,20 @@ const multiFindColors: IMultiFindColorsOrigin = {
 	},
 
 	'庭院_探索灯笼': {
-		region: [center, 1280, 720, 0, 0, 1280, 720], // 【实验】扩大到全屏，让纳物库点可扫描
+		region: [center, 1280, 720, 0, 83, 1006, 284],
 		desc: [
-			[1280, 720, // 【实验】替换为纳物库图标取点，验证识别链路
+			[1280, 720, // 狐栖归处主题灯笼（置顶优先匹配）
 				[
-					[center, 361, 614, 0x8f322c],
-					[center, 332, 638, 0xbe9a82],
-					[center, 322, 658, 0x825439],
-					[center, 365, 654, 0x76808e],
-					[center, 356, 636, 0xe0ae5d],
+					[right, 734, 231, 0xe37f5c],
+					[right, 754, 234, 0xe5895d],
+					[right, 755, 242, 0xea8d66],
+					[right, 754, 259, 0xeab78a],
+					[right, 751, 274, 0xeae78b],
+					[right, 734, 275, 0xdcb18b],
+					[right, 723, 266, 0xe8cb93],
+					[right, 724, 247, 0xdea385],
+					[right, 744, 241, 0x3e301d],
+					[right, 740, 259, 0x372b23],
 				]
 			],
 
