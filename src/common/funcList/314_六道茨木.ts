@@ -41,6 +41,20 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 936, 649, 977, 683, 1000],
 		]
+	}, { // 1 六道之门净佛刹页面（暂只识别，不点击）
+		desc: [1280, 720,
+			[
+				[left, 32, 46, 0xefece4],
+				[left, 251, 45, 0x583615],
+				[center, 323, 55, 0x968468],
+				[center, 349, 32, 0x50493f],
+				[left, 74, 231, 0x404030],
+				[right, 1231, 74, 0x3b3b2d],
+				[left, 110, 698, 0x302b1f],
+				[center, 363, 701, 0x2f2a1e],
+				[center, 429, 244, 0x746441],
+			]
+		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
@@ -48,6 +62,12 @@ export class Func314 implements IFuncOrigin {
 			id: 314,
 			name: '六道茨木_探索地图进入六道之门',
 			operator: [thisOperator[0]]
+		})) {
+			return true;
+		}
+		if (thisScript.oper({
+			name: '六道茨木_净佛刹页面识别',
+			operator: [thisOperator[1]]
 		})) {
 			return true;
 		}
