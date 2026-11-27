@@ -161,22 +161,20 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1123, 576, 1230, 675, 1000],
 		]
-	}, { // 9 右下角离开按钮
+	}, { // 9 混沌_精英怪页面
 		desc: [1280, 720,
 			[
-				[right, 1159, 657, 0x16120b],
-				[right, 1185, 632, 0x18130b],
-				[right, 1215, 658, 0x1d1812],
-				[right, 1182, 685, 0x31281a],
-				[right, 1167, 657, 0xe7d1ac],
-				[right, 1183, 640, 0xf7efdc],
-				[right, 1201, 658, 0xe8d4b4],
-				[right, 1182, 658, 0xead5b4],
-				[right, 1180, 676, 0xd4b686],
+				[left, 32, 46, 0xefece4],
+				[left, 124, 35, 0xeff8f7],
+				[left, 125, 59, 0xeff8f7],
+				[left, 151, 32, 0xeff8f7],
+				[left, 159, 59, 0xeff8f7],
+				[right, 685, 529, 0x9d9162],
+				[right, 888, 513, 0xab9d62],
 			]
 		],
 		oper: [
-			[center, 1280, 720, 1144, 625, 1222, 691, 1000],
+			[center, 1280, 720, 659, 239, 817, 369, 1000],
 		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
