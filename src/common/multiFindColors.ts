@@ -4093,6 +4093,36 @@ const multiFindColors: IMultiFindColorsOrigin = {
 
 			],
 
+			[ // 宁息
+
+				1280, 720,
+
+				[
+
+					[right, 915, 411, 0xf0d592],
+
+					[right, 917, 423, 0xc9a677],
+
+					[right, 917, 440, 0xf4eef1],
+
+					[right, 917, 460, 0xf8f2f2],
+
+					[right, 911, 475, 0xf9eef1],
+
+					[right, 921, 475, 0xf9f3f3],
+
+					[right, 915, 475, 0xfcf2f5],
+
+					[right, 912, 482, 0xfff2f2],
+
+					[right, 919, 482, 0xfff2f2],
+
+					[right, 921, 492, 0xf7f4f4],
+
+				]
+
+			],
+
 			[ // 混沌
 
 				1280, 720,
@@ -4178,36 +4208,6 @@ const multiFindColors: IMultiFindColorsOrigin = {
 					[right, 662, 421, 0xf7f0f3],
 
 					[right, 662, 431, 0xf1e9e9],
-
-				]
-
-			],
-
-			[ // 宁息
-
-				1280, 720,
-
-				[
-
-					[right, 915, 411, 0xf0d592],
-
-					[right, 917, 423, 0xc9a677],
-
-					[right, 917, 440, 0xf4eef1],
-
-					[right, 917, 460, 0xf8f2f2],
-
-					[right, 911, 475, 0xf9eef1],
-
-					[right, 921, 475, 0xf9f3f3],
-
-					[right, 915, 475, 0xfcf2f5],
-
-					[right, 912, 482, 0xfff2f2],
-
-					[right, 919, 482, 0xfff2f2],
-
-					[right, 921, 492, 0xf7f4f4],
 
 				]
 
