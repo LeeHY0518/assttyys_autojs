@@ -158,12 +158,22 @@ const drawFloaty = {
 	 */
 	draw: function (arr, time) {
 		if (!debugDrawConfig.showBox) return;
+		const now = new Date().getTime();
+		// 主动清理过期框：清理原本只依赖 canvas 的 draw 回调，只显示模式下回调可能不触发，
+		// 导致 toDraw 无限累积、内存暴涨直至闪退。这里入队时就过滤，兜住内存。
+		if (this.toDraw.length) {
+			this.toDraw = this.toDraw.filter(i => i.et > now);
+		}
 		arr.forEach(i => {
 			i.region[1] = i.region[1] - this.option.statusBarHeight;
 			i.region[3] = i.region[3] - this.option.statusBarHeight;
-			i.et = new Date().getTime() + time;
+			i.et = now + time;
 		});
 		this.toDraw = this.toDraw.concat(arr);
+		// 极端情况兜底：最多保留 300 个框，防止异常高频绘制撑爆内存
+		if (this.toDraw.length > 300) {
+			this.toDraw.splice(0, this.toDraw.length - 300);
+		}
 	},
 
 	// 销毁
