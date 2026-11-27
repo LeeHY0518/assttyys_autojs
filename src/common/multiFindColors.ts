@@ -1387,18 +1387,6 @@ const multiFindColors: IMultiFindColorsOrigin = {
 	'庭院_探索灯笼': {
 		region: [center, 1280, 720, 0, 83, 1006, 284],
 		desc: [
-			[1280, 720, // 狐栖归处主题灯笼（置顶优先匹配）
-				[
-					[right, 674, 142, 0xf7efef],
-					[right, 723, 142, 0xf5e5e7],
-					[right, 659, 170, 0xc9838b],
-					[right, 736, 168, 0xe5a9ab],
-					[right, 684, 179, 0xedc7bb],
-					[right, 705, 146, 0x404040],
-					[right, 702, 184, 0x404040],
-				]
-			],
-
 			[1280, 720,
 
 				[
