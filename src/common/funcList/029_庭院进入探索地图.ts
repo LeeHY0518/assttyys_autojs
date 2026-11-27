@@ -17,6 +17,10 @@ export class Func029 implements IFuncOrigin {
 		]
 	}, { // 庭院已打开菜单
 		desc: '页面是否为庭院_菜单已展开_只支持默认庭院皮肤与默认装饰'
+	}, { // 狐栖归处 庭院菜单未展开
+		desc: '页面是否为庭院_菜单未展开_狐栖归处'
+	}, { // 狐栖归处 庭院菜单已展开
+		desc: '页面是否为庭院_菜单已展开_狐栖归处'
 	}]
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
 		if (thisScript.oper({
@@ -25,6 +29,10 @@ export class Func029 implements IFuncOrigin {
 				desc: thisOperator[0].desc
 			}, {
 				desc: thisOperator[1].desc
+			}, {
+				desc: thisOperator[2].desc
+			}, {
+				desc: thisOperator[3].desc
 			}]
 		})) {
 			const point = thisScript.findMultiColor('庭院_探索灯笼');
