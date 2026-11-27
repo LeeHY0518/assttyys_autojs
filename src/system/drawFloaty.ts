@@ -4,17 +4,29 @@
  * 3. 绘制多点找色命中区域(script.js)
  * 2. 绘制点击区域与实际点击点(helperBridge.js)
  */
-// ==================== 调试绘制自定义配置（改这里即可，改完重新打包） ====================
-// ① drawTime：框框在屏幕上停留的毫秒数，手动填数字（如 500 / 1000 / 2000 / 3000）
-// ② showBox：是否显示框框。true=显示；false=不显示（脚本照常点击，不受③影响）
-// ③ clickWhenDrawing：显示框时脚本是否执行点击。
+// ==================== 调试绘制配置（可在设置界面修改，无需改代码） ====================
+// 三项对应设置界面里的「调试绘制」分组：
+// ① drawTime          = 框框在屏幕上停留的毫秒数（设置项 floaty_draw_time，手动填数字）
+// ② showBox           = 是否显示框框（设置项 floaty_draw_show_box）
+// ③ clickWhenDrawing  = 显示框时脚本是否点击（设置项 floaty_draw_click_when_drawing）
 //      true  = 显示框 + 脚本正常点击（边看边跑）
 //      false = 显示框 + 脚本不点击（只显示模式，界面停住方便校准取点）
+// 这里的初值是「设置里没配置时」的兜底默认值；启动/保存设置后由 syncDebugDrawConfig 覆盖。
 export const debugDrawConfig = {
 	drawTime: 1000,
 	showBox: true,
 	clickWhenDrawing: false
 };
+
+// 用全局设置同步绘制配置（settings.ts 保存后、script.ts 启动时调用）。
+// 参数 settings = storeCommon.get('settings')。字段缺失时保留当前默认值。
+export function syncDebugDrawConfig(settings: any): void {
+	if (!settings) return;
+	const t = Number(settings.floaty_draw_time);
+	if (!isNaN(t) && t > 0) debugDrawConfig.drawTime = Math.floor(t);
+	if (typeof settings.floaty_draw_show_box === 'boolean') debugDrawConfig.showBox = settings.floaty_draw_show_box;
+	if (typeof settings.floaty_draw_click_when_drawing === 'boolean') debugDrawConfig.clickWhenDrawing = settings.floaty_draw_click_when_drawing;
+}
 // ======================================================================================
 
 const drawFloaty = {

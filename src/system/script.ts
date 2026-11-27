@@ -12,7 +12,7 @@ import { yunxiOcr } from '@/system/Ocr/YunxiOcr';
 import { setCurrentScheme } from '@/common/tool';
 import { getWidthPixels, getHeightPixels } from '@auto.pro/core';
 import schemeDialog from './schemeDialog';
-import drawFloaty, { debugDrawConfig } from '@/system/drawFloaty';
+import drawFloaty, { debugDrawConfig, syncDebugDrawConfig } from '@/system/drawFloaty';
 import { myToast, doPush, questionSearch, search, formatTime, formatRunTime } from '@/common/toolAuto';
 import { IFunc, IFuncOrigin } from '@/interface/IFunc';
 import { IScheme } from '@/interface/IScheme';
@@ -123,6 +123,7 @@ export class Script {
 		};
 		this.myToast = myToast;
 		this.schedule = schedule;
+		syncDebugDrawConfig(storeCommon.get('settings', {})); // 脚本启动时同步调试绘制配置
 	}
 
 	initOcrIfNeeded() {

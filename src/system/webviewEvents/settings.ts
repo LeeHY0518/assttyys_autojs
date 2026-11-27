@@ -1,5 +1,5 @@
 import { webview } from '@/system';
-import drawFloaty from '@/system/drawFloaty';
+import drawFloaty, { syncDebugDrawConfig } from '@/system/drawFloaty';
 import myFloaty from '@/system/MyFloaty';
 import store, { getStorages, getStoragesList, setStorages, storeCommon, storeStore, testStorage } from '@/system/Store/store';
 import { doInitHookConsoleLog, getDeviceId, getInstalledPackages, isDebugPlayerRunning, myToast, requestMyScreenCapture } from '@/common/toolAuto';
@@ -36,6 +36,15 @@ export default function webviewSettigns() {
 
 	if (typeof initStoreSettings.floaty_scheme_openApp === 'undefined') {
 		initStoreSettings.floaty_scheme_openApp = false;
+	}
+	if (typeof initStoreSettings.floaty_draw_time === 'undefined') {
+		initStoreSettings.floaty_draw_time = 1000;
+	}
+	if (typeof initStoreSettings.floaty_draw_show_box === 'undefined') {
+		initStoreSettings.floaty_draw_show_box = true;
+	}
+	if (typeof initStoreSettings.floaty_draw_click_when_drawing === 'undefined') {
+		initStoreSettings.floaty_draw_click_when_drawing = false;
 	}
 
 	// if (typeof initStoreSettings.osp_user_token === 'undefined') {
@@ -85,6 +94,7 @@ export default function webviewSettigns() {
 	// }
 
 
+	syncDebugDrawConfig(initStoreSettings); // 启动时同步调试绘制配置
 	storeCommon.put('settings', initStoreSettings);
 
 	// 获取配置列表
@@ -183,6 +193,24 @@ export default function webviewSettigns() {
 			type: 'assttyys_setting',
 			stype: 'switch',
 			enabled: storeSettings.floaty_debugger_draw // !!drawFloaty.instacne
+		}, {
+			desc: '框显示时间(毫秒)',
+			name: 'floaty_draw_time',
+			type: 'assttyys_setting',
+			stype: 'text',
+			value: storeSettings.floaty_draw_time
+		}, {
+			desc: '显示框框',
+			name: 'floaty_draw_show_box',
+			type: 'assttyys_setting',
+			stype: 'switch',
+			enabled: storeSettings.floaty_draw_show_box
+		}, {
+			desc: '显示框时允许点击(开=边显示边跑,关=只显示不点)',
+			name: 'floaty_draw_click_when_drawing',
+			type: 'assttyys_setting',
+			stype: 'switch',
+			enabled: storeSettings.floaty_draw_click_when_drawing
 		}, {
 			desc: 'OCR扩展类型',
 			name: 'ocrType',
@@ -433,6 +461,7 @@ export default function webviewSettigns() {
 			if (item.name === 'remote_log_url') {
 				doInitHookConsoleLog(item.value);
 			}
+			syncDebugDrawConfig(storeSettings); // 保存后立即生效
 			storeCommon.put('settings', storeSettings);
 			done(true);
 			console.log(storeSettings);
