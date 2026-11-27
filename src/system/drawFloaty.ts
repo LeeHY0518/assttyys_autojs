@@ -4,31 +4,6 @@
  * 3. 绘制多点找色命中区域(script.js)
  * 2. 绘制点击区域与实际点击点(helperBridge.js)
  */
-// ==================== 调试绘制配置（可在设置界面修改，无需改代码） ====================
-// 三项对应设置界面里的「调试绘制」分组：
-// ① drawTime          = 框框在屏幕上停留的毫秒数（设置项 floaty_draw_time，手动填数字）
-// ② showBox           = 是否显示框框（设置项 floaty_draw_show_box）
-// ③ clickWhenDrawing  = 显示框时脚本是否点击（设置项 floaty_draw_click_when_drawing）
-//      true  = 显示框 + 脚本正常点击（边看边跑）
-//      false = 显示框 + 脚本不点击（只显示模式，界面停住方便校准取点）
-// 这里的初值是「设置里没配置时」的兜底默认值；启动/保存设置后由 syncDebugDrawConfig 覆盖。
-export const debugDrawConfig = {
-	drawTime: 1000,
-	showBox: true,
-	clickWhenDrawing: false
-};
-
-// 用全局设置同步绘制配置（settings.ts 保存后、script.ts 启动时调用）。
-// 参数 settings = storeCommon.get('settings')。字段缺失时保留当前默认值。
-export function syncDebugDrawConfig(settings: any): void {
-	if (!settings) return;
-	const t = Number(settings.floaty_draw_time);
-	if (!isNaN(t) && t > 0) debugDrawConfig.drawTime = Math.floor(t);
-	if (typeof settings.floaty_draw_show_box === 'boolean') debugDrawConfig.showBox = settings.floaty_draw_show_box;
-	if (typeof settings.floaty_draw_click_when_drawing === 'boolean') debugDrawConfig.clickWhenDrawing = settings.floaty_draw_click_when_drawing;
-}
-// ======================================================================================
-
 const drawFloaty = {
 	// 悬浮实例
 	instacne: null,
@@ -157,23 +132,12 @@ const drawFloaty = {
 	 * @param {*} time
 	 */
 	draw: function (arr, time) {
-		if (!debugDrawConfig.showBox) return;
-		const now = new Date().getTime();
-		// 主动清理过期框：清理原本只依赖 canvas 的 draw 回调，只显示模式下回调可能不触发，
-		// 导致 toDraw 无限累积、内存暴涨直至闪退。这里入队时就过滤，兜住内存。
-		if (this.toDraw.length) {
-			this.toDraw = this.toDraw.filter(i => i.et > now);
-		}
 		arr.forEach(i => {
 			i.region[1] = i.region[1] - this.option.statusBarHeight;
 			i.region[3] = i.region[3] - this.option.statusBarHeight;
-			i.et = now + time;
+			i.et = new Date().getTime() + time;
 		});
 		this.toDraw = this.toDraw.concat(arr);
-		// 极端情况兜底：最多保留 300 个框，防止异常高频绘制撑爆内存
-		if (this.toDraw.length > 300) {
-			this.toDraw.splice(0, this.toDraw.length - 300);
-		}
 	},
 
 	// 销毁

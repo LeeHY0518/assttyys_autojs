@@ -1,15 +1,21 @@
 import { isRoot } from '@auto.pro/core';
 import Bezier from 'bezier-js';
-import drawFloaty, { debugDrawConfig } from '@/system/drawFloaty';
+import drawFloaty from '@/system/drawFloaty';
 
 // @ts-expect-error d.ts文件问题
 export const myShell = isRoot ? new Shell(true) : undefined;
 
-// 每一类真实动作前都调用它：是否跳过点击由 drawFloaty.ts 的 debugDrawConfig 统一控制。
-// 条件：调试绘制开着 + 框框正在显示 + 配置了「显示框但不点击」→ 跳过动作（只显示模式）。
-// 框框不显示(showBox=false)时一律正常点击，避免看不到框又不能点、脚本卡住。
+// ==================== 【调试用·只显示不点击】开关 ====================
+// 当设置里打开「绘制调试」开关(屏幕上会画彩色框)时：
+//   true  = 只画框、找位置，【不真正点击/滑动】——你能慢慢看清，界面停住不动
+//   false = 原版行为：一边画框一边照常点击
+// 想恢复原版就把下面的 true 改成 false，然后重新打包。
+const NO_CLICK_WHEN_DRAWING = true;
+// ====================================================================
+
+// 每一类真实动作前都调用它：绘图调试开着 + 上面的开关为 true 时，跳过动作
 function shouldSkipAction(): boolean {
-	return !!drawFloaty.instacne && debugDrawConfig.showBox && !debugDrawConfig.clickWhenDrawing;
+	return NO_CLICK_WHEN_DRAWING && !!drawFloaty.instacne;
 }
 
 export interface IMyAutomator {
