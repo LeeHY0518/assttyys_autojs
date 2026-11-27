@@ -1564,6 +1564,28 @@ const multiFindColors: IMultiFindColorsOrigin = {
 
 			],
 
+			[1280, 720, // 狐栖归处主题灯笼
+
+				[
+
+					[right, 746, 233, 0xe87e5d],
+
+					[right, 729, 236, 0xe78d6f],
+
+					[right, 757, 241, 0xf19771],
+
+					[right, 737, 254, 0xfde8c2],
+
+					[right, 752, 274, 0xf6be96],
+
+					[right, 742, 274, 0xf6bd9b],
+
+					[right, 732, 270, 0xf6c09a],
+
+				]
+
+			],
+
 		]
 
 	},
