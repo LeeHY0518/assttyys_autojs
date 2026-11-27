@@ -1388,6 +1388,8 @@ const multiFindColors: IMultiFindColorsOrigin = {
 
 		region: [center, 1280, 720, 0, 83, 1006, 284],
 
+		similar: 93, // 灯笼有浮动+主题色差,降低相似度容忍(否则默认97%匹配不到)
+
 		desc: [
 
 			[1280, 720,
