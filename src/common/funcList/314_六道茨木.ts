@@ -134,15 +134,14 @@ export class Func314 implements IFuncOrigin {
 	}, { // 7 鏖战之屿选择页面_选择右边
 		desc: [1280, 720,
 			[
-				[left, 117, 55, 0xeff8f7],
+				[left, 35, 45, 0xf5f2ed],
 				[left, 122, 47, 0xeff8f7],
-				[left, 141, 48, 0xeff8f7],
-				[left, 153, 34, 0xeff8f7],
-				[left, 253, 45, 0x593716],
-				[left, 116, 567, 0x6f7254],
-				[left, 178, 620, 0x7c7e5c],
-				[center, 440, 261, 0x373733],
-				[right, 744, 288, 0x373733],
+				[left, 117, 55, 0xeff8f7],
+				[left, 141, 38, 0xeff8f7],
+				[left, 136, 50, 0xeff8f7],
+				[left, 157, 51, 0xeff8f7],
+				[left, 156, 329, 0x59563a],
+				[center, 621, 666, 0x777452],
 			]
 		],
 		oper: [
@@ -299,6 +298,18 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 17, 23, 74, 71, 1000],
 		]
+	}, { // 18 双倍次数为0（只判不点，用于只打双倍检测）
+		desc: [1280, 720,
+			[
+				[right, 1188, 38, 0xd6d4c4],
+				[right, 1188, 41, 0xd8d6c6],
+				[right, 1197, 39, 0xceccbc],
+				[right, 1197, 42, 0xd2d0c0],
+				[right, 1193, 47, 0x968f83],
+				[right, 1193, 32, 0x9a9487],
+				[right, 1193, 40, 0x7f734d],
+			]
+		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
@@ -309,15 +320,84 @@ export class Func314 implements IFuncOrigin {
 		})) {
 			return true;
 		}
+		// 只打双倍：在开始_开启页确认双倍次数为0则停止（照搬椒图 onlyDouble）
+		if ((thisScript.scheme.config['314'] || {}).onlyDouble) {
+			if (thisScript.oper({
+				id: 314,
+				name: '六道茨木_开始战斗检测',
+				operator: [{ desc: thisOperator[2].desc }]
+			})) {
+				if (thisScript.oper({
+					id: 314,
+					name: '六道茨木_双倍次数检测',
+					operator: [thisOperator[18]]
+				})) {
+					thisScript.myToast('双倍次数已用完，停止运行');
+					console.log('双倍次数已用完，停止运行');
+					thisScript.rerun('__停止脚本__');
+					return true;
+				}
+			}
+		}
 		if (thisScript.oper({
 			name: '六道茨木_执行个别事件',
 			operator: [
-				thisOperator[1], thisOperator[2], thisOperator[3], thisOperator[4],
+				thisOperator[1], thisOperator[2], thisOperator[3],
 				thisOperator[5], thisOperator[6], thisOperator[7], thisOperator[8],
 				thisOperator[9], thisOperator[10], thisOperator[11], thisOperator[12],
-				thisOperator[13], thisOperator[14], 				thisOperator[15], 				thisOperator[16], thisOperator[17]
+				thisOperator[13], thisOperator[14], thisOperator[15], thisOperator[17]
 			]
 		})) {
+			return true;
+		}
+		// 开始_重置参数：命中"开始_开启_60体"时计次（照搬椒图 global.times）
+		if (thisScript.oper({
+			id: 314,
+			name: '六道茨木_开始_重置参数',
+			operator: [thisOperator[4]]
+		})) {
+			thisScript.global.d6dCurrentBegin = new Date().getTime();
+			if (!thisScript.global.d6dBegin) {
+				thisScript.global.d6dBegin = new Date().getTime();
+			}
+			if (!thisScript.global.times) {
+				thisScript.global.times = 0;
+			}
+			thisScript.global.times++;
+			return true;
+		}
+
+		// 结束：统计通关次数/耗时，达到挂机局数则切换方案（照搬椒图）
+		if (thisScript.oper({
+			id: 314,
+			name: '六道茨木_结束',
+			operator: [thisOperator[16]]
+		})) {
+			const thisconf = thisScript.scheme.config['314'];
+			thisconf.overTimes = Math.floor(Number(thisconf.overTimes) || 0);
+			const now = new Date().getTime();
+			const currentCost = Math.floor((now - thisScript.global.d6dCurrentBegin) / 1000); // 秒
+			const cost = ((now - thisScript.global.d6dBegin) / 1000 / 60).toFixed(2); // 分
+			const costAvg = Math.floor((now - thisScript.global.d6dBegin) / 1000 / (thisScript.global.times || 0)); // 秒
+			let toLog = `通关次数: ${thisScript.global.times || 0}次, 本次通关时间: ${currentCost}秒, 平均通关时间: ${costAvg}秒, 总通关时间: ${cost}分`;
+			if (thisconf.overTimes && thisScript.global.times >= thisconf.overTimes) {
+				toLog = `[${thisScript.schemeHistory.map(item => item.schemeName).join('、')}]已够次数，请查看。` + toLog;
+			}
+			thisScript.myToast(toLog);
+			if (thisconf.pushResult) {
+				thisScript.doPush(thisScript, {
+					text: toLog,
+					before() {
+						thisScript.myToast('正在上传数据');
+					}
+				});
+				sleep(2000);
+			}
+			if (thisconf.overTimes && thisScript.global.times >= thisconf.overTimes) {
+				thisScript.rerun(thisconf.next_scheme);
+				sleep(3000);
+				return;
+			}
 			return true;
 		}
 		// 选事件：动态识别事件图标，按命中点偏移出点击框（照抄椒图偏移）
