@@ -176,6 +176,84 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 659, 239, 817, 369, 1000],
 		]
+	}, { // 10 挑战后buff选择页_固定点第四个
+		desc: [1280, 720,
+			[
+				[left, 164, 571, 0x373737],
+				[left, 259, 574, 0x454545],
+				[center, 440, 575, 0x393939],
+				[center, 542, 573, 0x434343],
+				[right, 709, 575, 0x3c3c3c],
+				[right, 809, 575, 0x343434],
+				[right, 1031, 575, 0x444444],
+				[right, 1132, 573, 0x2d2d2d],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1013, 551, 1159, 596, 1000],
+		]
+	}, { // 11 混沌之屿_宝箱页面（点击框=右下角离开固定框）
+		desc: [1280, 720,
+			[
+				[left, 34, 47, 0xede8df],
+				[left, 124, 32, 0xeff8f7],
+				[left, 122, 49, 0xeff8f7],
+				[left, 151, 33, 0xeff8f7],
+				[left, 160, 59, 0xeff8f7],
+				[center, 598, 527, 0x7f7d66],
+				[right, 890, 502, 0x8b876e],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1179, 621, 1222, 693, 1000],  // 右下角离开固定框
+		]
+	}, { // 12 淬炼之屿页面（点击框=右下角离开固定框）
+		desc: [1280, 720,
+			[
+				[left, 34, 45, 0xf2efe8],
+				[left, 120, 34, 0xeff8f7],
+				[left, 120, 50, 0xeff8f7],
+				[left, 139, 50, 0xeff8f7],
+				[left, 154, 34, 0xeff8f7],
+				[left, 155, 46, 0xeff8f7],
+				[left, 143, 608, 0x7b7754],
+				[center, 354, 626, 0x7e7b58],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1179, 621, 1222, 693, 1000],  // 右下角离开固定框
+		]
+	}, { // 13 宁息页面（点击框=右下角离开固定框）
+		desc: [1280, 720,
+			[
+				[left, 34, 45, 0xf2efe8],
+				[left, 116, 43, 0xeff8f7],
+				[left, 116, 59, 0xeff8f7],
+				[left, 154, 39, 0xeff8f7],
+				[left, 155, 60, 0xeff8f7],
+				[right, 1245, 156, 0xd5ccbc],
+				[left, 294, 636, 0x837e56],
+				[center, 392, 658, 0x9b9368],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1179, 621, 1222, 693, 1000],  // 右下角离开固定框
+		]
+	}, { // 14 Boss挑战页面
+		desc: [1280, 720,
+			[
+				[left, 32, 47, 0xefece4],
+				[left, 122, 54, 0xeff8f7],
+				[left, 121, 38, 0xeff8f7],
+				[left, 155, 37, 0xeef7f6],
+				[left, 158, 61, 0xeff8f7],
+				[left, 211, 172, 0xf5e6b7],
+				[left, 195, 415, 0xfbf1c9],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1116, 592, 1222, 689, 1000],
+		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
@@ -191,7 +269,8 @@ export class Func314 implements IFuncOrigin {
 			operator: [
 				thisOperator[1], thisOperator[2], thisOperator[3], thisOperator[4],
 				thisOperator[5], thisOperator[6], thisOperator[7], thisOperator[8],
-				thisOperator[9]
+				thisOperator[9], thisOperator[10], thisOperator[11], thisOperator[12],
+				thisOperator[13], thisOperator[14]
 			]
 		})) {
 			return true;

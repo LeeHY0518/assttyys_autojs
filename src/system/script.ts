@@ -805,7 +805,7 @@ export class Script {
 					rs = true;
 				}
 				if (rs) {
-					if (drawFloaty.instacne && item.desc && currFunc.id) {
+					if (drawFloaty.instacne && item.desc) {
 						let thisDesc: any = item.desc;
 						if (typeof item.desc === 'string') {
 							thisDesc = this.multiDetectColors[item.desc as string].desc;
