@@ -1586,6 +1586,28 @@ const multiFindColors: IMultiFindColorsOrigin = {
 
 			],
 
+			[1280, 720, // 狐栖归处主题灯笼_截图校准(避开文字笔画,橙色本体)
+
+				[
+
+					[right, 733, 244, 0xe3936e],
+
+					[right, 727, 265, 0xe6ae8d],
+
+					[right, 748, 265, 0xe3c39a],
+
+					[right, 724, 268, 0xe1b391],
+
+					[right, 739, 268, 0xe3b38d],
+
+					[right, 727, 271, 0xddb18e],
+
+					[right, 742, 274, 0xe5ba98],
+
+				]
+
+			],
+
 		]
 
 	},
