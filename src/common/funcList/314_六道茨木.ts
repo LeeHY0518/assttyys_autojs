@@ -340,6 +340,7 @@ export class Func314 implements IFuncOrigin {
 			}
 		}
 		if (thisScript.oper({
+			id: 314,
 			name: '六道茨木_执行个别事件',
 			operator: [
 				thisOperator[1], thisOperator[2], thisOperator[3],
