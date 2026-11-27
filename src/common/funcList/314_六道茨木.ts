@@ -254,6 +254,19 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1116, 592, 1222, 689, 1000],
 		]
+	}, { // 15 获得奖励页（照搬椒图op13确认奖励，点右侧空白关闭）
+		desc: [1280, 720,
+			[
+				[center, 554, 142, 0xfede96],
+				[center, 622, 143, 0xf7e691],
+				[center, 745, 181, 0xffeeaa],
+				[center, 583, 184, 0xf6e6b4],
+				[center, 635, 192, 0xeacd7e],
+			]
+		],
+		oper: [
+			[right, 1280, 720, 913, 129, 1245, 648, 500],
+		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
@@ -270,7 +283,7 @@ export class Func314 implements IFuncOrigin {
 				thisOperator[1], thisOperator[2], thisOperator[3], thisOperator[4],
 				thisOperator[5], thisOperator[6], thisOperator[7], thisOperator[8],
 				thisOperator[9], thisOperator[10], thisOperator[11], thisOperator[12],
-				thisOperator[13], thisOperator[14]
+				thisOperator[13], thisOperator[14], thisOperator[15]
 			]
 		})) {
 			return true;
