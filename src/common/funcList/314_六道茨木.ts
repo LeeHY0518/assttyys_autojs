@@ -131,6 +131,36 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 886, 549, 1029, 598, 1000],
 		]
+	}, { // 7 鏖战之屿选择页面_选择右边
+		desc: [1280, 720,
+			[
+				[left, 117, 55, 0xeff8f7],
+				[left, 122, 47, 0xeff8f7],
+				[left, 141, 48, 0xeff8f7],
+				[left, 153, 34, 0xeff8f7],
+				[left, 253, 45, 0x593716],
+				[left, 116, 567, 0x6f7254],
+				[left, 178, 620, 0x7c7e5c],
+				[center, 440, 261, 0x373733],
+				[right, 744, 288, 0x373733],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 761, 307, 923, 438, 1000],
+		]
+	}, { // 8 选择右边后_挑战页面
+		desc: [1280, 720,
+			[
+				[left, 31, 46, 0xefebe2],
+				[left, 68, 651, 0x171314],
+				[right, 1173, 659, 0xa89d7a],
+				[right, 1169, 624, 0xecf2d6],
+				[right, 1204, 594, 0x312e21],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1123, 576, 1230, 675, 1000],
+		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
@@ -142,15 +172,10 @@ export class Func314 implements IFuncOrigin {
 			return true;
 		}
 		if (thisScript.oper({
-			name: '六道茨木_净佛刹页面识别',
-			operator: [thisOperator[1]]
-		})) {
-			return true;
-		}
-		if (thisScript.oper({
-			name: '六道茨木_开始开启确定',
+			name: '六道茨木_执行个别事件',
 			operator: [
-				thisOperator[2], thisOperator[3], thisOperator[4], thisOperator[5], thisOperator[6]
+				thisOperator[1], thisOperator[2], thisOperator[3], thisOperator[4],
+				thisOperator[5], thisOperator[6], thisOperator[7], thisOperator[8]
 			]
 		})) {
 			return true;
