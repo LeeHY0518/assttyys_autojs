@@ -267,6 +267,38 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[right, 1280, 720, 913, 129, 1245, 648, 500],
 		]
+	}, { // 16 boss结束页面
+		desc: [1280, 720,
+			[
+				[right, 1163, 636, 0xd4c0a2],
+				[right, 1188, 633, 0xd0bf9e],
+				[right, 1186, 647, 0xdecfb7],
+				[right, 1208, 655, 0xe3ddd1],
+				[right, 1213, 663, 0xe9e4d8],
+				[right, 1209, 679, 0xf5f0db],
+				[right, 1174, 681, 0x716b5e],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 461, 643, 922, 711, 1000],
+		]
+	}, { // 17 神秘之屿（两页共用指纹，识别到点左上角退出）
+		desc: [1280, 720,
+			[
+				[left, 34, 45, 0xf2efe8],
+				[left, 109, 42, 0xeff8f7],
+				[left, 107, 48, 0xeff8f7],
+				[left, 117, 39, 0xeff8f7],
+				[left, 129, 49, 0xeff8f7],
+				[left, 146, 31, 0xeff8f7],
+				[left, 142, 54, 0xeff8f7],
+				[left, 162, 37, 0xeff8f7],
+				[left, 152, 50, 0xeff8f7],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 17, 23, 74, 71, 1000],
+		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
@@ -283,7 +315,7 @@ export class Func314 implements IFuncOrigin {
 				thisOperator[1], thisOperator[2], thisOperator[3], thisOperator[4],
 				thisOperator[5], thisOperator[6], thisOperator[7], thisOperator[8],
 				thisOperator[9], thisOperator[10], thisOperator[11], thisOperator[12],
-				thisOperator[13], thisOperator[14], thisOperator[15]
+				thisOperator[13], thisOperator[14], 				thisOperator[15], 				thisOperator[16], thisOperator[17]
 			]
 		})) {
 			return true;
