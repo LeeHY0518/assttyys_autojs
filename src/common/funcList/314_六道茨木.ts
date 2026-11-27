@@ -10,7 +10,7 @@ const right = 2;
 export class Func314 implements IFuncOrigin {
 	id = 314;
 	name = '六道茨木';
-	desc: '应排在[2退出结算]前';
+	desc = '应排在[2退出结算]前';
 	config = [{
 		desc: '配置',
 		config: [{
@@ -35,11 +35,22 @@ export class Func314 implements IFuncOrigin {
 			default: '返回庭院',
 		}],
 	}];
-	// 识别点/点击框：按实际页面取点后依次添加，注释写明下标与用途，如：
-	// 0 事件_唤息亮 / 1 点固定事件位置 / 2 事件_唤息暗 ...
-	operator: IFuncOperatorOrigin[] = [];
+	// 识别点/点击框：按实际页面取点后依次添加，注释写明下标与用途
+	operator: IFuncOperatorOrigin[] = [{ // 0 探索地图进入六道之门（沿用椒图316 op31）
+		desc: '探索地图界面',
+		oper: [
+			[center, 1280, 720, 936, 649, 977, 683, 1000],
+		]
+	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
+		if (thisScript.oper({
+			id: 314,
+			name: '六道茨木_探索地图进入六道之门',
+			operator: [thisOperator[0]]
+		})) {
+			return true;
+		}
 		return false;
 	}
 }
