@@ -310,6 +310,48 @@ export class Func314 implements IFuncOrigin {
 				[right, 1193, 40, 0x7f734d],
 			]
 		]
+	}, { // 19 结算双倍弹窗_使用（照搬椒图op21，取点更新；点击框复用）
+		desc: [1280, 720,
+			[
+				[center, 489, 442, 0xdf6851],
+				[right, 688, 443, 0xf3b25e],
+				[right, 662, 379, 0xf9e520],
+				[center, 500, 355, 0x282723],
+				[right, 762, 354, 0x393833],
+				[left, 212, 132, 0x5c4d2b],
+				[left, 250, 233, 0x58573a],
+				[left, 108, 218, 0x585438],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 671, 419, 794, 467, 1000],  // 复用椒图op21点"使用"
+		]
+	}, { // 20 结算双倍弹窗_取消（照搬椒图op22，取点更新；点击框复用）
+		desc: [1280, 720,
+			[
+				[center, 489, 442, 0xdf6851],
+				[right, 688, 443, 0xf3b25e],
+				[right, 662, 379, 0xf9e520],
+				[center, 500, 355, 0x282723],
+				[right, 762, 354, 0x393833],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 491, 419, 615, 471, 1000],  // 复用椒图op22点"取消"
+		]
+	}, { // 21 万象赐福取消购买（照搬椒图op26，先直接用椒图原点）
+		desc: [1280, 720,
+			[
+				[center, 430, 111, 0x94561d],
+				[center, 809, 113, 0x91461f],
+				[center, 659, 276, 0xe29701],
+				[center, 666, 276, 0xdf8f01],
+				[center, 577, 560, 0xf3b25e],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 939, 148, 1179, 281, 1000],  // 复用椒图op26
+		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
@@ -346,7 +388,8 @@ export class Func314 implements IFuncOrigin {
 				thisOperator[1], thisOperator[2], thisOperator[3],
 				thisOperator[5], thisOperator[6], thisOperator[7], thisOperator[8],
 				thisOperator[9], thisOperator[10], thisOperator[11], thisOperator[12],
-				thisOperator[13], thisOperator[14], thisOperator[15], thisOperator[17]
+				thisOperator[13], thisOperator[14], thisOperator[15], thisOperator[17],
+				thisOperator[19], thisOperator[20], thisOperator[21]
 			]
 		})) {
 			return true;
