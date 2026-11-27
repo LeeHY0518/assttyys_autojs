@@ -161,6 +161,23 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 1123, 576, 1230, 675, 1000],
 		]
+	}, { // 9 右下角离开按钮
+		desc: [1280, 720,
+			[
+				[right, 1159, 657, 0x16120b],
+				[right, 1185, 632, 0x18130b],
+				[right, 1215, 658, 0x1d1812],
+				[right, 1182, 685, 0x31281a],
+				[right, 1167, 657, 0xe7d1ac],
+				[right, 1183, 640, 0xf7efdc],
+				[right, 1201, 658, 0xe8d4b4],
+				[right, 1182, 658, 0xead5b4],
+				[right, 1180, 676, 0xd4b686],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1144, 625, 1222, 691, 1000],
+		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
 	operatorFunc(thisScript: Script, thisOperator: IFuncOperator[]): boolean {
@@ -175,7 +192,8 @@ export class Func314 implements IFuncOrigin {
 			name: '六道茨木_执行个别事件',
 			operator: [
 				thisOperator[1], thisOperator[2], thisOperator[3], thisOperator[4],
-				thisOperator[5], thisOperator[6], thisOperator[7], thisOperator[8]
+				thisOperator[5], thisOperator[6], thisOperator[7], thisOperator[8],
+				thisOperator[9]
 			]
 		})) {
 			return true;
