@@ -1388,8 +1388,6 @@ const multiFindColors: IMultiFindColorsOrigin = {
 
 		region: [center, 1280, 720, 0, 83, 1006, 284],
 
-		similar: 93, // 灯笼有浮动+主题色差,降低相似度容忍(否则默认97%匹配不到)
-
 		desc: [
 
 			[1280, 720,
@@ -1567,47 +1565,16 @@ const multiFindColors: IMultiFindColorsOrigin = {
 			],
 
 			[1280, 720, // 狐栖归处主题灯笼
-
 				[
-
-					[right, 746, 233, 0xe87e5d],
-
-					[right, 729, 236, 0xe78d6f],
-
-					[right, 757, 241, 0xf19771],
-
-					[right, 737, 254, 0xfde8c2],
-
-					[right, 752, 274, 0xf6be96],
-
-					[right, 742, 274, 0xf6bd9b],
-
-					[right, 732, 270, 0xf6c09a],
-
+					[right, 728, 235, 0xeb8b6b],
+					[right, 742, 232, 0xed815c],
+					[right, 755, 243, 0xe87c5a],
+					[right, 747, 257, 0xfefedf],
+					[right, 745, 271, 0xf6bb8d],
+					[right, 737, 273, 0xf7c797],
+					[right, 725, 267, 0xf6b488],
+					[right, 731, 253, 0xfedfb9],
 				]
-
-			],
-
-			[1280, 720, // 狐栖归处主题灯笼_截图校准(避开文字笔画,橙色本体)
-
-				[
-
-					[right, 733, 244, 0xe3936e],
-
-					[right, 727, 265, 0xe6ae8d],
-
-					[right, 748, 265, 0xe3c39a],
-
-					[right, 724, 268, 0xe1b391],
-
-					[right, 739, 268, 0xe3b38d],
-
-					[right, 727, 271, 0xddb18e],
-
-					[right, 742, 274, 0xe5ba98],
-
-				]
-
 			],
 
 		]
