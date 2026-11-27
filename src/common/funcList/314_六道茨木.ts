@@ -41,7 +41,7 @@ export class Func314 implements IFuncOrigin {
 		oper: [
 			[center, 1280, 720, 936, 649, 977, 683, 1000],
 		]
-	}, { // 1 六道之门净佛刹页面（暂只识别，不点击）
+	}, { // 1 六道之门净佛刹页面（点击框沿用椒图op30进入月之海）
 		desc: [1280, 720,
 			[
 				[left, 32, 46, 0xefece4],
@@ -54,6 +54,82 @@ export class Func314 implements IFuncOrigin {
 				[center, 363, 701, 0x2f2a1e],
 				[center, 429, 244, 0x746441],
 			]
+		],
+		oper: [
+			[center, 1280, 720, 354, 173, 371, 256, 1000],
+		]
+	}, { // 2 开始_开启（取点已更新，点击框沿用椒图op9）
+		desc: [1280, 720,
+			[
+				[right, 1153, 595, 0xffe083],
+				[right, 1167, 592, 0xffdc75],
+				[right, 1149, 627, 0xeff0ca],
+				[right, 1168, 627, 0xfaf3c6],
+				[right, 1198, 641, 0xfff3b2],
+				[right, 1188, 655, 0xf3f4d3],
+				[right, 1162, 650, 0x73694e],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1128, 606, 1217, 664, 500],
+		]
+	}, { // 3 开始_确定（取点已更新，点击框沿用椒图op10）
+		desc: [1280, 720,
+			[
+				[right, 1145, 595, 0xffe288],
+				[right, 1180, 607, 0xfff0b0],
+				[right, 1190, 631, 0xfee693],
+				[right, 1178, 648, 0x787053],
+				[right, 1146, 657, 0x8c7950],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1145, 597, 1228, 662, 500],
+		]
+	}, { // 4 开始_开启_60体（取点已更新，点击框沿用椒图op11）
+		desc: [1280, 720,
+			[
+				[right, 1156, 591, 0xffde7e],
+				[right, 1171, 588, 0xffdc74],
+				[right, 1171, 610, 0xfff3b6],
+				[right, 1172, 628, 0xf4f2cd],
+				[right, 1165, 646, 0x6a6148],
+				[right, 1199, 620, 0xffdc77],
+				[right, 1199, 650, 0xf5f5ce],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 1142, 595, 1230, 659, 500],
+		]
+	}, { // 5 开始_选择破邪弓（取点和点击框均已更新）
+		desc: [1280, 720,
+			[
+				[left, 237, 623, 0x4b4130],
+				[left, 299, 623, 0x353027],
+				[center, 610, 621, 0x483e2e],
+				[right, 674, 622, 0x2f2a22],
+				[right, 983, 623, 0x443c2c],
+				[right, 1049, 622, 0x332e25],
+				[center, 630, 402, 0xb68dcd],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 578, 604, 703, 640, 1000],
+		]
+	}, { // 6 选择大妖威势（取点和点击框均已给出）
+		desc: [1280, 720,
+			[
+				[left, 288, 574, 0x505050],
+				[center, 361, 575, 0x404040],
+				[center, 597, 573, 0x9e9e9e],
+				[right, 678, 576, 0x444444],
+				[right, 920, 575, 0x4c4c4c],
+				[right, 992, 577, 0x404040],
+				[right, 938, 199, 0xffff31],
+			]
+		],
+		oper: [
+			[center, 1280, 720, 886, 549, 1029, 598, 1000],
 		]
 	}];
 	// 主逻辑：识别到对应 operator 后执行点击/计数，返回 true 表示本次已处理
@@ -69,6 +145,20 @@ export class Func314 implements IFuncOrigin {
 			name: '六道茨木_净佛刹页面识别',
 			operator: [thisOperator[1]]
 		})) {
+			return true;
+		}
+		if (thisScript.oper({
+			name: '六道茨木_开始开启确定',
+			operator: [
+				thisOperator[2], thisOperator[3], thisOperator[4], thisOperator[5], thisOperator[6]
+			]
+		})) {
+			return true;
+		}
+		// 选事件：动态识别事件图标，按命中点偏移出点击框（照抄椒图偏移）
+		const eventPoint = thisScript.findMultiColor('六道茨木_事件');
+		if (eventPoint) {
+			thisScript.regionClick([[eventPoint.x - 40, eventPoint.y + 20, eventPoint.x + 40, eventPoint.y + 80, 200]]);
 			return true;
 		}
 		return false;

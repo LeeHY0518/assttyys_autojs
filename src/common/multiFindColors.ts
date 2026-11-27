@@ -4057,6 +4057,166 @@ const multiFindColors: IMultiFindColorsOrigin = {
 
 	},
 
+	'六道茨木_事件': {
+
+		region: [left, 1280, 720, 79, 86, 1020, 631],
+
+		desc: [
+
+			[ // 神秘
+
+				1280, 720,
+
+				[
+
+					[center, 388, 406, 0xf1c885],
+
+					[center, 383, 408, 0xdeb976],
+
+					[center, 385, 416, 0xcda672],
+
+					[center, 380, 438, 0xfaf2fa],
+
+					[center, 379, 443, 0xf9f2f3],
+
+					[center, 386, 435, 0xf9f2f8],
+
+					[center, 396, 444, 0xf8f2f2],
+
+					[center, 381, 462, 0xf7e8f4],
+
+					[center, 380, 482, 0xf5e7f3],
+
+					[center, 389, 476, 0xfff2f2],
+
+				]
+
+			],
+
+			[ // 混沌
+
+				1280, 720,
+
+				[
+
+					[right, 917, 430, 0xdcb075],
+
+					[right, 916, 433, 0xd8ae77],
+
+					[right, 908, 449, 0xeae2de],
+
+					[right, 906, 457, 0xf9f3f3],
+
+					[right, 906, 468, 0xfef6fd],
+
+					[right, 917, 449, 0xf4e9e8],
+
+					[right, 928, 469, 0xfff1ff],
+
+					[right, 917, 480, 0xf8f2f2],
+
+					[right, 916, 493, 0xfef2f2],
+
+					[right, 923, 501, 0xfff2f2],
+
+				]
+
+			],
+
+			[ // 鏖战
+
+				1280, 720,
+
+				[
+
+					[right, 650, 384, 0xcfab68],
+
+					[right, 660, 389, 0xd5b578],
+
+					[right, 650, 409, 0xf6f0f0],
+
+					[right, 660, 419, 0xf8f2f2],
+
+					[right, 656, 426, 0xf8f2f2],
+
+					[right, 655, 430, 0xf4ecec],
+
+					[right, 648, 443, 0xf7f7f7],
+
+					[right, 650, 458, 0xfdf1f4],
+
+					[right, 658, 446, 0xf8f2f2],
+
+					[right, 666, 460, 0xefefef],
+
+				]
+
+			],
+
+			[ // 淬炼之屿
+
+				1280, 720,
+
+				[
+
+					[right, 652, 360, 0xdcc17f],
+
+					[right, 664, 360, 0xd2ac7b],
+
+					[right, 661, 380, 0xf3ebed],
+
+					[right, 657, 387, 0xf7f1f0],
+
+					[right, 667, 388, 0xf8f0ed],
+
+					[right, 661, 399, 0xf9f2f6],
+
+					[right, 650, 424, 0xf7f1f1],
+
+					[right, 661, 411, 0xfaf2f6],
+
+					[right, 662, 421, 0xf7f0f3],
+
+					[right, 662, 431, 0xf1e9e9],
+
+				]
+
+			],
+
+			[ // 宁息
+
+				1280, 720,
+
+				[
+
+					[right, 915, 411, 0xf0d592],
+
+					[right, 917, 423, 0xc9a677],
+
+					[right, 917, 440, 0xf4eef1],
+
+					[right, 917, 460, 0xf8f2f2],
+
+					[right, 911, 475, 0xf9eef1],
+
+					[right, 921, 475, 0xf9f3f3],
+
+					[right, 915, 475, 0xfcf2f5],
+
+					[right, 912, 482, 0xfff2f2],
+
+					[right, 919, 482, 0xfff2f2],
+
+					[right, 921, 492, 0xf7f4f4],
+
+				]
+
+			],
+
+		]
+
+	},
+
 	'返回图标': {
 
 		region: [left, 1280, 720, 0, 0, 253, 145],
