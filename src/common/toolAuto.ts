@@ -107,7 +107,14 @@ function _toast(str: string, duration: number) {
  * @param {string}str
  */
 export function myToast(str: string, duration: number = 1000): void {
-	ui.run(() => _toast(str, duration));
+	// 安卓10兼容：ui.run 投递到 UI 线程后回调不执行，导致画面 toast 全部不显示（日志仍写）。
+	// 原生 Toast.show() 内部自行切主线程，无需 ui.run，直接同步调用即可跨版本显示。
+	try {
+		_toast(str, duration);
+	} catch (e) {
+		// 极端环境下降级到 UI 线程再试一次
+		ui.run(() => _toast(str, duration));
+	}
 	console.log(str);
 }
 
